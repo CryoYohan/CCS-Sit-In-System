@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
+    <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+    <title>CCS Sit-in System</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-5xl font-bold text-center">
+            CCS Sit-in System
+          </h1>
+        <p>CCS Sit-in System is a system that allows students to sit in a class even if it is already full. This system is only available for CCS students.</p>
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>
