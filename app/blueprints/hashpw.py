@@ -1,5 +1,5 @@
 import bcrypt
-class PasswordHashing:
+class PasswordHashing():
     
     def hashpassword(self,plain_password):
         plain_password_bytes = plain_password.encode('utf-8') # Convert plain text to bytes

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <h1 class="text-3xl font-bold text-center mb-8 dark:text-white">This is the dashboard. Hi {{ student.fullname }}</h1>
+
+<!-- User Info Card -->
+<div class="mx-auto max-w-sm bg-white rounded-xl shadow-lg p-6 space-y-4 dark:bg-slate-800 dark:shadow-none dark:outline dark:outline-1 dark:outline-white/10">
+  <div class="text-center">
+    <h2 class="text-2xl font-semibold text-black dark:text-white">User Information</h2>
+    <p class="text-gray-500 dark:text-gray-400">Details for {{ student.fullname }}</p>
+  </div>
+
+  <div class="space-y-2">
+    <!-- ID Number -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 dark:text-gray-300">ID Number:</span>
+      <span class="font-medium text-black dark:text-white">{{ student.idno }}</span>
+    </div>
+
+    <!-- Full Name -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 dark:text-gray-300">Full Name:</span>
+      <span class="font-medium text-black dark:text-white">{{ student.fullname }}</span>
+    </div>
+
+    <!-- Course -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 dark:text-gray-300">Course:</span>
+      <span class="font-medium text-black dark:text-white">{{ student.course }}</span>
+    </div>
+
+    <!-- Year -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 dark:text-gray-300">Year:</span>
+      <span class="font-medium text-black dark:text-white">{{ student.year }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Existing ChitChat Card -->
+<div class="mx-auto mt-8 max-w-sm flex items-center gap-x-4 rounded-xl bg-white p-6 shadow-lg outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:outline dark:outline-1 dark:outline-white/10">
+  <img class="size-12 shrink-0" src="/img/logo.svg" alt="ChitChat Logo" />
+  <div>
+    <div class="text-xl font-medium text-black dark:text-white">ChitChat</div>
+    <p class="text-gray-500 dark:text-gray-400">You have a new message!</p>
+  </div>
+</div>
+</body>
+</html>
