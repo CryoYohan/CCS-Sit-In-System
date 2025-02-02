@@ -21,7 +21,7 @@ class Student():
             "year": self.year
         }
     def __str__(self):
-        return f"Student ID: {self.idno}\nName: {self.get_fullname()}\nCourse: {self.course}\nYear: {self.year}"
+        return f"Student ID: {self.idno}\nName: {self.fullname}\nCourse: {self.course}\nYear: {self.year}"
     
 # Define a Blueprint for student-related routes
 student_bp = Blueprint('student', __name__)

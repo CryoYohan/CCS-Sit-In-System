@@ -38,5 +38,6 @@ def dashboard():
         course = student_data['course'],
         year = student_data['year'],
     )
+    print(student)
     return render_template('dashboard.html', student=student)
 
