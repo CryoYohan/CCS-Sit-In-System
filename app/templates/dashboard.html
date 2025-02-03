@@ -3,11 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
   <title>Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-  <h1 class="text-3xl font-bold text-center mb-8 dark:text-white">This is the dashboard. Hi {{ student.fullname }}</h1>
+<!-- Top Navigation Bar -->
+<nav class="flex justify-between items-center p-6 bg-white shadow-sm">
+  <!-- Title -->
+  <div class="text-5xl font-bold text-gray-800">CCSit.</div>
+  <!-- Navigation Links -->
+  <div class="flex space-x-6 text-xl text-gray-700">
+      <a href="#" class="hover:text-gray-900">Home</a>
+      <a href="#" class="hover:text-gray-900">About</a>
+      <a href="#" class="hover:text-gray-900">Contact</a>
+      <a href="{{ url_for('main.logout') }}" class="hover:text-gray-900">Logout</a>
+  </div>
+</nav>
 
 <!-- User Info Card -->
 <div class="mx-auto max-w-sm bg-white rounded-xl shadow-lg p-6 space-y-4 dark:bg-slate-800 dark:shadow-none dark:outline dark:outline-1 dark:outline-white/10">
