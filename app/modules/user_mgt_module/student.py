@@ -1,4 +1,7 @@
-from flask import Flask, Blueprint, jsonify
+from flask import Flask, Blueprint
+from ..database.dbhelper import Databasehelper
+
+db = Databasehelper()
 
 class Student():
     def __init__(self,idno:str,fullname:str,course:str, year:int):
@@ -10,7 +13,7 @@ class Student():
     def get_idno(self):                 return self.idno
     def get_fullname(self):             return self.fullname
     def get_course(self):               return self.course
-    def get_year(self):                 return self.year
+    def get_year(self):                 return self.year        
     
     def to_dict(self):
         """Convert the Student object to a dictionary for JSON response."""
