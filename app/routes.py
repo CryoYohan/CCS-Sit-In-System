@@ -1,15 +1,12 @@
 from flask import render_template, request, redirect, url_for, Blueprint, session, current_app
 from .blueprints.student import Student
 
-
 main = Blueprint('main', __name__)
-
-
 
 @main.route('/')
 def index():
-    secret_key = current_app.config['SECRET_KEY']  # Access secret key
-    print("Secret Key:", secret_key)  # Just for testing, remove in production
+    # secret_key = current_app.config['SECRET_KEY']  # Access secret key
+    # print("Secret Key:", secret_key)  # Just for testing, remove in production
     return render_template('index.html')
 
 @main.route('/registerstudent',methods=['POST'])
