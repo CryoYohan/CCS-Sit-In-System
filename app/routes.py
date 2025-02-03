@@ -25,6 +25,9 @@ def registerstudent():
 
     return redirect(url_for('main.dashboard'))
 
+@main.route('/admin')
+def admin():
+    return render_template('admin.html')
 
 @main.route('/dashboard')
 def dashboard():
