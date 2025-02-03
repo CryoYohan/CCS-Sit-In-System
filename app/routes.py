@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, Blueprint, session, abort
-from .blueprints.student import Student
+from .modules.student import Student
 from .database.dbhelper import Databasehelper
-from .blueprints.hashpw import PasswordHashing
+from .modules.hashpw import PasswordHashing
 
 main = Blueprint('main', __name__)
 hashpasword = PasswordHashing()
@@ -55,7 +55,8 @@ def loginstudent():
     student_exists = db.find_record('student',idno)
     if student_exists:
         for data in student_exists:
-            if data['password'] == password:
+            password_correct = hashpasword.check_password(password, data['password'])
+            if password_correct:
                 session['student'] = {
                     'idno': data['idno'],
                     'fullname': data['fullname'],
