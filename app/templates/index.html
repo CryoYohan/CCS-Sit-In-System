@@ -1,98 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login & Register Form</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCSit</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <!-- Tabs for Login and Register -->
-    <div class="flex justify-center mb-6">
-      <button id="login-tab" class="px-6 py-2 text-lg font-semibold text-gray-700 border-b-2 border-blue-500 focus:outline-none">
-        Login
-      </button>
-      <button id="register-tab" class="px-6 py-2 text-lg font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-700 focus:outline-none">
-        Register
-      </button>
-    </div>
+<body class="bg-gray-100 font-sans">
 
-    <!-- Login Form -->
-    <form id="login-form" class="space-y-4">
-      <div>
-        <label for="login-email" class="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" id="login-email" placeholder="Enter your email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-      </div>
-      <div>
-        <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
-        <input type="password" id="login-password" placeholder="Enter your password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-      </div>
-      <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-        Login
-      </button>
-    </form>
+    <!-- Top Navigation Bar -->
+    <nav class="flex justify-between items-center p-6 bg-white shadow-sm">
+        <!-- Title -->
+        <div class="text-5xl font-bold text-gray-800">CCSit.</div>
+        <!-- Navigation Links -->
+        <div class="flex space-x-6 text-xl text-gray-700">
+            <a href="#" class="hover:text-gray-900">Home</a>
+            <a href="#" class="hover:text-gray-900">About</a>
+            <a href="#" class="hover:text-gray-900">Contact</a>
+            <a href="#" class="hover:text-gray-900">Login</a>
+            <a href="{{ url_for('main.login') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Sign Up</a>
+        </div>
+    </nav>
 
-    <!-- Register Form -->
-    <form id="register-form" action="/registerstudent" method="post" class="space-y-4 hidden">
-      <div>
-        <label for="register-name" class="block text-sm font-medium text-gray-700">IDNO</label>
-        <input type="text" id="register-name" name="idno" placeholder="Enter your ID Number" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-      </div>
-      <div>
-        <label for="register-email" class="block text-sm font-medium text-gray-700">Fullname</label>
-        <input type="text" id="register-email" name="fullname"placeholder="Enter your fullname" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-      </div>
-      <div>
-        <label for="register-email" class="block text-sm font-medium text-gray-700">Course</label>
-        <input type="text" id="register-email" name="course"placeholder="Enter your course" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-      </div>
-      <div>
-        <label for="register-email" class="block text-sm font-medium text-gray-700">Year</label>
-        <input type="number" id="register-email" name="year"placeholder="Enter your year level" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-      </div>
-      <div>
-        <label for="register-password" class="block text-sm font-medium text-gray-700">Password</label>
-        <input type="password" name="password" id="register-password" placeholder="Enter your password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-      </div>
-      <div>
-        <label for="register-confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-        <input type="password" name="confirm-password" id="register-confirm-password" placeholder="Confirm your password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-      </div>
-      <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-        Register
-      </button>
-    </form>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script>
-        AOS.init({ duration: 1000, once: true });
-    </script>
-  <script>
-    // Toggle between Login and Register forms
-    const loginTab = document.getElementById('login-tab');
-    const registerTab = document.getElementById('register-tab');
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
+    <!-- Header Section -->
+    <header class="flex items-center justify-center h-screen bg-gradient-to-r from-blue-500 to-purple-600 animate-fade-in">
+        <div class="text-center">
+            <h1 class="text-5xl font-bold text-white mb-4">Simplify Your Workflow with CCSit</h1>
+            <p class="text-xl text-gray-200 mb-8">The ultimate tool for managing your projects efficiently and effectively.</p>
+            <a href="#" class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300">Get Started</a>
+        </div>
+    </header>
 
-    loginTab.addEventListener('click', () => {
-      loginForm.classList.remove('hidden');
-      registerForm.classList.add('hidden');
-      loginTab.classList.add('border-blue-500', 'text-gray-700');
-      loginTab.classList.remove('border-transparent', 'text-gray-500');
-      registerTab.classList.add('border-transparent', 'text-gray-500');
-      registerTab.classList.remove('border-blue-500', 'text-gray-700');
-    });
+    <!-- Additional Content Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Why Choose CCSit?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Ease of Use</h3>
+                    <p class="text-gray-600">Intuitive interface designed for seamless navigation and productivity.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Collaboration</h3>
+                    <p class="text-gray-600">Work together with your team in real-time, no matter where you are.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md animate-fade-in">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Security</h3>
+                    <p class="text-gray-600">Your data is safe with our top-notch security measures.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    registerTab.addEventListener('click', () => {
-      registerForm.classList.remove('hidden');
-      loginForm.classList.add('hidden');
-      registerTab.classList.add('border-blue-500', 'text-gray-700');
-      registerTab.classList.remove('border-transparent', 'text-gray-500');
-      loginTab.classList.add('border-transparent', 'text-gray-500');
-      loginTab.classList.remove('border-blue-500', 'text-gray-700');
-    });
-  </script>
+    <!-- Footer -->
+    <footer class="text-center py-6 bg-white border-t border-gray-200">
+        <p class="text-gray-600">&copy; 2023 CCSit. All rights reserved.</p>
+    </footer>
+
 </body>
 </html>
