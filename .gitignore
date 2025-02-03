@@ -1,4 +1,3 @@
 app/static/css/output.css
 node_modules/
 .env
-sqlite3.exe
