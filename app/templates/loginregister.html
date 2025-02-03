@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Register Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <!-- Tabs for Login and Register -->
+    <div class="flex justify-center mb-6">
+      <button id="login-tab" class="px-6 py-2 text-lg font-semibold text-gray-700 border-b-2 border-blue-500 focus:outline-none">
+        Login
+      </button>
+      <button id="register-tab" class="px-6 py-2 text-lg font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-700 focus:outline-none">
+        Register
+      </button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" class="space-y-4">
+      <div>
+        <label for="login-email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="email" id="login-email" placeholder="Enter your email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" id="login-password" placeholder="Enter your password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+        Login
+      </button>
+    </form>
+
+    <!-- Register Form -->
+    <form id="register-form" action="/registerstudent" method="post" class="space-y-4 hidden">
+      <div>
+        <label for="register-name" class="block text-sm font-medium text-gray-700">IDNO</label>
+        <input type="text" id="register-name" name="idno" placeholder="Enter your ID Number" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="register-email" class="block text-sm font-medium text-gray-700">Fullname</label>
+        <input type="text" id="register-email" name="fullname"placeholder="Enter your fullname" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="register-email" class="block text-sm font-medium text-gray-700">Course</label>
+        <input type="text" id="register-email" name="course"placeholder="Enter your course" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="register-email" class="block text-sm font-medium text-gray-700">Year</label>
+        <input type="number" id="register-email" name="year"placeholder="Enter your year level" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="register-email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="email" id="register-email" name="email"placeholder="Enter your year level" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="register-password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" name="password" id="register-password" placeholder="Enter your password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+        Register
+      </button>
+    </form>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000, once: true });
+    </script>
+  <script>
+    // Toggle between Login and Register forms
+    const loginTab = document.getElementById('login-tab');
+    const registerTab = document.getElementById('register-tab');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+
+    loginTab.addEventListener('click', () => {
+      loginForm.classList.remove('hidden');
+      registerForm.classList.add('hidden');
+      loginTab.classList.add('border-blue-500', 'text-gray-700');
+      loginTab.classList.remove('border-transparent', 'text-gray-500');
+      registerTab.classList.add('border-transparent', 'text-gray-500');
+      registerTab.classList.remove('border-blue-500', 'text-gray-700');
+    });
+
+    registerTab.addEventListener('click', () => {
+      registerForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+      registerTab.classList.add('border-blue-500', 'text-gray-700');
+      registerTab.classList.remove('border-transparent', 'text-gray-500');
+      loginTab.classList.add('border-transparent', 'text-gray-500');
+      loginTab.classList.remove('border-blue-500', 'text-gray-700');
+    });
+  </script>
+</body>
+</html>
