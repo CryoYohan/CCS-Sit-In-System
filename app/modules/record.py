@@ -1,4 +1,4 @@
-from student import Student
+from .user_mgt_module.student import Student
 class Record():
     def __init__(self, student:Student, timein:str,timeout:str,duration:float,remaining_session:float, reason:str):
         self.student = student

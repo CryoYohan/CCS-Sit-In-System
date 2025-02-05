@@ -33,7 +33,7 @@ class User():
         if not update_data:
             return "No changes made."
 
-        return self.db.update_record(self.table, "idno", **update_data)
+        return self.db.update_record(self.table, self.idno, **update_data)
 
     def delete(self):
         pass

@@ -2,7 +2,7 @@ from sqlite3 import connect, Row
 
 class Databasehelper:
     def __init__(self)->None:
-        self.database = 'student.db'
+        self.database = 'user.db'
 
     def getdb_connection(self):
         connection = connect(self.database)
