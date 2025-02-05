@@ -1,8 +1,12 @@
 from .user import User
 
 class Admin(User):
-    def __init__(self):
-        super().__init__()
+    def __init__(self,idno, firstname, middlename,lastname, email, role="Admin"):
+        super().__init__(idno, firstname, middlename, lastname, email)
+        self.role = role
 
-    def add_user(self):
-        self.db.add_record('admin',idno=idno,fullname=fullname,course=course,year=year,email=email,password=hashed_password)
+    def add(self):
+        pass
+
+    def delete(self):
+        pass

@@ -1,5 +1,5 @@
 from ..database.dbhelper import Databasehelper
-from ..modules.hashpw import PasswordHashing
+from .security.hashpw import PasswordHashing
 from flask import session
 
 

@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, Blueprint, session, abort
-from .modules.student import Student
+from .modules.user_mgt_module.student import Student
 from .modules.login_register_module import Authorization
 
 # Register as a Blueprint for create_app() function to recognize as Flask app
@@ -68,7 +68,7 @@ def registerstudent():
     year:int = request.form['year']
     email:str = request.form['email']
     password:str = request.form['password']
-    
+
     # Use Login Register Module for student registration
     if auth.student_is_registered(idno=idno,
                                   fullname=fullname,
