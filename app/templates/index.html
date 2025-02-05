@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCSit</title>
+    <title>CCSit - Sit-in System</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -21,18 +21,15 @@
     <!-- Top Navigation Bar -->
     <nav class="flex justify-between items-center p-6 bg-white shadow-sm">
         <!-- Title -->
-        <div class="text-5xl font-bold text-gray-800">
-            <a href="{{ url_for('main.index') }}">CCSit</a>
+        <div class="text-4xl font-bold text-gray-800">
+            <a href="{{ url_for('main.index') }}">CCSit<span class="text-purple-600 ">.</span></a>
           </div>
-        <!-- Navigation Links -->
-        <div class="flex space-x-6 text-xl text-gray-700">
-            <a href="#" class="hover:text-gray-900">Home</a>
-            <a href="#" class="hover:text-gray-900">About</a>
-            <a href="#" class="hover:text-gray-900">Contact</a>
-            <a href="{{ url_for('main.login') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Get Started</a>
+          <div class="hidden lg:flex lg:flex-1 lg:justify-end">
+            <a href="{{ url_for('main.login') }}" class="text-2xl font-semibold text-gray-900">Log in <span aria-hidden="true">&rarr;</span></a>
+          </div>
         </div>
     </nav>
-    {% import 'components.html' as component %}
+    
     <!-- Header Section -->
     {% if not user_in_login_page %}
     <header id="header-bg" class="flex items-center justify-center h-screen bg-gradient-to-r from-blue-500 to-purple-600 animate-fade-in">
@@ -43,7 +40,7 @@
         </div>
     </header>
     {% endif %}
-
+    {% import 'components.html' as component %}
     {{ component.flash_message() }}
 
     {% block content %}
