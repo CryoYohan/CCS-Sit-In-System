@@ -8,11 +8,11 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in {
-            animation: fadeIn 1.5s ease-in-out;
+            animation: fadeIn 0.5s ease-out;
         }
     </style>
 </head>
@@ -21,25 +21,33 @@
     <!-- Top Navigation Bar -->
     <nav class="flex justify-between items-center p-6 bg-white shadow-sm">
         <!-- Title -->
-        <div class="text-4xl font-bold text-gray-800">CCSit.</div>
+        <div class="text-5xl font-bold text-gray-800">
+            <a href="{{ url_for('main.index') }}">CCSit</a>
+          </div>
         <!-- Navigation Links -->
         <div class="flex space-x-6 text-xl text-gray-700">
             <a href="#" class="hover:text-gray-900">Home</a>
             <a href="#" class="hover:text-gray-900">About</a>
             <a href="#" class="hover:text-gray-900">Contact</a>
-            <a href="#" class="hover:text-gray-900">Login</a>
-            <a href="{{ url_for('main.login') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Sign Up</a>
+            <a href="{{ url_for('main.login') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Get Started</a>
         </div>
     </nav>
-
+    {% import 'components.html' as component %}
     <!-- Header Section -->
-    <header class="flex items-center justify-center h-screen bg-gradient-to-r from-blue-500 to-purple-600 animate-fade-in">
+    {% if not user_in_login_page %}
+    <header id="header-bg" class="flex items-center justify-center h-screen bg-gradient-to-r from-blue-500 to-purple-600 animate-fade-in">
         <div class="text-center">
             <h1 class="text-5xl font-bold text-white mb-4">Simplify Your Workflow with CCSit</h1>
             <p class="text-xl text-gray-200 mb-8">The ultimate tool for managing your projects efficiently and effectively.</p>
             <a href="#" class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300">Get Started</a>
         </div>
     </header>
+    {% endif %}
+
+    {{ component.flash_message() }}
+
+    {% block content %}
+    {% endblock %}
 
     <!-- Additional Content Section -->
     <section class="py-16 bg-gray-50">
@@ -64,7 +72,7 @@
 
     <!-- Footer -->
     <footer class="text-center py-6 bg-white border-t border-gray-200">
-        <p class="text-gray-600">&copy; 2023 CCSit. All rights reserved.</p>
+        <p class="text-gray-600">&copy; 2025 CCSit. All rights reserved.</p>
     </footer>
 
 </body>

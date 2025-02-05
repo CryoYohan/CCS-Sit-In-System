@@ -1,0 +1,23 @@
+{% macro flash_message() -%}
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <div class="fixed top-4 right-4 space-y-4 z-50">
+        {% for category, message in messages %}
+            <div class="animate-fade-in transform transition-all duration-300 ease-in-out flex items-center justify-between p-4 rounded-lg shadow-lg text-white
+                {% if category == 'success' %} bg-green-500
+                {% elif category == 'error' %} bg-red-500
+                {% else %} bg-blue-500
+                {% endif %}">
+                <span>{{ message }}</span>
+                <button onclick="this.parentElement.remove()" class="ml-4 p-1 rounded-full hover:bg-opacity-25 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+{%- endmacro %}

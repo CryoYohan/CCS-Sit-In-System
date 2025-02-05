@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, Blueprint, session, abort
+from flask import render_template, request, redirect, url_for, Blueprint, session, abort,jsonify, flash
 from .modules.user_mgt_module.student import Student
 from .modules.login_register_module import Authorization
 
@@ -12,29 +12,38 @@ auth = Authorization()
 @main.route('/')
 def index():
     """Landing page."""
-    return render_template('index.html')
+    return render_template('index.html', user_in_login_page=False)
 
 @main.route('/login')
 def login():
     """Login page."""
-    return render_template('login.html')
+    return render_template('login.html',user_in_login_page=True)
 
 
 @main.route('/dashboard')
 def dashboard():
     """Dashboard page."""
-    if not session['student'] == None:
-        student_data = session.get('student')
-        student = Student(
-                            idno= student_data['idno'],
-                            fullname = student_data['fullname'],
-                            course = student_data['course'],
-                            year = student_data['year'],
-             )
-        print(student)
-        return render_template('dashboard.html', student=student)
-    else:
-        abort(403)
+    try:
+        if not session['student'] == None:
+            student_data = session.get('student')
+            student = Student(
+                                idno= student_data['idno'],
+                                firstname = student_data['firstname'],
+                                middlename = student_data['middlename'],
+                                lastname =student_data['lastname'],
+                                course = student_data['course'],
+                                year = student_data['year'],
+                                email = student_data['email'],
+                )
+            print(student)
+            return render_template('dashboard.html', student=student, )
+        else:
+            return redirect(url_for('main.login'))
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
 
 @main.after_request
 def after_request(response):
@@ -45,38 +54,56 @@ def after_request(response):
 def logout():
     """Logout page."""
     session['student'] = None
+    message = "You have been logged out."
+    flash(message, 'success')
     return redirect(url_for('main.index'))
 
 @main.route('/loginstudent', methods=['POST'])
 def loginstudent():
     """Login a student."""
-    idno:str = request.form['idno']
-    password:str = request.form['password']
+    idno: str = request.form['idno']
+    password: str = request.form['password']
 
     # Use Login Register Module for authorization
-    if auth.student_account_exist_and_correct_credentials(idno=idno,password=password):
-        return redirect(url_for('main.dashboard'))     
+    if auth.user_account_exist_and_correct_credentials(idno=idno, password=password):
+        # If login is successful, send a message to show SweetAlert before redirecting
+        flash("Login successful.", 'success')
+        return redirect(url_for('main.dashboard'))
     else:
-        return redirect(url_for('main.login'))
+        # If login fails, pass error message to be used with SweetAlert
+        login_error = "Invalid credentials. Please try again."
+        message = "Invalid credentials. Please try again."
+        flash(message, 'error')
+        return render_template('login.html', user_in_login_page=True)
 
-@main.route('/registerstudent',methods=['POST'])
+
+
+@main.route('/registerstudent', methods=['POST'])
 def registerstudent():
     """Register a student"""
     idno:str = request.form['idno']
-    fullname:str = request.form['fullname']
+    firstname:str = request.form['firstname']
+    middlename:str = request.form['middlename']
+    lastname:str = request.form['lastname']
     course:str = request.form['course']
     year:int = request.form['year']
     email:str = request.form['email']
     password:str = request.form['password']
 
     # Use Login Register Module for student registration
-    if auth.student_is_registered(idno=idno,
-                                  fullname=fullname,
-                                  course=course,
-                                  year=year,
-                                  email=email,
-                                  password=password
-                                  ):
-        return redirect(url_for('main.dashboard'))
+    registration_success = auth.user_is_registered(idno=idno,
+                                                   firstname=firstname,
+                                                   middlename=middlename,
+                                                   lastname=lastname,
+                                                   course=course,
+                                                   year=year,
+                                                   email=email,
+                                                   password=password)
+    if registration_success:
+        # If registration is successful, show a success alert and redirect to login page
+        message = "Registration successful. Please login."
+        flash(message, 'success')
+        return redirect(url_for('main.login'))
     else:
+        # If registration failed, show an error alert
         return redirect(url_for('main.login'))
