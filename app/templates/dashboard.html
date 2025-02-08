@@ -1,91 +1,254 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
-  <title>Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-<!-- Top Navigation Bar -->
-<nav class="flex justify-between items-center p-6 bg-white shadow-sm">
-  <!-- Title -->
-  <div class="text-5xl font-bold text-gray-800">
-    <a href="{{ url_for('main.index') }}">CCSit</a>
-  </div>
-  <!-- Navigation Links -->
-  <div class="flex space-x-6 text-xl text-gray-700">
-      <a href="#" class="hover:text-gray-900">Home</a>
-      <a href="#" class="hover:text-gray-900">About</a>
-      <a href="#" class="hover:text-gray-900">Contact</a>
-      <a href="{{ url_for('main.logout') }}" class="hover:text-gray-900">Logout</a>
-  </div>
-</nav>
-<!-- Flash Messages -->
+{% extends 'dashboard_template.html' %}
+{% block content %}
 {% import 'components.html' as component %}
-{{ component.flash_message() }}
-<!-- User Info Card -->
-<div class="mx-auto max-w-sm bg-white rounded-xl shadow-lg p-6 space-y-4 dark:bg-slate-800 dark:shadow-none dark:outline dark:outline-1 dark:outline-white/10">
-  <div class="text-center">
-    <h2 class="text-2xl font-semibold text-black dark:text-white">User Information</h2>
-    <p class="text-gray-500 dark:text-gray-400">Details for {{ student.fullname }}</p>
-  </div>
-  <!-- Role -->
-  <div class="flex items-center justify-between">
-    <span class="text-gray-600 dark:text-gray-300">Role:</span>
-    <span class="font-medium text-black dark:text-white">{{ student.role }}</span>
-  </div>
-  <div class="space-y-2">
-    <!-- ID Number -->
-    <div class="flex items-center justify-between">
-      <span class="text-gray-600 dark:text-gray-300">ID Number:</span>
-      <span class="font-medium text-black dark:text-white">{{ student.idno }}</span>
-    </div>
+<main class="">
+    <div class="grid mb-4 pb-10 px-8 mx-4 rounded-3xl bg-gray-100 border-4 border-gray-400">
+        <div class="grid grid-cols-12 gap-6">
+            <div class="grid grid-cols-12 col-span-12 gap-6 xxl:col-span-9">
+                <div class="col-span-12 mt-8">
+                    <div class="flex items-center h-3 intro-y">
+                        <h2 class="mr-5 text-lg font-medium truncate">Welcome {{ student }}</h2>
+                    </div>
+                    <div class="grid grid-cols-12 gap-6 mt-5">
+                        <a class="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white"
+                            href="#">
+                            <div class="p-5">
+                                <div class="flex justify-between">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-400"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    </svg>
+                                    <div
+                                        class="bg-green-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
+                                        <span class="flex items-center">30%</span>
+                                    </div>
+                                </div>
+                                <div class="ml-2 w-full flex-1">
+                                    <div>
+                                        <div class="mt-3 text-3xl font-bold leading-8">27</div>
 
-    <!-- Full Name -->
-    <div class="flex items-center justify-between">
-      <span class="text-gray-600 dark:text-gray-300">Full Name:</span>
-      <span class="font-medium text-black dark:text-white">{{ student }}</span>
-    </div>
+                                        <div class="mt-1 text-base text-gray-600">Sessions Left</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <a class="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white"
+                            href="#">
+                            <div class="p-5">
+                                <div class="flex justify-between">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-yellow-400"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <div
+                                        class="bg-red-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
+                                        <span class="flex items-center">30%</span>
+                                    </div>
+                                </div>
+                                <div class="ml-2 w-full flex-1">
+                                    <div>
+                                        <div class="mt-3 text-3xl font-bold leading-8">7</div>
 
-    <!-- Course -->
-    <div class="flex items-center justify-between">
-      <span class="text-gray-600 dark:text-gray-300">Course:</span>
-      <span class="font-medium text-black dark:text-white">{{ student.course }}</span>
-    </div>
+                                        <div class="mt-1 text-base text-gray-600">Labs Open</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <a class="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white"
+                            href="#">
+                            <div class="p-5">
+                                <div class="flex justify-between">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-pink-600"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                                    </svg>
+                                    <div
+                                        class="bg-yellow-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
+                                        <span class="flex items-center">30%</span>
+                                    </div>
+                                </div>
+                                <div class="ml-2 w-full flex-1">
+                                    <div>
+                                        <div class="mt-3 text-3xl font-bold leading-8">49</div>
 
-    <!-- Year -->
-    <div class="flex items-center justify-between">
-      <span class="text-gray-600 dark:text-gray-300">Year:</span>
-      <span class="font-medium text-black dark:text-white">{{ student.year }}</span>
+                                        <div class="mt-1 text-base text-gray-600">Total Hours</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <a class="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white"
+                            href="#">
+                            <div class="p-5">
+                                <div class="flex justify-between">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-green-400"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                                    </svg>
+                                    <div
+                                        class="bg-blue-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
+                                        <span class="flex items-center">30%</span>
+                                    </div>
+                                </div>
+                                <div class="ml-2 w-full flex-1">
+                                    <div>
+                                        <div class="mt-3 text-3xl font-bold leading-8">Lab 530</div>
+
+                                        <div class="mt-1 text-base text-gray-600">Top Lab</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-span-12 mt-5">
+                    <div class="grid gap-2 grid-cols-1 lg:grid-cols-2">
+                        <div class="bg-white shadow-lg p-4" id="chartline"></div>
+                        <div class="bg-white shadow-lg" id="chartpie"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- Email -->
-    <div class="flex items-center justify-between">
-      <span class="text-gray-600 dark:text-gray-300">Year:</span>
-      <span class="font-medium text-black dark:text-white">{{ student.email }}</span>
-    </div>
-  </div>
+</main>
 </div>
-
-<!-- Existing ChitChat Card -->
-<div class="mx-auto mt-8 max-w-sm flex items-center gap-x-4 rounded-xl bg-white p-6 shadow-lg outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:outline dark:outline-1 dark:outline-white/10">
-  <img class="size-12 shrink-0" src="/img/logo.svg" alt="ChitChat Logo" />
-  <div>
-    <div class="text-xl font-medium text-black dark:text-white">ChitChat</div>
-    <p class="text-gray-500 dark:text-gray-400">You have a new message!</p>
-  </div>
 </div>
-{% if login_success %}
-  <script>
-      // Display SweetAlert on registration success
-      Swal.fire({
-          icon: 'success',
-          title: 'Login Successful',
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'Login'
-      });
-  </script>
-{% endif %}
-</body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+function data() {
+
+return {
+   
+    isSideMenuOpen: false,
+    toggleSideMenu() {
+        this.isSideMenuOpen = !this.isSideMenuOpen
+    },
+    closeSideMenu() {
+        this.isSideMenuOpen = false
+    },
+    isNotificationsMenuOpen: false,
+    toggleNotificationsMenu() {
+        this.isNotificationsMenuOpen = !this.isNotificationsMenuOpen
+    },
+    closeNotificationsMenu() {
+        this.isNotificationsMenuOpen = false
+    },
+    isProfileMenuOpen: false,
+    toggleProfileMenu() {
+        this.isProfileMenuOpen = !this.isProfileMenuOpen
+    },
+    closeProfileMenu() {
+        this.isProfileMenuOpen = false
+    },
+    isPagesMenuOpen: false,
+    togglePagesMenu() {
+        this.isPagesMenuOpen = !this.isPagesMenuOpen
+    },
+   
+}
+}
+</script>
+<script>
+var chart = document.querySelector('#chartline')
+var options = {
+series: [{
+    name: 'TEAM A',
+    type: 'area',
+    data: [44, 55, 31, 47, 31, 43, 26, 41, 31, 47, 33]
+}, {
+    name: 'TEAM B',
+    type: 'line',
+    data: [55, 69, 45, 61, 43, 54, 37, 52, 44, 61, 43]
+}],
+chart: {
+    height: 350,
+    type: 'line',
+    zoom: {
+        enabled: false
+    }
+},
+stroke: {
+    curve: 'smooth'
+},
+fill: {
+    type: 'solid',
+    opacity: [0.35, 1],
+},
+labels: ['Dec 01', 'Dec 02', 'Dec 03', 'Dec 04', 'Dec 05', 'Dec 06', 'Dec 07', 'Dec 08', 'Dec 09 ',
+    'Dec 10', 'Dec 11'
+],
+markers: {
+    size: 0
+},
+yaxis: [{
+        title: {
+            text: 'Series A',
+        },
+    },
+    {
+        opposite: true,
+        title: {
+            text: 'Series B',
+        },
+    },
+],
+tooltip: {
+    shared: true,
+    intersect: false,
+    y: {
+        formatter: function(y) {
+            if (typeof y !== "undefined") {
+                return y.toFixed(0) + " points";
+            }
+            return y;
+        }
+    }
+}
+};
+var chart = new ApexCharts(chart, options);
+chart.render();
+</script>
+<script>
+var chart = document.querySelector('#chartpie')
+var options = {
+series: [44, 55, 67, 83],
+chart: {
+    height: 350,
+    type: 'radialBar',
+},
+plotOptions: {
+    radialBar: {
+        dataLabels: {
+            name: {
+                fontSize: '22px',
+            },
+            value: {
+                fontSize: '16px',
+            },
+            total: {
+                show: true,
+                label: 'Total',
+                formatter: function(w) {
+                    // By default this function returns the average of all series. The below is just an example to show the use of custom formatter function
+                    return 249
+                }
+            }
+        }
+    }
+},
+labels: ['Apples', 'Oranges', 'Bananas', 'Berries'],
+};
+var chart = new ApexCharts(chart, options);
+chart.render();
+</script>
+{% endblock %}

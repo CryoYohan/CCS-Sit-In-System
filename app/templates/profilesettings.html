@@ -1,0 +1,100 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="w-full flex justify-center items-center p-5 bg-gradient-to-r from-blue-50 to-blue-100 min-h-screen">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-center text-blue-700 mb-6">Edit Profile</h2>
+
+        <form action="/editprofile" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- First Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">First Name</label>
+                <input type="text" name="editfirstname" placeholder="{{ student.firstname }}" 
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+            </div>
+
+            <!-- Middle Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Middle Name</label>
+                <input type="text" name="editmiddlename" placeholder="{{ student.middlename }}" 
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+            </div>
+
+            <!-- Last Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Last Name</label>
+                <input type="text" name="editlastname" placeholder="{{ student.lastname }}" 
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+            </div>
+
+            <!-- Course (ComboBox) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Course</label>
+                <select name="editcourse" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                    <option {% if student.course == 'BSIT' %}selected{% endif %}>BSIT</option>
+                    <option {% if student.course == 'BSCS' %}selected{% endif %}>BSCS</option>
+                    <option {% if student.course == 'ACT' %}selected{% endif %}>ACT</option>
+                </select>
+            </div>
+
+            <!-- Year Level (ComboBox) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Year</label>
+                <select name="edityear" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                    <option {% if student.year == '1' %}selected{% endif %}>1</option>
+                    <option {% if student.year == '2' %}selected{% endif %}>2</option>
+                    <option {% if student.year == '3' %}selected{% endif %}>3</option>
+                    <option {% if student.year == '4' %}selected{% endif %}>4</option>
+                </select>
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" name="editemail" placeholder="{{ student.email }}" 
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+            </div>
+
+            <!-- New Password -->
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700">New Password</label>
+                <div class="relative">
+                    <input type="password" name="editpassword" id="password"
+                        class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                    <button type="button" onclick="togglePassword('password')"
+                        class="absolute right-3 top-2 text-gray-600 hover:text-blue-600 transition">
+                        👁️
+                    </button>
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                <div class="relative">
+                    <input type="password" name="editconfirmpassword" id="confirmpassword"
+                        class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                    <button type="button" onclick="togglePassword('confirmpassword')"
+                        class="absolute right-3 top-2 text-gray-600 hover:text-blue-600 transition">
+                        👁️
+                    </button>
+                </div>
+            </div>
+
+            <!-- Save Changes Button -->
+            <div class="md:col-span-2 flex justify-center">
+                <button type="submit"
+                    class="w-full md:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function togglePassword(id) {
+    const field = document.getElementById(id);
+    field.type = field.type === "password" ? "text" : "password";
+}
+</script>
+{% endblock %}

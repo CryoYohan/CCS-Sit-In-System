@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+</head>
+<body>
+    <h1>Admin Webpage</h1>
+    <div class="flex justify-center mb-6">
+        <button
+          id="login-tab"
+          class="px-6 py-2 text-lg font-semibold text-gray-700 border-b-2 border-blue-500 focus:outline-none"
+        >
+          Login
+        </button>
+        <button
+          id="register-tab"
+          class="px-6 py-2 text-lg font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-700 focus:outline-none"
+        >
+          Register
+        </button>
+      </div>
+  
+      <!-- Login Form -->
+      <form
+        id="login-form"
+        action="/loginstudent"
+        method="post"
+        class="space-y-4"
+      >
+        <div>
+          <label
+            for="login-email"
+            class="block text-sm font-medium text-gray-700"
+            >IDNO</label
+          >
+          <input
+            type="text"
+            name="idno"
+            id="login-email"
+            placeholder="Enter your ID Number"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+        <div>
+          <label
+            for="login-password"
+            class="block text-sm font-medium text-gray-700"
+            >Password</label
+          >
+          <input
+            type="password"
+            name="password"
+            id="login-password"
+            placeholder="Enter your password"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Login
+        </button>
+      </form>
+</body>
+</html>
