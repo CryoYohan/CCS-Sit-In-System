@@ -22,7 +22,7 @@
 {% endwith %}
 {%- endmacro %}
 
-{% macro navbar(user_in_login_page, action) %}
+{% macro navbar(user_in_login_page, action,admin) %}
     {% if not user_in_login_page %}
     <nav class="flex justify-between items-center p-4 bg-black text-white shadow-sm">
         <!-- Title -->
@@ -33,7 +33,19 @@
             <a href="{{ url_for('main.login') }}" class="text-white text-l hover:text-blue-600 transition duration-3000">{{ action }}</a>
         </div>
     </nav>
-    {% elif user_in_login_page and action=='Logout'%}
+    {% elif user_in_login_page and action=='Logout' and admin%}
+    <nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm">
+        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
+            <a href="{{ url_for('admin.dashboard') }}">CCSit.</a>
+        </div>  
+        <div class="flex space-x-8 text-l text-white pr-12">
+            <a href="{{ url_for('admin.adminlogout') }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <span class="flex-1 ms-3 whitespace-nowrap">{{ action }}</span>
+             </a>
+            
+        </div>
+    </nav>
+    {% elif user_in_login_page and action=='Logout' and not admin%}
     <nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm">
         <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
             <a href="{{ url_for('main.dashboard') }}">CCSit.</a>

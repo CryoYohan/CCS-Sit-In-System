@@ -3,7 +3,7 @@ from .modules.user_mgt_module.student import Student
 from .modules.login_register_module import Authorization
 
 # Register as a Blueprint for create_app() function to recognize as Flask app
-main = Blueprint('main', __name__)
+main = Blueprint('main', __name__, template_folder='templates/student')
 
 # Initialize Authorization instance Login Register Module
 auth = Authorization()
@@ -76,7 +76,7 @@ def editprofile():
     form_data = request.form.to_dict()
 
     # Get and validate password fields
-    password = form_data.pop('editpassword', None)
+    password = form_data.pop('editpassword', None) # Remove from form_data dict
     confirmpassword = form_data.pop('editconfirmpassword', None)
 
     if password and password != confirmpassword:
@@ -134,13 +134,11 @@ def loginstudent():
     # Use Login Register Module for authorization
     student_sucessfully_login = auth.user_account_exist_and_correct_credentials(idno=idno, password=password)
     if student_sucessfully_login:
-        # If login is successful, send a message to show SweetAlert before redirecting
         session['student'] = student_sucessfully_login.__dict__
         student = student_sucessfully_login
         flash("Login successful.", 'success')
         return redirect(url_for('main.dashboard'))
     else:
-        # If login fails, pass error message to be used with SweetAlert
         return render_template('login.html', user_in_login_page=True,action='Back')
 
 

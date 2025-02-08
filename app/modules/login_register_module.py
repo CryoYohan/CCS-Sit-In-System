@@ -11,7 +11,7 @@ class Authorization():
         self.db = Databasehelper()
         self.hashpasword = PasswordHashing()
 
-    def user_account_exist_and_correct_credentials(self, idno: str, password: str) -> Student | None:
+    def user_account_exist_and_correct_credentials(self, idno: str, password: str) -> Student | None | Admin | Staff:
         """Check if a student account exists and return a Student instance if valid."""
         try:
             student_exists = self.db.find_record('user', idno=idno)
