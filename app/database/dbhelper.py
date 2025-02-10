@@ -1,65 +1,72 @@
 from sqlite3 import connect, Row
 
 class Databasehelper:
-    def __init__(self)->None:
+    def __init__(self) -> None:
         self.database = 'user.db'
 
     def getdb_connection(self):
+        """Establishes and returns a database connection."""
         connection = connect(self.database)
+        connection.row_factory = Row  # Ensures results are returned as dictionaries
         return connection
-    
-    def getprocess(self,sql:str):
+
+    def getprocess(self, sql: str, params=()):
+        """Executes a SELECT query and returns results."""
         connection = self.getdb_connection()
         cursor = connection.cursor()
-        cursor.execute(sql)
-        cursor.row_factory = Row
-        data:list = cursor.fetchall()
+        cursor.execute(sql, params)
+        data = cursor.fetchall()
         cursor.close()
         connection.close()
         return data
 
-    def postprocess(self,sql:str):
+    def postprocess(self, sql: str, params=()):
+        """Executes an INSERT, UPDATE, or DELETE query."""
         connection = self.getdb_connection()
         cursor = connection.cursor()
-        cursor.execute(sql)
+        cursor.execute(sql, params)
         connection.commit()
+        row_count = cursor.rowcount
         cursor.close()
-        connection.close() 
-        return True if cursor.rowcount > 0 else False
+        connection.close()
+        return row_count > 0  # Returns True if at least one row is affected
 
-    def getall_records(self,table)->list:
+    def getall_records(self, table: str) -> list:
+        """Retrieves all records from a specified table."""
         query = f"SELECT * FROM {table}"
-        users:list = self.getprocess(query)
-        return users
-    
-    def find_record(self,table,idno:str):
-        sql:str = f"SELECT * FROM {table} WHERE `idno` = {idno}"
-        return self.getprocess(sql)
-    
-    def add_record(self,table,**kwargs):
-        keys:list = kwargs.keys()
-        values:list=kwargs.values()
-        columns:str = ",".join(keys)
-        formatted_values = ",".join([f"'{v}'" if isinstance(v, str) else str(v) for v in values])
-        sql:str = f"INSERT INTO {table} ({columns}) VALUES({formatted_values})"
-        return self.postprocess(sql)
-    
-    def update_record(self,table,**kwargs):
-        keys:list = list(kwargs.keys())
-        values:list = list(kwargs.values())
-        flds:list = []
-        # join both keys and values as an element in a list
-        for i in range(1, len(keys)):
-            flds.append(f"`{keys[i]}` = '{values[i]}'")
-        #transform the list of string with "," as delimiter
-        fld:str = ",".join(flds)
-        #create sql statement
-        sql:str = f"UPDATE `{table}` SET {fld} WHERE `{keys[0]}`= '{values[0]}'"
-        return self.postprocess(sql)
-    
-    def delete_record(self,table,**kwargs)->list:
-        keys:list = list(kwargs.keys())
-        values:list = list(kwargs.values())
-        sql:str = f"DELETE FROM `{table}` WHERE `{keys[0]}` = '{values[0]}'"
-        return self.postprocess(sql)
-    
+        return self.getprocess(query)
+
+    def find_record(self, table: str, idno: str):
+        """Finds a specific record by idno."""
+        sql = f"SELECT * FROM {table} WHERE idno = ?"
+        return self.getprocess(sql, (idno,))
+
+    def add_record(self, table:str, **kwargs):
+        """Adds a new record to a table."""
+        columns = ", ".join(kwargs.keys())
+        placeholders = ", ".join(["?" for _ in kwargs])
+        values = tuple(kwargs.values())
+
+        sql = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
+        return self.postprocess(sql, values)
+
+    def update_record(self, table:str, **kwargs):
+        """Updates an existing record in a table."""
+        keys = list(kwargs.keys())
+        values = list(kwargs.values())
+
+        if len(keys) < 2:
+            return False  # Ensures there's at least one field to update
+
+        set_clause = ", ".join([f"{key} = ?" for key in keys[1:]])
+        sql = f"UPDATE {table} SET {set_clause} WHERE {keys[0]} = ?"
+
+        return self.postprocess(sql, values[1:] + [values[0]])  # Moves ID to the end
+
+    def delete_record(self, table: str, **kwargs):
+        """Deletes a record based on the given criteria."""
+        keys = list(kwargs.keys())
+        values = list(kwargs.values())
+
+        sql = f"DELETE FROM {table} WHERE {keys[0]} = ?"
+        return self.postprocess(sql, (values[0],))

@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CCSit</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon/favicon.ico') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
@@ -14,34 +16,25 @@
         .animate-fade-in {
             animation: fadeIn 0.5s ease-out;
         }
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
-
-    <!-- Top Navigation Bar -->
-    <nav class="flex justify-between items-center p-6 bg-white shadow-sm">
-        <!-- Title -->
-        <div class="text-5xl font-bold text-gray-800">
-            <a href="{{ url_for('main.index') }}">CCSit</a>
-          </div>
-        <!-- Navigation Links -->
-        <div class="flex space-x-6 text-xl text-gray-700">
-            <a href="#" class="hover:text-gray-900">Home</a>
-            <a href="#" class="hover:text-gray-900">About</a>
-            <a href="#" class="hover:text-gray-900">Contact</a>
-            <a href="{{ url_for('main.login') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Get Started</a>
-        </div>
-    </nav>
-    {% import 'components.html' as component %}
+<body class="bg-gray-100 font-sans"  style="background-image: url('{{ url_for('static', filename='images/landingBG.jpg') }}'); background-size: cover; background-position: center;">
+    {% import '/components.html' as component %}
+    {{ component.navbar(user_in_login_page, action) }}
     <!-- Header Section -->
     {% if not user_in_login_page %}
-    <header id="header-bg" class="flex items-center justify-center h-screen bg-gradient-to-r from-blue-500 to-purple-600 animate-fade-in">
-        <div class="text-center">
-            <h1 class="text-5xl font-bold text-white mb-4">Simplify Your Workflow with CCSit</h1>
-            <p class="text-xl text-gray-200 mb-8">The ultimate tool for managing your projects efficiently and effectively.</p>
-            <a href="#" class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300">Get Started</a>
+    <header id="header-bg" class="flex items-center justify-center h-screen relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-70 filter brightness-75"></div>
+        <div class="text-center relative z-10 animate-fade-in">
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">Simplify Your Workflow with CCSit</h1>
+            <p class="text-l text-gray-200 mb-8">The ultimate tool for managing your projects efficiently and effectively.</p>
+            <a href="{{ url_for('main.login') }}" class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300">Get Started</a>
         </div>
-    </header>
+    </header>    
+        
     {% endif %}
 
     {{ component.flash_message() }}
@@ -49,6 +42,7 @@
     {% block content %}
     {% endblock %}
 
+    {%  if not user_in_login_page%}
     <!-- Additional Content Section -->
     <section class="py-16 bg-gray-50">
         <div class="container mx-auto px-6">
@@ -69,11 +63,12 @@
             </div>
         </div>
     </section>
-
     <!-- Footer -->
     <footer class="text-center py-6 bg-white border-t border-gray-200">
         <p class="text-gray-600">&copy; 2025 CCSit. All rights reserved.</p>
     </footer>
+    {% endif %}
+
 
 </body>
 </html>

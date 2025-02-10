@@ -16,7 +16,9 @@ def create_app():
 
     # Import and register blueprints (routes)
     from .routes import main  # Import your routes
+    from .adminroute import admin # Register admin route
 
+    app.register_blueprint(admin)
     app.register_blueprint(main)
 
     return app

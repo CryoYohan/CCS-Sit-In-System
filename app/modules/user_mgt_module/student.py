@@ -1,8 +1,7 @@
 from .user import User
 
-
 class Student(User):
-    def __init__(self,idno:str,firstname:str, middlename,lastname,course:str, year:int, email:str, role="Student"):
+    def __init__(self,idno:str,firstname:str, middlename,lastname,course:str, year:int, email:str,role="Student"):
         super().__init__(idno, firstname, middlename,lastname, email)
         self.idno = idno
         self.course = course

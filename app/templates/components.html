@@ -2,7 +2,7 @@
 <!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
-    <div class="fixed top-4 right-4 space-y-4 z-50">
+    <div class="fixed top-4 left-4 space-y-4 z-50">
         {% for category, message in messages %}
             <div class="animate-fade-in transform transition-all duration-300 ease-in-out flex items-center justify-between p-4 rounded-lg shadow-lg text-white
                 {% if category == 'success' %} bg-green-500
@@ -20,4 +20,98 @@
     </div>
 {% endif %}
 {% endwith %}
+{%- endmacro %}
+
+{% macro navbar(user_in_login_page, action,admin) %}
+    {% if not user_in_login_page %}
+    <nav class="flex justify-between items-center p-4 bg-black text-white shadow-sm">
+        <!-- Title -->
+        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
+            <a href="{{ url_for('main.index') }}">CCSit.</a>
+        </div>   
+        <div class="flex space-x-8 text-l text-white pr-12">
+            <a href="{{ url_for('main.login') }}" class="text-white text-l hover:text-blue-600 transition duration-3000">{{ action }}</a>
+        </div>
+    </nav>
+    {% elif user_in_login_page and action=='Logout' and admin%}
+    <nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm">
+        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
+            <a href="{{ url_for('admin.dashboard') }}">CCSit.</a>
+        </div>  
+        <div class="flex space-x-8 text-l text-white pr-12">
+            <a href="{{ url_for('admin.adminlogout') }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <span class="flex-1 ms-3 whitespace-nowrap">{{ action }}</span>
+             </a>
+            
+        </div>
+    </nav>
+    {% elif user_in_login_page and action=='Logout' and not admin%}
+    <nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm">
+        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
+            <a href="{{ url_for('main.dashboard') }}">CCSit.</a>
+        </div>  
+        <div class="flex space-x-8 text-l text-white pr-12">
+            <a href="{{ url_for('main.logout') }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <span class="flex-1 ms-3 whitespace-nowrap">{{ action }}</span>
+             </a>
+            
+        </div>
+    </nav>
+    {% else %}
+    <!-- Title -->
+    <nav class="flex justify-between items-center p-4 bg-black text-white shadow-sm">
+        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
+            <a href="{{ url_for('main.index') }}">CCSit.</a>
+        </div>   
+        <div class="flex space-x-8 text-l text-white pr-12">
+            <a href="{{ url_for('main.index') }}" class="text-white text-l hover:text-blue-600">{{ action }}</a>
+        </div>
+    </nav>
+    {% endif %}
+
+{% endmacro %}
+
+{% macro user_card(student) -%}
+<!-- User Info Card -->
+<div class="mx-auto max-w-sm bg-white rounded-xl shadow-lg p-6 space-y-4 dark:bg-slate-800 dark:shadow-none dark:outline dark:outline-1 dark:outline-white/10">
+    <div class="text-center">
+      <h2 class="text-2xl font-semibold text-black dark:text-white">User Information</h2>
+      <p class="text-gray-500 dark:text-gray-400">Details for {{ student.lastname }}</p>
+    </div>
+    <!-- Role -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 dark:text-gray-300">Role:</span>
+      <span class="font-medium text-black dark:text-white">{{ student.role }}</span>
+    </div>
+    <div class="space-y-2">
+      <!-- ID Number -->
+      <div class="flex items-center justify-between">
+        <span class="text-gray-600 dark:text-gray-300">ID Number:</span>
+        <span class="font-medium text-black dark:text-white">{{ student.idno }}</span>
+      </div>
+  
+      <!-- Full Name -->
+      <div class="flex items-center justify-between">
+        <span class="text-gray-600 dark:text-gray-300">Full Name:</span>
+        <span class="font-medium text-black dark:text-white">{{ student }}</span>
+      </div>
+  
+      <!-- Course -->
+      <div class="flex items-center justify-between">
+        <span class="text-gray-600 dark:text-gray-300">Course:</span>
+        <span class="font-medium text-black dark:text-white">{{ student.course }}</span>
+      </div>
+  
+      <!-- Year -->
+      <div class="flex items-center justify-between">
+        <span class="text-gray-600 dark:text-gray-300">Year:</span>
+        <span class="font-medium text-black dark:text-white">{{ student.year }}</span>
+      </div>
+      <!-- Email -->
+      <div class="flex items-center justify-between">
+        <span class="text-gray-600 dark:text-gray-300">Email:</span>
+        <span class="font-medium text-black dark:text-white">{{ student.email }}</span>
+      </div>
+    </div>
+  </div>
 {%- endmacro %}
