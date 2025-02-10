@@ -82,7 +82,7 @@ def addstaff():
         }
         staff_account = Staff(**add_data)
         # Hash password
-        add_data = admin_account.__dict__.copy()
+        add_data = staff_account.__dict__.copy()
         if password:
             hashed_password = auth.hashpasword.hashpassword(password)
             add_data['password'] = hashed_password
