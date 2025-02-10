@@ -76,9 +76,11 @@ def addstaff():
             "firstname": staff_data.get("firstname"),
             "middlename": staff_data.get("middlename"),
             "lastname": staff_data.get("lastname"),
+            "course": staff_data.get("course"),
+            "year":staff_data.get("year"),
             "email": staff_data.get("email"),
         }
-        admin_account = Admin(**add_data)
+        staff_account = Staff(**add_data)
         # Hash password
         add_data = admin_account.__dict__.copy()
         if password:
@@ -88,10 +90,8 @@ def addstaff():
         try:
             if add_data:
                 print(f"ADD DATA DICT =>{add_data}")
-                db.add_record(table='user',**add_data)
-                session['user'] = admin_account.__dict__
+                db.add_record(table='user',**{k:v for k,v in add_data.items() if v})
                 del add_data['password']
-                print(f"DATA DICT AFTER DEL PASSWORD=>{add_data}")
 
                 flash('Successfully added','success')
                 return redirect(url_for('admin.adminusermgt'))
