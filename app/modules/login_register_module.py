@@ -33,7 +33,6 @@ class Authorization():
                     print(e)
                     return False            
         else:
-            print("User does not exist.")
             return False
     
     def user_is_registered(self,idno:str,firstname:str,middlename:str,lastname:str,course:str, year:int,email:str,password:str)->None:
