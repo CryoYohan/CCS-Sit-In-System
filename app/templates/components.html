@@ -22,7 +22,7 @@
 {% endwith %}
 {%- endmacro %}
 
-{% macro navbar(user_in_login_page, action,is_admin, user, image) %}
+{% macro navbar(user_in_login_page, action,user, is_admin, image) %}
     {% if not user_in_login_page %}
     <nav class="flex justify-between items-center p-4 bg-black text-white shadow-sm">
         <!-- Title -->
@@ -48,7 +48,7 @@
                     </div>
                 </button>
                 <div id="dropdown-admin" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg">
-                    <a href="{{ url_for('main.profile') }}" class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600">Profile Settings</a>
+                    <a href="{{ url_for('main.profilesettings') }}" class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600">Profile Settings</a>
                     <a href="{{ url_for('admin.adminlogout') }}" class="block px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600">Logout</a>
                 </div>
             </div>
@@ -62,9 +62,9 @@
         <div class="relative flex items-center space-x-8 pr-12">
             <div class="relative">
                 <button id="profile-menu-user" class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600">
-                    <img src="{{  url_for('static',filename='images/profileicons/shark.png') }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
+                    <img src="{{  url_for('static',filename='images/profileicons/'+user.image) }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
                     <div class="text-left hidden sm:block">
-                        <span class="block font-semibold text-gray-900 dark:text-white">{{ 'Jinwoo Sung' }}</span>
+                        <span class="block font-semibold text-gray-900 dark:text-white">{{ user }}</span>
                         <span class="text-sm text-gray-500 dark:text-gray-400">STUDENT</span>
                     </div>
                 </button>

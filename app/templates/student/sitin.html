@@ -1,0 +1,86 @@
+{% extends 'dashboard_template.html' %}
+{% block content %}
+<div class="container mx-auto p-6">
+  <!-- Laboratory Selection -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    {% for lab in labs %}
+    <div class="bg-white shadow-md rounded-lg overflow-hidden transform transition-transform hover:scale-105 cursor-pointer" onclick="openModal('{{ lab.name }}', {{ lab.availableSeats }})">
+      <img src="{{ lab.image }}" alt="{{ lab.name }}" class="w-full h-32 object-cover">
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800">{{ lab.name }}</h3>
+        <p class="text-sm text-gray-600">{{ lab.description }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Reservation Form -->
+  <div class="bg-white shadow-md rounded-lg p-6">
+    <h2  class="text-3xl mb-4 font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">Reserve for Sit-in</h2>
+    <form action="{{ url_for('main.reserve_lab') }}" method="POST" class="space-y-4">
+      <div>
+        <label for="lab" class="block text-sm font-medium text-gray-700">Select Laboratory</label>
+        <select id="lab" name="lab" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+          {% for lab in labs %}
+          <option value="{{ lab.name }}">{{ lab.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Reservation</label>
+        <select id="reason" name="reason" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+          <option value="Programming Related Projects">Programming Related Projects</option>
+          <option value="Java">Java</option>
+          <option value="Python">Python</option>
+          <option value="C">C</option>
+          <option value="C#">C#</option>
+          <option value="Web Dev">Web Dev</option>
+          <option value="School purposes">School purposes</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+      <div>
+        <label for="date" class="block text-sm font-medium text-gray-700">Reservation Date</label>
+        <input type="date" id="date" name="date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+      </div>
+      <div>
+        <label for="time" class="block text-sm font-medium text-gray-700">Reservation Time</label>
+        <input type="time" id="time" name="time" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+      </div>
+      <div class="flex justify-end">
+        <button type="submit" class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-2 rounded-lg text-lg hover:bg-blue-700 transition duration-300 shadow-md">
+          Request Reservation
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="labModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-lg overflow-hidden w-1/3">
+    <div class="p-4 border-b">
+      <h3 class="text-lg font-semibold text-gray-800" id="modalLabName">Lab Name</h3>
+    </div>
+    <div class="p-4">
+      <p class="text-sm text-gray-600">Available Seats: <span id="modalAvailableSeats">50</span></p>
+      <!-- Add more details as needed -->
+    </div>
+    <div class="p-4 border-t flex justify-end">
+      <button onclick="closeModal()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal(labName, availableSeats) {
+    document.getElementById('modalLabName').innerText = labName;
+    document.getElementById('modalAvailableSeats').innerText = availableSeats;
+    document.getElementById('labModal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('labModal').classList.add('hidden');
+  }
+</script>
+{% endblock %}

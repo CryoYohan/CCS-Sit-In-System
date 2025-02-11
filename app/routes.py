@@ -17,12 +17,12 @@ def after_request(response):
 @main.route('/')
 def index():
     """Landing page."""
-    return render_template('index.html', user_in_login_page=False, action='Login')
+    return render_template('index.html', user_in_login_page=False, action='Login', is_admin=False)
 
 @main.route('/login')
 def login():
     """Login page."""
-    return render_template('login.html',user_in_login_page=True,action='Back')
+    return render_template('login.html',user_in_login_page=True,action='Back',is_admin=False)
 
 
 @main.route('/dashboard')
@@ -30,47 +30,90 @@ def dashboard():
     """Dashboard page."""
     global student
     try:
+
         if not session['student'] == None:
-            return render_template('dashboard.html', student=student,user_in_login_page=True,action='Logout')
+            return render_template('dashboard.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
         else:
             message = "Please login first."
             flash(message)
             return redirect(url_for('main.login'))
+        
     except Exception as e:
         flash(str(e),'error')
         flash("Please try again")
         #session['student'] = None
         return redirect(url_for('main.login'))
 
+@main.route('/sitin')
+def sitin():
+    """Profile page."""
+    labs = [
+        {
+        'name': 'Lab 530',
+        'description': 'A lab for 530'
+        },
+        {
+        'name': 'Lab 544',
+        'description': 'A lab for 544'
+        },
+        {
+        'name': 'Lab 526',
+        'description': 'A lab for 526'
+        },
+        {
+        'name': 'Lab 524',
+        'description': 'A lab for 524'
+        },
+    ]
+    global student
+    try:
+
+        if not session['student'] == None:
+            return render_template('sitin.html', student=student,user_in_login_page=True,action='Logout',is_admin=False,labs=labs)
+        else:
+            message = "Please login first."
+            flash(message)
+            return redirect(url_for('main.login'))
+        
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
 
 @main.route('/sessions')
 def sessions():
     """Remaining Sessions Page"""
     global student
     try:
+
         if not session['student'] == None:
-            return render_template('sessions.html', student=student,user_in_login_page=True,action='Logout')
+            return render_template('sessions.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
         else:
             message = "Please login first."
             flash(message)
             return redirect(url_for('main.login'))
+        
     except Exception as e:
         flash(str(e),'error')
         flash("Please try again")
         #session['student'] = None
         return redirect(url_for('main.login'))
 
+
 @main.route('/profilesettings')
 def profilesettings():
     """Profile page."""
     global student
     try:
+
         if not session['student'] == None:
-            return render_template('profilesettings.html', student=student,user_in_login_page=True,action='Logout')
+            return render_template('profilesettings.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
         else:
             message = "Please login first."
             flash(message)
             return redirect(url_for('main.login'))
+        
     except Exception as e:
         flash(str(e),'error')
         flash("Please try again")
@@ -85,6 +128,10 @@ def logout():
     flash(message, 'success')
     return redirect(url_for('main.index'))
 
+
+@main.route('/reserve_lab', methods=['POST'])
+def reserve_lab():
+    pass
 
 
 @main.route('/editprofile', methods=['POST'])
@@ -103,14 +150,14 @@ def editprofile():
 
     # Create update dictionary with only non-empty fields
     edit_data = {
-        "idno": student.idno,  # Keep ID in case it's required
-        "firstname": form_data.get("editfirstname") or student.firstname,
-        "middlename": form_data.get("editmiddlename") or student.middlename,
-        "lastname": form_data.get("editlastname") or student.lastname,
-        "course": form_data.get("editcourse") or student.course,
-        "year": form_data.get("edityear") or student.year,
-        "email": form_data.get("editemail") or student.email
-    }
+                "idno": student.idno,  # Keep ID in case it's required
+                "firstname": form_data.get("editfirstname") or student.firstname,
+                "middlename": form_data.get("editmiddlename") or student.middlename,
+                "lastname": form_data.get("editlastname") or student.lastname,
+                "course": form_data.get("editcourse") or student.course,
+                "year": form_data.get("edityear") or student.year,
+                "email": form_data.get("editemail") or student.email
+                }
 
     # Update password only if provided
     if password:
@@ -191,4 +238,4 @@ def registerstudent():
         return redirect(url_for('main.login'))
     else:
         # If registration failed, show an error alert
-        return redirect(url_for('main.log   in'))
+        return redirect(url_for('main.login'))
