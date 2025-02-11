@@ -4,7 +4,7 @@ from random import choice
 class User():
     db = Databasehelper()
     table = 'user'
-    profileicons = ['bear.png','cat.png','chicken.png', 'meerkat.png','panda.png','polar-bear.png', 'shark.png','weasel.png']
+    profileicons = ['bear.png','cat.png','chicken.png', 'meerkat.png','panda.png','polar-bear.png', 'shark.png','weasel.png','wolf.png']
     def __init__(self, idno,firstname,middlename,lastname,email):
         self.idno = idno
         self.firstname = firstname

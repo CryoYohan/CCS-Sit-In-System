@@ -32,6 +32,7 @@ class Authorization():
                                                 year=data['year'],
                                                 email=data['email'],
                                                 image = data['image'],
+                                                session = data['session'],
                                             )
                                 # session['student'] = student.__dict__  # Store Student object as a dictionary in session
                                 return student
@@ -112,6 +113,7 @@ class Authorization():
                                     year=year, 
                                     email=email,
                                     image=None,
+                                    session=None,
                                     )
                     
                     # session['student'] = student.__dict__ 
@@ -119,6 +121,7 @@ class Authorization():
                     student_data = student.__dict__.copy()
                     student_data['password'] = hashed_password
                     student_data['image'] = student.random_profile() # Add random profile icon
+                    student_data['session'] = 30 # Add default amount of session
                     self.db.add_record(table='user',**student_data) 
 
                     return student

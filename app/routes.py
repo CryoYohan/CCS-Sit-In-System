@@ -32,7 +32,11 @@ def dashboard():
     try:
 
         if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
             return render_template('dashboard.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
+         
         else:
             message = "Please login first."
             flash(message)
@@ -50,26 +54,34 @@ def sitin():
     labs = [
         {
         'name': 'Lab 530',
-        'description': 'A lab for 530'
+        'description': 'A lab for 530',
+        'image': '530.jpg',
         },
         {
         'name': 'Lab 544',
-        'description': 'A lab for 544'
+        'description': 'A lab for 544',
+        'image': '544.avif',
         },
         {
         'name': 'Lab 526',
-        'description': 'A lab for 526'
+        'description': 'A lab for 526',
+        'image': '526.jpg',
         },
         {
         'name': 'Lab 524',
-        'description': 'A lab for 524'
+        'description': 'A lab for 524',
+        'image': '524.jpg',
         },
     ]
     global student
     try:
 
         if not session['student'] == None:
-            return render_template('sitin.html', student=student,user_in_login_page=True,action='Logout',is_admin=False,labs=labs)
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
+            return render_template('sitin.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
+         
         else:
             message = "Please login first."
             flash(message)
@@ -88,7 +100,34 @@ def sessions():
     try:
 
         if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
             return render_template('sessions.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
+
+        else:
+            message = "Please login first."
+            flash(message)
+            return redirect(url_for('main.login'))
+        
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
+
+
+@main.route('/rulesregulations')
+def rulesregulations():
+    global student
+    try:
+
+        if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
+            return render_template('rulesregulations.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
+         
         else:
             message = "Please login first."
             flash(message)
@@ -108,7 +147,11 @@ def profilesettings():
     try:
 
         if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
             return render_template('profilesettings.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
+         
         else:
             message = "Please login first."
             flash(message)
