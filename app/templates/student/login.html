@@ -31,14 +31,10 @@
           class="block text-sm font-medium text-gray-700"
           >IDNO</label
         >
-        <input
-          type="text"
-          name="idno"
-          id="login-email"
-          placeholder="Enter your ID Number"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
+        <div>
+          <input type="text" name="idno" placeholder="Enter your ID Number" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
       </div>
       <div>
         <label
@@ -46,14 +42,17 @@
           class="block text-sm font-medium text-gray-700"
           >Password</label
         >
-        <input
-          type="password"
-          name="password"
-          id="login-password"
-          placeholder="Enter your password"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
+        <!-- New Password -->
+        <div class="md:col-span-2">
+            <div class="relative">
+                <input type="password" name="password" id="password" placeholder="Enter your Password"
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+                <button type="button" onclick="togglePassword('password')"
+                    class="absolute right-3 top-2 text-gray-600 hover:text-blue-600 transition">
+                    👁️
+                </button>
+            </div>
+        </div>
       </div>
       <!-- Save Changes Button -->
       <div class="md:col-span-2 flex justify-center">
@@ -81,14 +80,10 @@
           class="block text-sm font-medium text-gray-700"
           >IDNO</label
         >
-        <input
-          type="text"
-          id="register-name"
-          name="idno"
-          placeholder="Enter your ID Number"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
+        <div>
+          <input type="text" name="idno" placeholder="Enter your ID Number" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
       </div>
       <div>
         <label
@@ -96,14 +91,10 @@
           class="block text-sm font-medium text-gray-700"
           >First Name</label
         >
-        <input
-          type="text"
-          id="register-fname"
-          name="firstname"
-          placeholder="Enter your first name"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
+        <div>
+          <input type="text" name="firstname" placeholder="Enter your first name" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
       </div>
       <div>
         <label
@@ -111,14 +102,10 @@
           class="block text-sm font-medium text-gray-700"
           >Middle Name</label
         >
-        <input
-          type="text"
-          id="register-mname"
-          name="middlename"
-          placeholder="Enter your middle name"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
+        <div>
+          <input type="text" name="middlename" placeholder="Enter your middle name" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
       </div>
       <div>
         <label
@@ -126,18 +113,14 @@
           class="block text-sm font-medium text-gray-700"
           >Last Name</label
         >
-        <input
-          type="text"
-          id="register-email"
-          name="lastname"
-          placeholder="Enter your lastname"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
+        <div>
+          <input type="text" name="lastname" placeholder="Enter your last name" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-600">Course</label>
-        <select name="course" class="w-full px-4 py-2 border text-gray-700 rounded-lg focus:ring focus:ring-blue-200">
+        <select name="course" class="w-full px-4 py-2 border text-gray-700 border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
           <option value="">Select Course</option>
           <option value="BSIT">BSIT</option>
           <option value="BSCS">BSCS</option>
@@ -155,7 +138,7 @@
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-600">Year</label>
-        <select name="year" class="w-full px-4 py-2 border text-gray-700 rounded-lg focus:ring focus:ring-blue-200">
+        <select name="year" class="w-full px-4 py-2 border text-gray-700 border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
             <option value="">Select Year</option>
             <option value="1">1st Year</option>
             <option value="2">2nd Year</option>
@@ -169,14 +152,10 @@
           class="block text-sm font-medium text-gray-700"
           >Email</label
         >
-        <input
-          type="email"
-          id="register-email"
-          name="email"
-          placeholder="Enter your email"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
+        <div>
+          <input type="email" name="email" placeholder="Enter your email" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
       </div>
       <div>
         <label
@@ -184,14 +163,16 @@
           class="block text-sm font-medium text-gray-700"
           >Password</label
         >
-        <input
-          type="password"
-          name="password"
-          id="register-password"
-          placeholder="Enter your password"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
+        <div class="md:col-span-2">
+          <div class="relative">
+              <input type="password" name="password" id="password-register" placeholder="Enter your Password"
+                  class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+              <button type="button" onclick="togglePassword('password-register')"
+                  class="absolute right-3 top-2 text-gray-600 hover:text-blue-600 transition">
+                  👁️
+              </button>
+          </div>
+        </div>
       </div>
       <div class="md:col-span-2 flex justify-center">
         <button type="submit"
@@ -294,6 +275,10 @@
       registerTab.classList.add("border-transparent", "text-gray-500");
       registerTab.classList.remove("border-blue-500", "text-gray-700");
     });
+    function togglePassword(id) {
+      const field = document.getElementById(id);
+      field.type = field.type === "password" ? "text" : "password";
+    }
 
   </script>
 </div>

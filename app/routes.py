@@ -17,12 +17,12 @@ def after_request(response):
 @main.route('/')
 def index():
     """Landing page."""
-    return render_template('index.html', user_in_login_page=False, action='Login', is_admin=False)
+    return render_template('index.html', user_in_login_page=False, action='Login')
 
 @main.route('/login')
 def login():
     """Login page."""
-    return render_template('login.html',user_in_login_page=True,action='Back',is_admin=False)
+    return render_template('login.html',user_in_login_page=True,action='Back')
 
 
 @main.route('/dashboard')
@@ -35,7 +35,7 @@ def dashboard():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('dashboard.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
+            return render_template('dashboard.html', student=student,user_in_login_page=True,action='Logout')
          
         else:
             message = "Please login first."
@@ -80,7 +80,7 @@ def sitin():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('sitin.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
+            return render_template('sitin.html', student=student,user_in_login_page=True,action='Logout',labs=labs)
          
         else:
             message = "Please login first."
@@ -103,7 +103,7 @@ def sessions():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('sessions.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
+            return render_template('sessions.html', student=student,user_in_login_page=True,action='Logout')
 
         else:
             message = "Please login first."
@@ -126,7 +126,7 @@ def rulesregulations():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('rulesregulations.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
+            return render_template('rulesregulations.html', student=student,user_in_login_page=True,action='Logout')
          
         else:
             message = "Please login first."
@@ -150,7 +150,7 @@ def profilesettings():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('profilesettings.html', student=student,user_in_login_page=True,action='Logout',is_admin=False)
+            return render_template('profilesettings.html', student=student,user_in_login_page=True,action='Logout')
          
         else:
             message = "Please login first."
@@ -240,7 +240,7 @@ def loginstudent():
     password: str = request.form['password']
 
     # Use Login Register Module for authorization
-    student_sucessfully_login = auth.user_account_exist_and_correct_credentials(idno=idno, password=password)
+    student_sucessfully_login = auth.user_account_exist_and_correct_credentials(idno=idno, password=password,url='student')
     if student_sucessfully_login:
         session['student'] = student_sucessfully_login.__dict__
         student = student_sucessfully_login
@@ -271,7 +271,8 @@ def registerstudent():
                                 course=course,
                                 year=year,
                                 email=email,
-                                password=password)
+                                password=password,
+                                url='student')
     
     if student_sucessfully_registered:
         # If registration is successful, show a success alert and redirect to login page

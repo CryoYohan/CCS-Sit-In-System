@@ -23,7 +23,7 @@ def adminlogin():
 @admin.route('/dashboard')
 def dashboard():
     if not session['admin'] == None:
-        return render_template('admindashboard.html',user_in_login_page=True, action='Logout',is_admin=True,admin=admin_account)
+        return render_template('admindashboard.html',user_in_login_page=True, action='Logout',admin=admin_account)
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
@@ -31,7 +31,7 @@ def dashboard():
 @admin.route('/adminusermgt')
 def adminusermgt():
     if not session['admin'] == None:
-        return render_template('adminusermgt.html',user_in_login_page=True, action='Logout',is_admin=True,admin=admin_account)
+        return render_template('adminusermgt.html',user_in_login_page=True, action='Logout',admin=admin_account)
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
@@ -48,7 +48,7 @@ def loginadmin():
     idno:str = request.form['idno']
     password:str = request.form['password']
 
-    legit_admin = auth.user_account_exist_and_correct_credentials(idno=idno,password=password) 
+    legit_admin = auth.user_account_exist_and_correct_credentials(idno=idno,password=password,url='admin') 
     if legit_admin:
         flash('Login successful!', 'success')
         session['admin'] = legit_admin.__dict__
@@ -82,27 +82,31 @@ def addstaff():
             "year":staff_data.get("year"),
             "email": staff_data.get("email"),
         }
-        staff_account = Staff(**add_data)
+
+
         # Hash password
-        add_data = staff_account.__dict__.copy()
         if password:
             hashed_password = auth.hashpasword.hashpassword(password)
             add_data['password'] = hashed_password
         
         try:
             if add_data:
-                print(f"ADD DATA DICT =>{add_data}")
-                db.add_record(table='user',**{k:v for k,v in add_data.items() if v})
+                staff_registered = auth.user_is_registered(**add_data,url='staff')
                 del add_data['password']
-
-                flash('Successfully added','success')
-                return redirect(url_for('admin.adminusermgt'))
+                if staff_registered:
+                    flash('Successfully added','success')
+                    session['staff'] = staff_registered.__dict__
+                    return redirect(url_for('admin.adminusermgt'))
+                else:
+                    flash('Add staff failed','error')
+                    return redirect(url_for('admin.adminusermgt'))
             else:
                 flash('No Changes made')
                 return redirect(url_for('admin.adminusermgt'))
 
         except Exception as e:
             flash(str(e),'error')
+            return redirect(url_for('admin.adminusermgt'))
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
