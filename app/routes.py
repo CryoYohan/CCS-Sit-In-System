@@ -42,6 +42,24 @@ def dashboard():
         #session['student'] = None
         return redirect(url_for('main.login'))
 
+
+@main.route('/sessions')
+def sessions():
+    """Remaining Sessions Page"""
+    global student
+    try:
+        if not session['student'] == None:
+            return render_template('sessions.html', student=student,user_in_login_page=True,action='Logout')
+        else:
+            message = "Please login first."
+            flash(message)
+            return redirect(url_for('main.login'))
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
+
 @main.route('/profilesettings')
 def profilesettings():
     """Profile page."""

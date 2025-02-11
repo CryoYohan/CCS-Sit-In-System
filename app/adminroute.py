@@ -23,7 +23,7 @@ def adminlogin():
 @admin.route('/dashboard')
 def dashboard():
     if not session['admin'] == None:
-        return render_template('admindashboard.html')
+        return render_template('admindashboard.html',user_in_login_page=True, action='Logout',is_admin=True,admin=admin_account)
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
@@ -31,7 +31,7 @@ def dashboard():
 @admin.route('/adminusermgt')
 def adminusermgt():
     if not session['admin'] == None:
-        return render_template('adminusermgt.html',user_in_login_page=True, action='Logout',admin=True)
+        return render_template('adminusermgt.html',user_in_login_page=True, action='Logout',is_admin=True,admin=admin_account)
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
@@ -44,6 +44,7 @@ def adminlogout():
 
 @admin.route('/adminlogin', methods=['POST'])
 def loginadmin():
+    global admin_account
     idno:str = request.form['idno']
     password:str = request.form['password']
 
@@ -51,7 +52,8 @@ def loginadmin():
     if legit_admin:
         flash('Login successful!', 'success')
         session['admin'] = legit_admin.__dict__
-        return redirect(url_for('admin.adminusermgt'))
+        admin_account = legit_admin
+        return redirect(url_for('admin.dashboard'))
     else:
         return redirect(url_for('admin.adminlogin'))
 

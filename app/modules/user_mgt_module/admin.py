@@ -10,3 +10,6 @@ class Admin(User):
 
     def delete(self):
         pass
+
+    def __str__(self):
+        return f"{self.firstname.title()} {self.middlename[0].capitalize()}. {self.lastname.title()}"

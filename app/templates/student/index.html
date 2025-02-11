@@ -22,7 +22,7 @@
 </head>
 <body class="bg-gray-100 font-sans"  style="background-image: url('{{ url_for('static', filename='images/landingBG.jpg') }}'); background-size: cover; background-position: center;">
     {% import '/components.html' as component %}
-    {{ component.navbar(user_in_login_page, action) }}
+    {{ component.navbar(user_in_login_page, action, user) }}
     <!-- Header Section -->
     {% if not user_in_login_page %}
     <header id="header-bg" class="flex items-center justify-center h-screen relative">
