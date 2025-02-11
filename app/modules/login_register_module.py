@@ -91,13 +91,14 @@ class Authorization():
                            ) -> Student | None:
         
         """Register a user and return a Student instance if successful."""
-        student_exist = self.db.find_record('user', idno=idno)
+        students = self.db.getall_records('user')
+        student_exist = [student['idno'] for student in students if student['idno'] == idno]
+        email_exist =  [student['email'] for student in students if student['email'] == email]
+
         if not student_exist:
             try:
-                email_in_db = {k for k,v in student_exist.items() if k == 'email'}
-                
                  # Check if email input already exists in database
-                if email == email_in_db:
+                if email == email_exist:
                     flash('Email already in use. Please try a different email', 'error')
                     return None
                 
@@ -133,6 +134,6 @@ class Authorization():
                 return None
             
         else:
-            flash("User ID already exists.", 'error')
+            flash(f"User ID already exists.\nID {student_exist}\nEMAIL\n{email_exist}", 'error')
             return None
 
