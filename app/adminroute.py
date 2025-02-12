@@ -22,7 +22,13 @@ def adminlogin():
 
 @admin.route('/dashboard')
 def dashboard():
+    """Admin Dashboard"""
+    global admin_account
     if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Staff(**admin_account)
+
         return render_template('admindashboard.html',user_in_login_page=True, action='Logout',admin=admin_account)
     else:
         flash('Unauthorized Access is Prohibited', 'error')
@@ -30,7 +36,13 @@ def dashboard():
 
 @admin.route('/adminusermgt')
 def adminusermgt():
+    """Admin User Management"""
+    global admin_account
     if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Staff(**admin_account)
+
         return render_template('adminusermgt.html',user_in_login_page=True, action='Logout',admin=admin_account)
     else:
         flash('Unauthorized Access is Prohibited', 'error')
@@ -91,7 +103,7 @@ def addstaff():
         
         try:
             if add_data:
-                staff_registered = auth.user_is_registered(**add_data,url='staff')
+                staff_registered = auth.user_is_registered(**{k:v for k,v in add_data.items() if v},url='staff')
                 del add_data['password']
                 if staff_registered:
                     flash('Successfully added','success')

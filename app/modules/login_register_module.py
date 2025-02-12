@@ -89,45 +89,38 @@ class Authorization():
             flash(str(e), 'error')
             return None
     
-    def user_is_registered(self, idno: str, firstname: str, 
-                           middlename: str, lastname: str,
-                           course: str, year: int,
-                            email: str, password: str,
-                            url:str,
+    def user_is_registered(self, **kwargs
                            ) -> Student | Staff | None:
         
         """Register a user and return a Student instance if successful."""
         users = self.db.getall_records('user')
-        user_exist = [user['idno'] for user in users if user['idno'] == idno]
-        email_exist =  [user['email'] for user in users if user['email'] == email]
+        user_exist = [user['idno'] for user in users if user['idno'] == kwargs.get('idno')]
+        email_exist =  [user['email'] for user in users if user['email'] == kwargs.get('email')]
 
-        if not user_exist and url=='student':
+        if not user_exist and kwargs.get('url')=='student':
             try:
                  # Check if email input already exists in database
-                if email == email_exist:
+                if kwargs.get('email') == email_exist:
                     flash('Email already in use. Please try a different email', 'error')
                     return None
                 
                 else:
-                    hashed_password = self.hashpasword.hashpassword(password)
-                    student = Student(idno=idno, 
-                                    firstname=firstname,
-                                    middlename=middlename, 
-                                    lastname=lastname, 
-                                    course=course, 
-                                    year=year, 
-                                    email=email,
-                                    image=None,
-                                    session=None,
-                                    )
+                    hashed_password = self.hashpasword.hashpassword(kwargs.get('password'))
+
+                    student_add_data_to_object = {k:v for k,v in kwargs.items() if not k == 'password' and not k == 'url'}
+                    student_add_data_to_object['image'] = None
+                    student_add_data_to_object['session'] = 30 # Add default amount of session
+
+                    student = Student(**student_add_data_to_object)
                     
                     # session['student'] = student.__dict__ 
 
                     student_data = student.__dict__.copy()
                     student_data['password'] = hashed_password
                     student_data['image'] = student.random_profile() # Add random profile icon
-                    student_data['session'] = 30 # Add default amount of session
                     self.db.add_record(table='user',**student_data) 
+
+                    del student_data['password']
 
                     return student    
 
@@ -138,29 +131,27 @@ class Authorization():
         else:
             try:
                 # Check if email input already exists in database
-                if email == email_exist:
+                if kwargs.get('email') == email_exist:
                     flash('Email already in use. Please try a different email', 'error')
                     return None
                 
                 else:
-                    staff = Staff(idno=idno, 
-                                    firstname=firstname,
-                                    middlename=middlename, 
-                                    lastname=lastname, 
-                                    course=course, 
-                                    year=year, 
-                                    email=email,
-                                    image=None,
-                                    )
+                    staff_add_data_to_object = {k:v for k,v in kwargs.items() if not k == 'password' and not k == 'url'}
+                    staff_add_data_to_object['image'] = None
+
+                    staff = Staff(**staff_add_data_to_object)
                     
                     # session['student'] = student.__dict__ 
 
                     staff_data = staff.__dict__.copy()
-                    staff_data['password'] = password
+                    staff_data['password'] = kwargs.get('password')
                     staff_data['image'] = staff.random_profile() # Add random profile icon
                     self.db.add_record(table='user',**staff_data) 
+                    
+                    del staff_data['password']
 
                     return staff
+                
             except Exception as e:
                 flash(str(e),'error')
                 return None

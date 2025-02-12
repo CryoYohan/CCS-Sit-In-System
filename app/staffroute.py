@@ -26,6 +26,37 @@ def dashboard():
 
     else:
         return redirect(url_for('staff.login'))
+    
+@staff.route('/managesitin')
+def managesitin():
+    """Staff Sit-in Management"""
+    global staff_account
+    if not session['staff'] == None:
+
+        if staff_account == None:
+            staff_data = session.get('staff')
+            staff_account = Staff(**staff_data)
+
+        return render_template('managesitin.html',user_in_login_page=True, action='Logout',staff=staff_account)
+
+    else:
+        return redirect(url_for('staff.login'))
+    
+    
+@staff.route('/staffusermgt')
+def staffusermgt():
+    """Staff User Management"""
+    global staff_account
+    if not session['staff'] == None:
+
+        if staff_account == None:
+            staff_data = session.get('staff')
+            staff_account = Staff(**staff_data)
+
+        return render_template('staffusermgt.html',user_in_login_page=True, action='Logout',staff=staff_account)
+
+    else:
+        return redirect(url_for('staff.login'))
 
 
 @staff.route('/login')

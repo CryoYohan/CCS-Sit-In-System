@@ -92,6 +92,29 @@ def sitin():
         flash("Please try again")
         #session['student'] = None
         return redirect(url_for('main.login'))
+    
+@main.route('/records')
+def records():
+    """Record History Page"""
+    global student
+    try:
+
+        if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
+            return render_template('records.html', student=student,user_in_login_page=True,action='Logout')
+
+        else:
+            message = "Please login first."
+            flash(message)
+            return redirect(url_for('main.login'))
+        
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
 
 @main.route('/sessions')
 def sessions():
