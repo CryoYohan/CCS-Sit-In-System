@@ -30,29 +30,133 @@ def dashboard():
     """Dashboard page."""
     global student
     try:
+
         if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
             return render_template('dashboard.html', student=student,user_in_login_page=True,action='Logout')
+         
         else:
             message = "Please login first."
             flash(message)
             return redirect(url_for('main.login'))
+        
     except Exception as e:
         flash(str(e),'error')
         flash("Please try again")
         #session['student'] = None
         return redirect(url_for('main.login'))
 
+@main.route('/sitin')
+def sitin():
+    """Profile page."""
+    labs = [
+        {
+        'name': 'Lab 530',
+        'description': 'A lab for 530',
+        'image': '530.jpg',
+        },
+        {
+        'name': 'Lab 544',
+        'description': 'A lab for 544',
+        'image': '544.avif',
+        },
+        {
+        'name': 'Lab 526',
+        'description': 'A lab for 526',
+        'image': '526.jpg',
+        },
+        {
+        'name': 'Lab 524',
+        'description': 'A lab for 524',
+        'image': '524.jpg',
+        },
+    ]
+    global student
+    try:
+
+        if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
+            return render_template('sitin.html', student=student,user_in_login_page=True,action='Logout',labs=labs)
+         
+        else:
+            message = "Please login first."
+            flash(message)
+            return redirect(url_for('main.login'))
+        
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
+
+@main.route('/sessions')
+def sessions():
+    """Remaining Sessions Page"""
+    global student
+    try:
+
+        if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
+            return render_template('sessions.html', student=student,user_in_login_page=True,action='Logout')
+
+        else:
+            message = "Please login first."
+            flash(message)
+            return redirect(url_for('main.login'))
+        
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
+
+
+@main.route('/rulesregulations')
+def rulesregulations():
+    global student
+    try:
+
+        if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
+            return render_template('rulesregulations.html', student=student,user_in_login_page=True,action='Logout')
+         
+        else:
+            message = "Please login first."
+            flash(message)
+            return redirect(url_for('main.login'))
+        
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
+
+
 @main.route('/profilesettings')
 def profilesettings():
     """Profile page."""
     global student
     try:
+
         if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
             return render_template('profilesettings.html', student=student,user_in_login_page=True,action='Logout')
+         
         else:
             message = "Please login first."
             flash(message)
             return redirect(url_for('main.login'))
+        
     except Exception as e:
         flash(str(e),'error')
         flash("Please try again")
@@ -67,6 +171,10 @@ def logout():
     flash(message, 'success')
     return redirect(url_for('main.index'))
 
+
+@main.route('/reserve_lab', methods=['POST'])
+def reserve_lab():
+    pass
 
 
 @main.route('/editprofile', methods=['POST'])
@@ -85,14 +193,14 @@ def editprofile():
 
     # Create update dictionary with only non-empty fields
     edit_data = {
-        "idno": student.idno,  # Keep ID in case it's required
-        "firstname": form_data.get("editfirstname") or student.firstname,
-        "middlename": form_data.get("editmiddlename") or student.middlename,
-        "lastname": form_data.get("editlastname") or student.lastname,
-        "course": form_data.get("editcourse") or student.course,
-        "year": form_data.get("edityear") or student.year,
-        "email": form_data.get("editemail") or student.email
-    }
+                "idno": student.idno,  # Keep ID in case it's required
+                "firstname": form_data.get("editfirstname") or student.firstname,
+                "middlename": form_data.get("editmiddlename") or student.middlename,
+                "lastname": form_data.get("editlastname") or student.lastname,
+                "course": form_data.get("editcourse") or student.course,
+                "year": form_data.get("edityear") or student.year,
+                "email": form_data.get("editemail") or student.email
+                }
 
     # Update password only if provided
     if password:
@@ -132,7 +240,7 @@ def loginstudent():
     password: str = request.form['password']
 
     # Use Login Register Module for authorization
-    student_sucessfully_login = auth.user_account_exist_and_correct_credentials(idno=idno, password=password)
+    student_sucessfully_login = auth.user_account_exist_and_correct_credentials(idno=idno, password=password,url='student')
     if student_sucessfully_login:
         session['student'] = student_sucessfully_login.__dict__
         student = student_sucessfully_login
@@ -163,7 +271,8 @@ def registerstudent():
                                 course=course,
                                 year=year,
                                 email=email,
-                                password=password)
+                                password=password,
+                                url='student')
     
     if student_sucessfully_registered:
         # If registration is successful, show a success alert and redirect to login page
@@ -173,4 +282,4 @@ def registerstudent():
         return redirect(url_for('main.login'))
     else:
         # If registration failed, show an error alert
-        return redirect(url_for('main.log   in'))
+        return redirect(url_for('main.login'))

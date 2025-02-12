@@ -31,6 +31,175 @@
           class="block text-sm font-medium text-gray-700"
           >IDNO</label
         >
+        <div>
+          <input type="text" name="idno" placeholder="Enter your ID Number" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
+      </div>
+      <div>
+        <label
+          for="login-password"
+          class="block text-sm font-medium text-gray-700"
+          >Password</label
+        >
+        <!-- New Password -->
+        <div class="md:col-span-2">
+            <div class="relative">
+                <input type="password" name="password" id="password" placeholder="Enter your Password"
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+                <button type="button" onclick="togglePassword('password')"
+                    class="absolute right-3 top-2 text-gray-600 hover:text-blue-600 transition">
+                    👁️
+                </button>
+            </div>
+        </div>
+      </div>
+      <!-- Save Changes Button -->
+      <div class="md:col-span-2 flex justify-center">
+        <button type="submit"
+            class="w-full md:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
+            Login
+        </button>
+      </div>
+      <div id="forgot-password" class="text-center text-sm text-blue-400">
+        <p>Forgot Password?</p>
+      </div>
+
+    </form>
+
+    <!-- Register Form -->
+    <form
+      id="register-form"
+      action="{{ url_for('main.registerstudent') }}"
+      method="post"
+      class="space-y-4 hidden "
+    >
+      <div>
+        <label
+          for="register-name"
+          class="block text-sm font-medium text-gray-700"
+          >IDNO</label
+        >
+        <div>
+          <input type="text" name="idno" placeholder="Enter your ID Number" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
+      </div>
+      <div>
+        <label
+          for="register-fname"
+          class="block text-sm font-medium text-gray-700"
+          >First Name</label
+        >
+        <div>
+          <input type="text" name="firstname" placeholder="Enter your first name" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
+      </div>
+      <div>
+        <label
+          for="register-middlename"
+          class="block text-sm font-medium text-gray-700"
+          >Middle Name</label
+        >
+        <div>
+          <input type="text" name="middlename" placeholder="Enter your middle name" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
+      </div>
+      <div>
+        <label
+          for="register-lname"
+          class="block text-sm font-medium text-gray-700"
+          >Last Name</label
+        >
+        <div>
+          <input type="text" name="lastname" placeholder="Enter your last name" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Course</label>
+        <select name="course" class="w-full px-4 py-2 border text-gray-700 border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+          <option value="">Select Course</option>
+          <option value="BSIT">BSIT</option>
+          <option value="BSCS">BSCS</option>
+          <option value="ACT">ACT</option>
+          <option value="BSN">BSN</option>
+          <option value="BSCRIM">BSCRIM</option>
+          <option value="BSEE">BSEE</option>
+          <option value="BSED">BSED</option>
+          <option value="BSBA">BSBA</option>
+          <option value="BSCpE">BSCpE</option>
+          <option value="BSHM">BSHM</option>
+          <option value="BAS">BAS</option>
+          <option value="BSCE">BSCE</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-600">Year</label>
+        <select name="year" class="w-full px-4 py-2 border text-gray-700 border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+            <option value="">Select Year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+        </select>
+      </div>
+      <div>
+        <label
+          for="register-email"
+          class="block text-sm font-medium text-gray-700"
+          >Email</label
+        >
+        <div>
+          <input type="email" name="email" placeholder="Enter your email" 
+              class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+        </div>
+      </div>
+      <div>
+        <label
+          for="register-password"
+          class="block text-sm font-medium text-gray-700"
+          >Password</label
+        >
+        <div class="md:col-span-2">
+          <div class="relative">
+              <input type="password" name="password" id="password-register" placeholder="Enter your Password"
+                  class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" required>
+              <button type="button" onclick="togglePassword('password-register')"
+                  class="absolute right-3 top-2 text-gray-600 hover:text-blue-600 transition">
+                  👁️
+              </button>
+          </div>
+        </div>
+      </div>
+      <div class="md:col-span-2 flex justify-center">
+        <button type="submit"
+            class="w-full md:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
+            Login
+        </button>
+      </div>
+    </form>
+
+    <!---RESET PASSWORD FORM -->
+    <form
+      id="forgotpass-form"
+      action="#"
+      method="post"
+      class="space-y-4 hidden "
+    >
+      <div
+      class="text-center text-xl font-bold text-green-400"  
+      >
+      <p>RESET PASSWORD</p>
+      </div>
+      <div>
+        <label
+          for="login-email"
+          class="block text-sm font-medium text-gray-700"
+          >IDNO</label
+        >
         <input
           type="text"
           name="idno"
@@ -63,139 +232,6 @@
         </button>
       </div>
     </form>
-
-    <!-- Register Form -->
-    <form
-      id="register-form"
-      action="{{ url_for('main.registerstudent') }}"
-      method="post"
-      class="space-y-4 hidden "
-    >
-      <div>
-        <label
-          for="register-name"
-          class="block text-sm font-medium text-gray-700"
-          >IDNO</label
-        >
-        <input
-          type="text"
-          id="register-name"
-          name="idno"
-          placeholder="Enter your ID Number"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
-      </div>
-      <div>
-        <label
-          for="register-fname"
-          class="block text-sm font-medium text-gray-700"
-          >First Name</label
-        >
-        <input
-          type="text"
-          id="register-fname"
-          name="firstname"
-          placeholder="Enter your first name"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
-      </div>
-      <div>
-        <label
-          for="register-middlename"
-          class="block text-sm font-medium text-gray-700"
-          >Middle Name</label
-        >
-        <input
-          type="text"
-          id="register-mname"
-          name="middlename"
-          placeholder="Enter your middle name"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
-      </div>
-      <div>
-        <label
-          for="register-lname"
-          class="block text-sm font-medium text-gray-700"
-          >Last Name</label
-        >
-        <input
-          type="text"
-          id="register-email"
-          name="lastname"
-          placeholder="Enter your lastname"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-600">Course</label>
-        <select name="course" class="w-full px-4 py-2 border text-gray-700 rounded-lg focus:ring focus:ring-blue-200">
-            <option value="">Select Course</option>
-            <option value="BSIT">BSIT</option>
-            <option value="BSCS">BSCS</option>
-            <option value="ACT">ACT</option>
-            <option value="BSN">BSN</option>
-            <option value="BSCRIM">BSCRIM</option>
-            <option value="BSCompE">BSCompE</option>
-            <option value="BSHM">BSHM</option>
-            <option value="BSBA">BSBA</option>
-            <option value="BSEE">BSEE</option>
-            <option value="BEED">BEED</option>
-            <option value="BSED">BSED</option>
-            <option value="BSBA">BSBA</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-600">Year</label>
-        <select name="year" class="w-full px-4 py-2 border text-gray-700 rounded-lg focus:ring focus:ring-blue-200">
-            <option value="">Select Year</option>
-            <option value="1">1st Year</option>
-            <option value="2">2nd Year</option>
-            <option value="3">3rd Year</option>
-            <option value="4">4th Year</option>
-        </select>
-      </div>
-      <div>
-        <label
-          for="register-email"
-          class="block text-sm font-medium text-gray-700"
-          >Email</label
-        >
-        <input
-          type="email"
-          id="register-email"
-          name="email"
-          placeholder="Enter your email"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
-      </div>
-      <div>
-        <label
-          for="register-password"
-          class="block text-sm font-medium text-gray-700"
-          >Password</label
-        >
-        <input
-          type="password"
-          name="password"
-          id="register-password"
-          placeholder="Enter your password"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required
-        />
-      </div>
-      <div class="md:col-span-2 flex justify-center">
-        <button type="submit"
-            class="w-full md:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
-            Login
-        </button>
-      </div>
-    </form>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
   <script>
@@ -205,12 +241,15 @@
     // Toggle between Login and Register forms
     const loginTab = document.getElementById("login-tab");
     const registerTab = document.getElementById("register-tab");
+    const forgotpassTab = document.getElementById("forgot-password");
     const loginForm = document.getElementById("login-form");
     const registerForm = document.getElementById("register-form");
+    const forgotpassForm = document.getElementById("forgotpass-form");
 
     loginTab.addEventListener("click", () => {
       loginForm.classList.remove("hidden");
       registerForm.classList.add("hidden");
+      forgotpassForm.classList.add("hidden");
       loginTab.classList.add("border-blue-500", "text-gray-700");
       loginTab.classList.remove("border-transparent", "text-gray-500");
       registerTab.classList.add("border-transparent", "text-gray-500");
@@ -220,11 +259,26 @@
     registerTab.addEventListener("click", () => {
       registerForm.classList.remove("hidden");
       loginForm.classList.add("hidden");
+      forgotpassForm.classList.add("hidden");
       registerTab.classList.add("border-blue-500", "text-gray-700");
       registerTab.classList.remove("border-transparent", "text-gray-500");
       loginTab.classList.add("border-transparent", "text-gray-500");
       loginTab.classList.remove("border-blue-500", "text-gray-700");
     });
+
+    forgotpassTab.addEventListener("click", () => {
+      loginForm.classList.add("hidden");
+      registerForm.classList.add("hidden");
+      forgotpassForm.classList.remove("hidden");
+      loginTab.classList.add("border-blue-500", "text-gray-700");
+      loginTab.classList.remove("border-transparent", "text-gray-500");
+      registerTab.classList.add("border-transparent", "text-gray-500");
+      registerTab.classList.remove("border-blue-500", "text-gray-700");
+    });
+    function togglePassword(id) {
+      const field = document.getElementById(id);
+      field.type = field.type === "password" ? "text" : "password";
+    }
 
   </script>
 </div>
