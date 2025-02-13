@@ -1,30 +1,26 @@
 from .user import User
+from ..security.hashpw import PasswordHashing
+from random import choice
 
 class Admin(User):
+    auth = PasswordHashing()
     def __init__(self,idno:str, firstname:str, middlename:str, lastname:str, email:str,image:str, role="Admin"):
         super().__init__(idno, firstname, middlename, lastname, email)
         self.role = role
         self.image = image
 
     def add_staff(self,**kwargs):
-        hashed_password = ""
+        """Add a new Staff"""
         password = kwargs.get("password")
+        kwargs['password'] = self.auth.hashpassword(password)
+        kwargs['image'] = choice(self.profileicons)
 
-        # Hash password
-        if password:
-            hashed_password = self.auth.hashpasword.hashpassword(password)
-            kwargs['password'] = hashed_password
+        print(f'Data to insert to table{kwargs}')
         
         try:
-            response = self.auth.user_is_registered(**{k:v for k,v in kwargs.items() if v},url='staff')
-
+            self.db.add_record(table='user',**kwargs) 
             del kwargs['password']
-            if response['success']:
-                return {'success': True}
-
-            else:
-                return {'success' : False, 'error':response['error']}
-                
+            return {'success': True} 
         except Exception as e:
             return {'success': False, 'error': str(e)}
 

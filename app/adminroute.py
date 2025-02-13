@@ -77,7 +77,19 @@ def addstaff():
     global admin_account
     if not session['admin'] == None:
         if admin_account == None:
-            admin_account = session.get('admin')
+            admin_account = Admin(**session.get('admin'))
+
+        
+        staff_data = {
+            'idno': request.form.get('idno'),
+            'firstname': request.form.get('firstname'),
+            'middlename': request.form.get('middlename'),
+            'lastname': request.form.get('lastname'),
+            'email': request.form.get('email'),
+            'course': request.form.get('course', ''),  # Default to empty string if not provided
+            'year': request.form.get('year', ''),  
+            'image': None,    # Default to empty string if not provided
+        }
 
         password = request.form['password']
         confirmpassword = request.form['confirmpassword']
@@ -86,10 +98,8 @@ def addstaff():
             flash('Password do not match', 'error')
             return redirect(url_for('admin.adminusermgt'))
 
-        staff_data = request.form.to_dict(flat=False)
-        staff_data['image'] = [None]
 
-        staff = Staff(**{k: v for k, v in staff_data.items() if k not in ['password', 'confirmpassword']})
+        staff = Staff(**{k: v for k, v in staff_data.items()})
         print(staff.__dict__)
 
         response = admin_account.add_staff(**staff.__dict__,password=password)

@@ -123,26 +123,6 @@ class Authorization():
 
             except Exception as e:
                 return {'success': False, 'error': str(e)}
-        
-        elif kwargs.get('url')=='Staff':
-            hashed_password = self.hashpasword.hashpassword(kwargs.get('password'))
-
-            staff_add_data_to_object = {k:v for k,v in kwargs.items() if not k == 'password' and not k == 'url'}
-            staff_add_data_to_object['image'] = None
-            staff_add_data_to_object['session'] = 30 # Add default amount of session
-            
-            # session['student'] = student.__dict__ 
-
-            staff_add_data_to_object['password'] = hashed_password
-            staff_add_data_to_object['image'] = choice(self.profileicons) # Add random profile icon
-
-            self.db.add_record(table='user',**student_add_data_to_object) 
-
-            del student_add_data_to_object['password']
-            student_add_data_to_object['success'] = True
-
-            return student_add_data_to_object 
-
 
         else:
             return {'success': False, 'error':'User already exists'}
