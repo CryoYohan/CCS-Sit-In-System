@@ -192,7 +192,7 @@ def logout():
     session['student'] = None
     message = "You have been logged out."
     flash(message, 'success')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('main.login'))
 
 
 @main.route('/reserve_lab', methods=['POST'])
@@ -263,13 +263,14 @@ def loginstudent():
     password: str = request.form['password']
 
     # Use Login Register Module for authorization
-    student_sucessfully_login = auth.user_account_exist_and_correct_credentials(idno=idno, password=password,url='student')
-    if student_sucessfully_login:
-        session['student'] = student_sucessfully_login.__dict__
-        student = student_sucessfully_login
+    response = auth.user_account_exist_and_correct_credentials(idno=idno, password=password,url='student')
+    if response['success']:
+        del response['success']
+        session['student'] = response
         flash("Login successful.", 'success')
         return redirect(url_for('main.dashboard'))
     else:
+        flash(response['error'], 'error')
         return render_template('login.html', user_in_login_page=True,action='Back')
 
 
@@ -287,22 +288,32 @@ def registerstudent():
     password:str = request.form['password']
 
     # Use Login Register Module for student registration
-    student_sucessfully_registered = auth.user_is_registered(idno=idno,
-                                firstname=firstname,
-                                middlename=middlename,
-                                lastname=lastname,
-                                course=course,
-                                year=year,
-                                email=email,
+    student = Student(
+                    idno=idno,
+                    firstname=firstname,
+                    middlename=middlename,
+                    lastname=lastname,
+                    course=course,
+                    year=year,
+                    email=email,
+                    image=None,
+                    session=None,
+            )
+    response = auth.user_is_registered(
+                                **student.__dict__,
                                 password=password,
-                                url='student')
+                                url='student'
+                                )
     
-    if student_sucessfully_registered:
+    if response['success']:
         # If registration is successful, show a success alert and redirect to login page
-        session['student'] = student_sucessfully_registered.__dict__
+        del response['success']
+        print(response)
+        session['student'] = response
         message = "Registration successful. Please login."
         flash(message, 'success')
         return redirect(url_for('main.login'))
     else:
         # If registration failed, show an error alert
+        flash(response['error'], 'error')
         return redirect(url_for('main.login'))

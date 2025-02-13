@@ -76,11 +76,13 @@ def loginstaff():
     idno:str = request.form['idno']
     password:str = request.form['password']
 
-    legit_staff = auth.user_account_exist_and_correct_credentials(idno=idno,password=password,url='staff') 
-    if legit_staff:
+    response = auth.user_account_exist_and_correct_credentials(idno=idno,password=password,url='staff') 
+    if response['success']:
+        del response['success']
         flash('Login successful!', 'success')
-        session['staff'] = legit_staff.__dict__
-        staff_account = legit_staff
+        session['staff'] = response
+        staff_account = Staff(**response)
         return redirect(url_for('staff.dashboard'))
     else:
+        flash(response['error'], 'error')
         return redirect(url_for('staff.login'))

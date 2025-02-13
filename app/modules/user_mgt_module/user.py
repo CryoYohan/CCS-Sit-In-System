@@ -1,10 +1,11 @@
 from ...database.dbhelper import Databasehelper
 from random import choice
+from ..login_register_module import Authorization
 
 class User():
     db = Databasehelper()
     table = 'user'
-    profileicons = ['bear.png','cat.png','chicken.png', 'meerkat.png','panda.png','polar-bear.png', 'shark.png','weasel.png','wolf.png']
+    auth = Authorization()
     def __init__(self, idno,firstname,middlename,lastname,email):
         self.idno = idno
         self.firstname = firstname
