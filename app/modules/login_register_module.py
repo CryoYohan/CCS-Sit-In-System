@@ -92,37 +92,58 @@ class Authorization():
 
         user_exist = [user['idno'] for user in users if user['idno'] == kwargs.get('idno')]
         email_exist =  [user['email'] for user in users if user['email'] == kwargs.get('email')]
+        # Check if email input already exists in database
+        if kwargs.get('email') in email_exist:
+            print(f"EMAIL EXISTS{kwargs.get('email')}\EMAIL EXISTING{email_exist}")
+            return {'success': False,'error' : 'Email already in use. Please try a different email'}
+        
+        if kwargs.get('idno') in user_exist:
+             return {'success': False,'error' : 'User already exists!'}
 
-        if not kwargs.get('idno') in user_exist and kwargs.get('url')=='student':
+        if kwargs.get('url')=='student':
             try:
-                 # Check if email input already exists in database
-                if kwargs.get('email') in email_exist:
-                    print(f"EMAIL EXISTS{kwargs.get('email')}\EMAIL EXISTING{email_exist}")
-                    return {'success': False,'error' : 'Email already in use. Please try a different email'}
+                hashed_password = self.hashpasword.hashpassword(kwargs.get('password'))
+
+                student_add_data_to_object = {k:v for k,v in kwargs.items() if not k == 'password' and not k == 'url'}
+                student_add_data_to_object['image'] = None
+                student_add_data_to_object['session'] = 30 # Add default amount of session
                 
-                else:
-                    hashed_password = self.hashpasword.hashpassword(kwargs.get('password'))
+                # session['student'] = student.__dict__ 
 
-                    student_add_data_to_object = {k:v for k,v in kwargs.items() if not k == 'password' and not k == 'url'}
-                    student_add_data_to_object['image'] = None
-                    student_add_data_to_object['session'] = 30 # Add default amount of session
-                    
-                    # session['student'] = student.__dict__ 
+                student_add_data_to_object['password'] = hashed_password
+                student_add_data_to_object['image'] = choice(self.profileicons) # Add random profile icon
+                student_add_data_to_object['session'] = 30 # Add default amount of sessions
 
-                    student_add_data_to_object['password'] = hashed_password
-                    student_add_data_to_object['image'] = choice(self.profileicons) # Add random profile icon
-                    student_add_data_to_object['session'] = 30 # Add default amount of sessions
+                self.db.add_record(table='user',**student_add_data_to_object) 
 
-                    self.db.add_record(table='user',**student_add_data_to_object) 
+                del student_add_data_to_object['password']
+                student_add_data_to_object['success'] = True
 
-                    del student_add_data_to_object['password']
-                    student_add_data_to_object['success'] = True
-
-                    return student_add_data_to_object  
+                return student_add_data_to_object  
 
             except Exception as e:
                 return {'success': False, 'error': str(e)}
+        
+        elif kwargs.get('url')=='Staff':
+            hashed_password = self.hashpasword.hashpassword(kwargs.get('password'))
+
+            staff_add_data_to_object = {k:v for k,v in kwargs.items() if not k == 'password' and not k == 'url'}
+            staff_add_data_to_object['image'] = None
+            staff_add_data_to_object['session'] = 30 # Add default amount of session
             
+            # session['student'] = student.__dict__ 
+
+            staff_add_data_to_object['password'] = hashed_password
+            staff_add_data_to_object['image'] = choice(self.profileicons) # Add random profile icon
+
+            self.db.add_record(table='user',**student_add_data_to_object) 
+
+            del student_add_data_to_object['password']
+            student_add_data_to_object['success'] = True
+
+            return student_add_data_to_object 
+
+
         else:
             return {'success': False, 'error':'User already exists'}
             

@@ -65,6 +65,7 @@ def loginadmin():
         del response['success']
         flash('Login successful!', 'success')
         session['admin'] = response
+        admin_account = Admin(**response)
         return redirect(url_for('admin.dashboard'))
     else:
         flash(response['error'], 'error')
@@ -77,8 +78,21 @@ def addstaff():
     if not session['admin'] == None:
         if admin_account == None:
             admin_account = session.get('admin')
-        staff_data = request.form.to_dict()
-        response = admin_account.add_staff(staff_data=staff_data)
+
+        password = request.form['password']
+        confirmpassword = request.form['confirmpassword']
+
+        if password != confirmpassword:
+            flash('Password do not match', 'error')
+            return redirect(url_for('admin.adminusermgt'))
+
+        staff_data = request.form.to_dict(flat=False)
+        staff_data['image'] = [None]
+
+        staff = Staff(**{k: v for k, v in staff_data.items() if k not in ['password', 'confirmpassword']})
+        print(staff.__dict__)
+
+        response = admin_account.add_staff(**staff.__dict__,password=password)
 
         if response['success']:
             flash('Successfully added','success')

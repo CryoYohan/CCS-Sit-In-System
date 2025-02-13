@@ -6,34 +6,19 @@ class Admin(User):
         self.role = role
         self.image = image
 
-    def add_staff(self,staff_data):
+    def add_staff(self,**kwargs):
         hashed_password = ""
-
-        password = staff_data.pop('password',None)
-        confirmpassword = staff_data.pop('confirm_password',None)
-
-        if password and password != confirmpassword:
-            return {"success": False, "error": "Passwords do not match"}
-
-        add_data = {
-            "idno": staff_data.get("idno"),
-            "firstname": staff_data.get("firstname"),
-            "middlename": staff_data.get("middlename"),
-            "lastname": staff_data.get("lastname"),
-            "course": staff_data.get("course"),
-            "year":staff_data.get("year"),
-            "email": staff_data.get("email"),
-        }
+        password = kwargs.get("password")
 
         # Hash password
         if password:
             hashed_password = self.auth.hashpasword.hashpassword(password)
-            add_data['password'] = hashed_password
+            kwargs['password'] = hashed_password
         
         try:
-            response = self.auth.user_is_registered(**{k:v for k,v in add_data.items() if v},url='staff')
+            response = self.auth.user_is_registered(**{k:v for k,v in kwargs.items() if v},url='staff')
 
-            del add_data['password']
+            del kwargs['password']
             if response['success']:
                 return {'success': True}
 
