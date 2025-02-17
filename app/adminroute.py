@@ -33,6 +33,21 @@ def dashboard():
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
+    
+
+@admin.route('/managelab')
+def managelab():
+    """Manage Laboratories"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        return render_template('managelab.html',user_in_login_page=True, action='Logout',admin=admin_account)
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
 
 @admin.route('/adminusermgt')
 def adminusermgt():
@@ -113,54 +128,6 @@ def addstaff():
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
-
-    #     hashed_password = ""
-
-    #     password = staff_data.pop('password',None)
-    #     confirmpassword = staff_data.pop('confirm_password',None)
-
-    #     if password and password != confirmpassword:
-    #         print(password, confirmpassword)
-    #         flash('Passwords do not match!', 'error')
-    #         return redirect(url_for('admin.adminusermgt'))
-
-    #     add_data = {
-    #         "idno": staff_data.get("idno"),
-    #         "firstname": staff_data.get("firstname"),
-    #         "middlename": staff_data.get("middlename"),
-    #         "lastname": staff_data.get("lastname"),
-    #         "course": staff_data.get("course"),
-    #         "year":staff_data.get("year"),
-    #         "email": staff_data.get("email"),
-    #     }
-
-
-    #     # Hash password
-    #     if password:
-    #         hashed_password = auth.hashpasword.hashpassword(password)
-    #         add_data['password'] = hashed_password
-        
-    #     try:
-    #         if add_data:
-    #             staff_registered = auth.user_is_registered(**{k:v for k,v in add_data.items() if v},url='staff')
-    #             del add_data['password']
-    #             if staff_registered:
-    #                 flash('Successfully added','success')
-    #                 session['staff'] = staff_registered.__dict__
-    #                 return redirect(url_for('admin.adminusermgt'))
-    #             else:
-    #                 flash('Add staff failed','error')
-    #                 return redirect(url_for('admin.adminusermgt'))
-    #         else:
-    #             flash('No Changes made')
-    #             return redirect(url_for('admin.adminusermgt'))
-
-    #     except Exception as e:
-    #         flash(str(e),'error')
-    #         return redirect(url_for('admin.adminusermgt'))
-    # else:
-    #     flash('Unauthorized Access is Prohibited', 'error')
-    #     return redirect(url_for('admin.adminlogin'))
 
 
 
