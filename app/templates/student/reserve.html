@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation Calendar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .calendar-day {
+            @apply w-12 h-12 flex items-center justify-center rounded-md cursor-pointer transition;
+        }
+        .available { @apply bg-green-500 text-white hover:bg-green-600; }
+        .full { @apply bg-red-500 text-white; }
+        .unavailable { @apply bg-gray-400 text-white cursor-not-allowed; }
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen bg-gray-100">
+
+    <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl">
+        <h2 class="text-2xl font-semibold text-center mb-4">Select a Date</h2>
+
+        <!-- Calendar Grid -->
+        <div class="grid grid-cols-7 gap-2 mb-6 text-center">
+            <div class="font-semibold">Sun</div>
+            <div class="font-semibold">Mon</div>
+            <div class="font-semibold">Tue</div>
+            <div class="font-semibold">Wed</div>
+            <div class="font-semibold">Thu</div>
+            <div class="font-semibold">Fri</div>
+            <div class="font-semibold">Sat</div>
+
+            <!-- Days will be populated here -->
+            <div id="calendar" class="grid grid-cols-7 gap-2 col-span-7"></div>
+        </div>
+
+        <!-- Time Slot Selection -->
+        <div id="time-selection" class="hidden bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-lg font-medium mb-2">Select a Time Slot</h3>
+            <div id="time-slots" class="flex flex-col space-y-2"></div>
+        </div>
+    </div>
+
+    <script>
+        const calendarElement = document.getElementById("calendar");
+        const timeSelectionElement = document.getElementById("time-selection");
+        const timeSlotsElement = document.getElementById("time-slots");
+
+        // Example availability data (backend will replace this)
+        const availability = {
+            "2025-02-15": { available: true, slots: ["10:00 AM", "2:00 PM", "4:00 PM"] },
+            "2025-02-16": { available: false, slots: [] },
+            "2025-02-17": { available: true, slots: ["9:00 AM", "1:00 PM"] },
+        };
+
+        function generateCalendar(year, month) {
+            calendarElement.innerHTML = "";
+
+            let firstDay = new Date(year, month, 1).getDay();
+            let totalDays = new Date(year, month + 1, 0).getDate();
+
+            // Fill empty slots before first day
+            for (let i = 0; i < firstDay; i++) {
+                let emptyDiv = document.createElement("div");
+                calendarElement.appendChild(emptyDiv);
+            }
+
+            // Populate calendar days
+            for (let day = 1; day <= totalDays; day++) {
+                let dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                let dayDiv = document.createElement("div");
+
+                dayDiv.textContent = day;
+                dayDiv.classList.add("calendar-day");
+
+                if (availability[dateKey]) {
+                    dayDiv.classList.add(availability[dateKey].available ? "available" : "full");
+                    dayDiv.onclick = () => showTimeSlots(dateKey, availability[dateKey].slots);
+                } else {
+                    dayDiv.classList.add("unavailable");
+                }
+
+                calendarElement.appendChild(dayDiv);
+            }
+        }
+
+        function showTimeSlots(date, slots) {
+            timeSlotsElement.innerHTML = "";
+            if (slots.length > 0) {
+                slots.forEach(slot => {
+                    let radioWrapper = document.createElement("div");
+                    radioWrapper.classList.add("flex", "items-center", "space-x-2");
+
+                    let radioInput = document.createElement("input");
+                    radioInput.type = "radio";
+                    radioInput.name = "timeSlot";
+                    radioInput.value = slot;
+                    radioInput.classList.add("form-radio", "h-5", "w-5", "text-blue-500");
+
+                    let label = document.createElement("label");
+                    label.textContent = slot;
+                    label.classList.add("text-gray-700");
+
+                    radioWrapper.appendChild(radioInput);
+                    radioWrapper.appendChild(label);
+                    timeSlotsElement.appendChild(radioWrapper);
+                });
+                timeSelectionElement.classList.remove("hidden");
+            } else {
+                timeSelectionElement.classList.add("hidden");
+            }
+        }
+
+        // Load current month
+        let today = new Date();
+        generateCalendar(today.getFullYear(), today.getMonth());
+    </script>
+
+</body>
+</html>

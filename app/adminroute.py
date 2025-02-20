@@ -88,7 +88,7 @@ def addstaff():
             'email': request.form.get('email'),
             'course': request.form.get('course', ''),  # Default to empty string if not provided
             'year': request.form.get('year', ''),  
-            'image': None,    # Default to empty string if not provided
+            'image': None,    # Set to None but will have new value later
         }
 
         password = request.form['password']

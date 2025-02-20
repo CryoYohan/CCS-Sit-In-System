@@ -186,6 +186,11 @@ def profilesettings():
         #session['student'] = None
         return redirect(url_for('main.login'))
 
+
+@main.route('/reserve')
+def reserve():
+    return render_template('reserve.html')        
+
 @main.route('/logout')
 def logout():
     """Logout page."""
