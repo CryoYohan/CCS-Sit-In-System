@@ -1,12 +1,17 @@
 from flask import render_template, request, redirect, url_for, Blueprint, session, abort,jsonify, flash
 from .modules.user_mgt_module.student import Student
 from .modules.login_register_module import Authorization
+from .modules.reservation_module.reserve_lab import Reservation
+from datetime import datetime
 
 # Register as a Blueprint for create_app() function to recognize as Flask app
 main = Blueprint('main', __name__, template_folder='templates/student')
 
 # Initialize Authorization instance Login Register Module
 auth = Authorization()
+
+# Initialize Reservation instance
+reservation = Reservation()
 
 student = None # Global student object to be reusable
 @main.after_request
@@ -48,9 +53,10 @@ def dashboard():
         #session['student'] = None
         return redirect(url_for('main.login'))
 
+
 @main.route('/sitin')
 def sitin():
-    """Profile page."""
+    """Render Sit-in page."""
     labs = [
         {
         'name': 'Lab 530',
@@ -74,13 +80,30 @@ def sitin():
         },
     ]
     global student
+    datenow = datetime.now()
+
+    if not session.get('student') == None:
+        if not student:
+            student_data = session.get('student')
+            student = Student(**student_data)
+        return render_template('sitin.html', student=student,user_in_login_page=True,action='Logout', labs=labs, datenow=datenow)
+    else:
+        message = "Please login first."
+        flash(message)
+        return redirect(url_for('main.login'))
+
+
+@main.route('/reserve')
+def reserve():
+    """Reserve page."""
+    global student
     try:
 
         if not session['student'] == None:
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('sitin.html', student=student,user_in_login_page=True,action='Logout',labs=labs)
+            return render_template('reserve.html', student=student,user_in_login_page=True,action='Logout')
          
         else:
             message = "Please login first."
@@ -184,12 +207,7 @@ def profilesettings():
         flash(str(e),'error')
         flash("Please try again")
         #session['student'] = None
-        return redirect(url_for('main.login'))
-
-
-@main.route('/reserve')
-def reserve():
-    return render_template('reserve.html')        
+        return redirect(url_for('main.login'))      
 
 @main.route('/logout')
 def logout():
@@ -200,9 +218,29 @@ def logout():
     return redirect(url_for('main.login'))
 
 
-@main.route('/reserve_lab', methods=['POST'])
-def reserve_lab():
-    pass
+@main.route('/sitin_lab', methods=['POST'])
+def sitin_lab():
+    """Handles POST method in sit-in functionality"""
+    global student
+
+    lab = request.form['lab']
+    reason = request.form['reason']
+    date = request.form['date']
+    lab = lab.split(' ')[1]
+    print(lab, reason, date)
+    response = reservation.add_sitin_details(
+                                                lab_id=reservation.retrieve_lab_id(lab), 
+                                                idno=student.idno, reason=reason, 
+                                                sitin_datetime=date
+                                             )
+    
+    if response['success']:
+        flash('Request Sent!', 'success')
+        return redirect(url_for('main.sitin'))
+
+    else:
+        flash(response['error'],'error')
+        return redirect(url_for('main.sitin'))
 
 
 @main.route('/editprofile', methods=['POST'])

@@ -1,121 +1,83 @@
 {% extends 'dashboard_template.html' %}
 {% block content %}
-<div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4 text-center">Computer Laboratory Seat Reservation</h1>
-    <div class="bg-white shadow-md rounded-lg p-6">
-      <div class="flex justify-between items-center mb-4 bg-gray-100 p-3 rounded-lg shadow-md">
-        <button id="prevMonth" class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-200 active:scale-95 transition-all duration-200 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M12.707 15.707a1 1 0 0 1-1.414 0l-5-5a1 1 0 0 1 0-1.414l5-5a1 1 0 1 1 1.414 1.414L8.414 10l4.293 4.293a1 1 0 0 1 0 1.414z" clip-rule="evenodd"/>
-            </svg>
-            Prev
-        </button>
-    
-        <h2 id="monthYear" class="text-xl font-bold text-gray-700"></h2>
-    
-        <button id="nextMonth" class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-200 active:scale-95 transition-all duration-200 flex items-center gap-2">
-            Next
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M7.293 16.707a1 1 0 0 1 0-1.414L11.586 10 7.293 5.707a1 1 0 1 1 1.414-1.414l5 5a1 1 0 0 1 0 1.414l-5 5a1 1 0 0 1-1.414 0z" clip-rule="evenodd"/>
-            </svg>
-        </button>
+<div class="container mx-auto p-6">
+  <!-- Laboratory Selection -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    {% for lab in labs %}
+    <div class="bg-white shadow-md rounded-lg overflow-hidden transform transition-transform hover:scale-105 cursor-pointer" onclick="openModal('{{ lab.name }}', {{ lab.availableSeats }})">
+      <img src="{{ url_for('static', filename='images/laboratories/'+lab.image) }}" alt="{{ lab.name }}" class="w-full h-32 object-cover">
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800">{{ lab.name }}</h3>
+        <p class="text-sm text-gray-600">{{ lab.description }}</p>
+      </div>
     </div>
-    
-        <div class="grid grid-cols-7 gap-2 text-center font-semibold bg-gray-200 p-2 rounded">
-            <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+    {% endfor %}
+  </div>
+
+  <!-- Reservation Form -->
+  <div class="bg-white shadow-md rounded-lg p-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sit-in Laboratory</h2>
+    <form action="{{ url_for('main.sitin_lab') }}" method="POST" class="space-y-4">
+        <div>
+            <label for="date" class="block text-sm font-medium text-gray-700">Sit-in Date and Time</label>
+            <input type="text" id="date" name="date" value="{{ datenow }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-blue-200 focus:ring-blue-500 focus:border-blue-500" readonly>
+        </div> 
+        <div>
+            <label for="lab" class="block text-sm font-medium text-gray-700">Select Laboratory</label>
+            <select id="lab" name="lab" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            {% for lab in labs %}
+            <option value="{{ lab.name }}">{{ lab.name }}</option>
+            {% endfor %}
+            </select>
         </div>
-        <div id="calendar" class="grid grid-cols-7 gap-2 mt-2 text-center"></div>
-    </div>
+        <div>
+            <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Sit-in</label>
+            <select id="reason" name="reason" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            <option value="Programming Related Projects">Programming Related Projects</option>
+            <option value="Java">Java</option>
+            <option value="Python">Python</option>
+            <option value="C">C</option>
+            <option value="C#">C#</option>
+            <option value="Web Dev">Web Dev</option>
+            <option value="School purposes">School purposes</option>
+            <!-- Add more options as needed -->
+            </select>
+        </div>
+        <div>
+        <div class="flex justify-center">
+            <button type="submit" class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-2 rounded-lg text-lg hover:bg-blue-700 transition duration-300 shadow-md">
+            Request Sit-in
+            </button>
+        </div>
+    </form>
+  </div>
 </div>
 
 <!-- Modal -->
-<div id="reservationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h3 class="text-lg font-medium text-gray-900 text-center">Available Schedules</h3>
-        <form action="#">
-            <div class="mt-3" id="scheduleList"></div>
-            <div class="flex justify-center gap-2">
-              <div class="mt-4">
-                <button id="reserve" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-gray-700">Reserve</button>
-              </div>
-              <div class="mt-4 ">
-                  <button id="closeModal" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700">Close</button>
-              </div>
-            </div> 
-        </form>
-       
+<div id="labModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-lg overflow-hidden w-1/3">
+    <div class="p-4 border-b">
+      <h3 class="text-lg font-semibold text-gray-800" id="modalLabName">Lab Name</h3>
     </div>
+    <div class="p-4">
+      <p class="text-sm text-gray-600">Available Seats: <span id="modalAvailableSeats">50</span></p>
+      <!-- Add more details as needed -->
+    </div>
+    <div class="p-4 border-t flex justify-end">
+      <button onclick="closeModal()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300">Close</button>
+    </div>
+  </div>
 </div>
 
 <script>
-    let currentMonth = new Date().getMonth();
-    let currentYear = new Date().getFullYear();
+  function openModal(labName, availableSeats) {
+    document.getElementById('modalLabName').innerText = labName;
+    document.getElementById('modalAvailableSeats').innerText = availableSeats;
+    document.getElementById('labModal').classList.remove('hidden');
+  }
 
-
-    const calendarData = {
-        "2025-02-20": { status: "available", schedules: ["9am-10am", "1pm-2pm"] },
-        "2025-02-19": { status: "available", schedules: ["9am-10am", "1pm-2pm"] },
-        "2025-02-21": { status: "full", schedules: [] },
-        "2025-02-22": { status: "closed", schedules: [] }
-    };
-
-    function generateCalendar(year, month) {
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const calendar = document.getElementById('calendar');
-        calendar.innerHTML = '';
-        document.getElementById('monthYear').innerText = new Date(year, month).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-
-        const adjustedFirstDay = (firstDay === 0) ? 6 : firstDay - 1;
-
-        for (let i = 0; i < adjustedFirstDay; i++) {
-            const emptyCell = document.createElement('div');
-            calendar.appendChild(emptyCell);
-        }
-
-        for (let i = 1; i <= daysInMonth; i++) {
-            const date = `${year}-${(month + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
-            const dayData = calendarData[date] || { status: "closed", schedules: [] };
-            const dayElement = document.createElement('div');
-            dayElement.className = `p-4 border rounded-lg cursor-pointer transition text-center ` +
-                `${dayData.status === 'available' ? 'bg-green-200 hover:bg-green-300' : dayData.status === 'full' ? 'bg-red-200 hover:bg-red-300' : 'bg-gray-200 hover:bg-gray-300'}`;
-            dayElement.innerText = i;
-            dayElement.onclick = () => openModal(date, dayData.schedules);
-            calendar.appendChild(dayElement);
-        }
-    }
-
-    function openModal(date, schedules) {
-        document.getElementById('scheduleList').innerHTML = schedules.length > 0 ? 
-            schedules.map(schedule => `<div class='mb-2'><input type='radio' name='schedule' value='${schedule}' class='mr-2'>${schedule}</div>`).join('') 
-            : '<p class="text-gray-500 text-center">No available schedules</p>';
-        document.getElementById('reservationModal').classList.remove('hidden');
-    }
-
-    document.getElementById('closeModal').onclick = () => {
-        document.getElementById('reservationModal').classList.add('hidden');
-    };
-
-    document.getElementById('prevMonth').onclick = () => {
-        if (currentMonth === 0) {
-            currentMonth = 11;
-            currentYear--;
-        } else {
-            currentMonth--;
-        }
-        generateCalendar(currentYear, currentMonth);
-    };
-
-    document.getElementById('nextMonth').onclick = () => {
-        if (currentMonth === 11) {
-            currentMonth = 0;
-            currentYear++;
-        } else {
-            currentMonth++;
-        }
-        generateCalendar(currentYear, currentMonth);
-    };
-
-    generateCalendar(currentYear, currentMonth);
+  function closeModal() {
+    document.getElementById('labModal').classList.add('hidden');
+  }
 </script>
 {% endblock %}
