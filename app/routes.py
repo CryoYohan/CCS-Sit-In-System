@@ -126,7 +126,10 @@ def records():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('records.html', student=student,user_in_login_page=True,action='Logout')
+            
+            records = reservation.retrieve_sitinrecords(idno=student.idno)
+
+            return render_template('records.html', student=student,user_in_login_page=True,action='Logout', records=records)
 
         else:
             message = "Please login first."
@@ -149,7 +152,10 @@ def sessions():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('sessions.html', student=student,user_in_login_page=True,action='Logout')
+
+            records = reservation.retrieve_sessionhistory(idno=student.idno)
+
+            return render_template('sessions.html', student=student,user_in_login_page=True,action='Logout', records=records)
 
         else:
             message = "Please login first."
@@ -230,8 +236,7 @@ def sitin_lab():
     print(lab, reason, date)
     response = reservation.add_sitin_details(
                                                 lab_id=reservation.retrieve_lab_id(lab), 
-                                                idno=student.idno, reason=reason, 
-                                                sitin_datetime=date
+                                                idno=student.idno, reason=reason,
                                              )
     
     if response['success']:

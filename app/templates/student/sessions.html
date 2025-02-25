@@ -33,14 +33,14 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Example Row -->
+        {% for record in records %}
         <tr>
-          <td class="py-2 px-4 border-b">Feb 15, 2025</td>
+          <td class="py-2 px-4 border-b">{{ record['sitin_out'] }}</td>
           <td class="py-2 px-4 border-b">10:00 AM - 12:00 PM</td>
           <td class="py-2 px-4 border-b">Chemistry Lab</td>
           <td class="py-2 px-4 border-b text-green-500">Confirmed</td>
         </tr>
-        <!-- Additional rows as needed -->
+        {% endfor %}
       </tbody>
     </table>
   </div>

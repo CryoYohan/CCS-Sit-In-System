@@ -3,7 +3,7 @@ class Reservation():
     db = Databasehelper()
     table_lab = 'lab'
     table_reserve = 'sitin_reservation'
-    def add_sitin_details(self,lab_id, idno,reason, sitin_datetime, sitinout_datetime=None, staff_idno=None,status='Pending'):
+    def add_sitin_details(self,lab_id, idno,reason, sitin_datetime=None, sitinout_datetime=None, staff_idno=None,status='Pending'):
         try:
             self.db.add_record(
                             table=self.table_reserve,
@@ -34,3 +34,11 @@ class Reservation():
                 
 
         return lab_id
+
+    def retrieve_sitinrecords(self, idno:str):
+        """Retrieve all sitin records"""
+        return self.db.getall_sitinrecords(idno=idno)
+
+    def retrieve_sessionhistory(self, idno:str):
+        """Retrieve all session history"""
+        return self.db.getall_sessionhistory(idno=idno)
