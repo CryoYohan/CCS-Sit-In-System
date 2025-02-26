@@ -1,34 +1,45 @@
-{% extends 'dashboard_template.html' %}
-{% block content %}
+{% extends 'dashboard_template.html' %} {% block content %}
 <div class="bg-white shadow-md rounded-lg p-6 overflow-x-auto">
-    <h3 class="text-xl font-semibold text-gray-700 mb-4">Sit-in Reservation Records</h3>
-    <table class="min-w-full bg-white border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="py-2 px-4 border text-center w-auto">Reservation ID</th>
-                <th class="py-2 px-4 border text-center w-auto">Laboratory ID</th>
-                <th class="py-2 px-4 border text-center w-auto">Student IDNO</th>
-                <th class="py-2 px-4 border text-center w-auto">Lab</th>
-                <th class="py-2 px-4 border text-center w-auto">Status</th>
-                <th class="py-2 px-4 border text-center w-auto">Sit-in Time</th>
-                <th class="py-2 px-4 border text-center w-auto">Log-off Time</th>
-                <th class="py-2 px-4 border text-center w-auto">Staff</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="border-b">
-                <td class="py-2 px-4 border text-center">1</td>
-                <td class="py-2 px-4 border text-center">1</td>
-                <td class="py-2 px-4 border text-center">22604185</td>
-                <td class="py-2 px-4 border text-center">Chemistry Lab</td>
-                <td class="py-2 px-4 border-b text-center">
-                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-200 text-gray-700">Completed</span>
-                </td>
-                <td class="py-2 px-4 border text-center">11:56 AM</td>
-                <td class="py-2 px-4 border text-center">1:30 PM</td>
-                <td class="py-2 px-4 border text-center">Dennis Durano</td>
-            </tr>
-        </tbody>
-    </table>
+  <h3 class="text-xl font-semibold text-gray-700 mb-4">
+    Sit-in Reservation Records
+  </h3>
+  <table class="min-w-full bg-white border-collapse border border-gray-300">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="py-2 px-4 border text-center w-auto">Reservation ID</th>
+        <th class="py-2 px-4 border text-center w-auto">Laboratory</th>
+        <th class="py-2 px-4 border text-center w-auto">Student IDNO</th>
+        <th class="py-2 px-4 border text-center w-auto">Name</th>
+        <th class="py-2 px-4 border text-center w-auto">Status</th>
+        <th class="py-2 px-4 border text-center w-auto">Sit-in Time</th>
+        <th class="py-2 px-4 border text-center w-auto">Log-off Time</th>
+        <th class="py-2 px-4 border text-center w-auto">Staff</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr class="border-b"></tr>
+            <td class="py-2 px-4 border text-center">{{ record['reservation_id'] }}</td>
+            <td class="py-2 px-4 border text-center">{{ record['lab_name'] }}</td>
+            <td class="py-2 px-4 border text-center">{{ record['idno'] }}</td>
+            <td class="py-2 px-4 border text-center">{{ record['firstname'] }}</td>
+            <td class="py-2 px-4 border-b text-center">
+            <span
+                class="px-3 py-1 rounded-full text-sm font-semibold 
+                {% if record['status'] == 'Completed' %}bg-gray-200
+                {% elif record['status'] == 'Pending'%} bg-yellow-300
+                {% elif record['status'] == 'Approved'%} bg-green-400
+                {% elif record['status'] == 'Declined'%} bg-red-400 {% endif %}
+                text-gray-700"
+                >{{ record['status'] }}</span
+            >
+            </td>
+            <td class="py-2 px-4 border text-center">{{ record['sitin_in'] }}</td>
+            <td class="py-2 px-4 border text-center">{{ record['sitin_out'] }}</td>
+            <td class="py-2 px-4 border text-center">{{ record['staff_idno'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

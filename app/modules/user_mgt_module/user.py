@@ -1,5 +1,4 @@
 from ...database.dbhelper import Databasehelper
-from random import choice
 from ..login_register_module import Authorization
 
 class User():

@@ -16,7 +16,7 @@
 
   <!-- Action Buttons -->
   <div class="flex space-x-4 mb-6">
-    <a href="{{ url_for('main.sitin') }}" class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">Reserve for Sit-in</a>
+    <a href="{{ url_for('main.reserve') }}" class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">Reserve for Sit-in</a>
     <a href="{{ url_for('main.profilesettings') }}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">Reservation Records</a>
   </div>
 
@@ -33,14 +33,14 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Example Row -->
+        {% for record in records %}
         <tr>
-          <td class="py-2 px-4 border-b">Feb 15, 2025</td>
+          <td class="py-2 px-4 border-b">{{ record['sitin_out'] }}</td>
           <td class="py-2 px-4 border-b">10:00 AM - 12:00 PM</td>
           <td class="py-2 px-4 border-b">Chemistry Lab</td>
           <td class="py-2 px-4 border-b text-green-500">Confirmed</td>
         </tr>
-        <!-- Additional rows as needed -->
+        {% endfor %}
       </tbody>
     </table>
   </div>

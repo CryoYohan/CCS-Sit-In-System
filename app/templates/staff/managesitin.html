@@ -6,7 +6,7 @@
         <thead>
             <tr class="bg-gray-100">
                 <th class="py-2 px-4 border text-center w-auto">Reservation ID</th>
-                <th class="py-2 px-4 border text-center w-auto">Laboratory ID</th>
+                <th class="py-2 px-4 border text-center w-auto">Laboratory Name</th>
                 <th class="py-2 px-4 border text-center w-auto">Student IDNO</th>
                 <th class="py-2 px-4 border text-center w-auto">Lab</th>
                 <th class="py-2 px-4 border text-center w-auto">Status</th>
@@ -16,16 +16,22 @@
             </tr>
         </thead>
         <tbody>
+            {% for record in records %}
             <tr class="border-b">
-                <td class="py-2 px-4 border text-center">1</td>
-                <td class="py-2 px-4 border text-center">1</td>
-                <td class="py-2 px-4 border text-center">22604185</td>
-                <td class="py-2 px-4 border text-center">Chemistry Lab</td>
+                <td class="py-2 px-4 border text-center">{{ record['reservation_id'] }}</td>
+                <td class="py-2 px-4 border text-center">{{ record['lab_name'] }}</td>
+                <td class="py-2 px-4 border text-center">{{ record['idno'] }}</td>
+                <td class="py-2 px-4 border text-center">{{ record['reservation_id'] }}</td>
                 <td class="py-2 px-4 border text-center">
-                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-200 text-green-700">Confirmed</span>
+                    <span class="px-3 py-1 rounded-full text-sm font-semibold 
+                    {% if record['status'] == 'Completed' %}bg-gray-200
+                    {% elif record['status'] == 'Pending'%} bg-yellow-300
+                    {% elif record['status'] == 'Approved'%} bg-green-400
+                    {% elif record['status'] == 'Declined'%} bg-red-400 {% endif %}
+                     text-gray-700">{{ record['status'] }}</span>
                 </td>
-                <td class="py-2 px-4 border text-center">11:56 AM</td>
-                <td class="py-2 px-4 border text-center"></td>
+                <td class="py-2 px-4 border text-center">{{ record['sitin_in'] }}</td>
+                <td class="py-2 px-4 border text-center">{{ record['sitin_out'] }}</td>
                 <td class="py-2 px-4 border text-center flex justify-center space-x-2">
                     <button onclick="updateStatus(this, 'Confirmed')" class="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600 transition">
                         Accept
@@ -35,6 +41,7 @@
                     </button>
                 </td>
             </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
