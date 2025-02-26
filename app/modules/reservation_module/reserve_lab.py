@@ -23,6 +23,10 @@ class Reservation():
 
     def deny_sitin(self):
         pass
+    
+    def retrieve_labs(self)->list:
+        """Retrieve all labs"""
+        return self.db.getall_records(table=self.table_lab)
 
     def retrieve_lab_id(self, lab_name):
         """Retrieve lab id using UNIQUE lab name shet"""
@@ -31,8 +35,6 @@ class Reservation():
         for lab in labs:
             if lab['lab_name'] == lab_name:
                 lab_id = lab['lab_id']
-                
-
         return lab_id
 
     def retrieve_sitinrecords(self, idno:str):

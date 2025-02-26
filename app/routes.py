@@ -22,12 +22,20 @@ def after_request(response):
 @main.route('/')
 def index():
     """Landing page."""
-    return render_template('index.html', user_in_login_page=False, action='Login')
+    return render_template(
+                            'index.html',
+                            user_in_login_page=False, 
+                            action='Login'
+                            )
 
 @main.route('/login')
 def login():
     """Login page."""
-    return render_template('login.html',user_in_login_page=True,action='Back')
+    return render_template(
+                            'login.html',
+                            user_in_login_page=True,
+                            action='Back'
+                           )
 
 
 @main.route('/dashboard')
@@ -40,7 +48,12 @@ def dashboard():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('dashboard.html', student=student,user_in_login_page=True,action='Logout')
+            return render_template(
+                                    'dashboard.html', 
+                                    student=student,
+                                    user_in_login_page=True,
+                                    action='Logout',
+                                   )
          
         else:
             message = "Please login first."
@@ -57,7 +70,7 @@ def dashboard():
 @main.route('/sitin')
 def sitin():
     """Render Sit-in page."""
-    labs = [
+    labs2 = [
         {
         'name': 'Lab 530',
         'description': 'A lab for 530',
@@ -80,13 +93,22 @@ def sitin():
         },
     ]
     global student
+    labs = reservation.retrieve_labs()
     datenow = datetime.now()
 
     if not session.get('student') == None:
         if not student:
             student_data = session.get('student')
             student = Student(**student_data)
-        return render_template('sitin.html', student=student,user_in_login_page=True,action='Logout', labs=labs, datenow=datenow)
+
+        return render_template(
+                                'sitin.html', 
+                                student=student,
+                                user_in_login_page=True,
+                                action='Logout',
+                                labs=labs,
+                                datenow=datenow
+                               )
     else:
         message = "Please login first."
         flash(message)
@@ -178,7 +200,12 @@ def rulesregulations():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('rulesregulations.html', student=student,user_in_login_page=True,action='Logout')
+            return render_template(
+                                    'rulesregulations.html', 
+                                    student=student,
+                                    user_in_login_page=True,
+                                    action='Logout'
+                                   )
          
         else:
             message = "Please login first."
@@ -202,7 +229,12 @@ def profilesettings():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('profilesettings.html', student=student,user_in_login_page=True,action='Logout')
+            return render_template(
+                                    'profilesettings.html', 
+                                    student=student,
+                                    user_in_login_page=True,
+                                    action='Logout'
+                                    )
          
         else:
             message = "Please login first."
@@ -235,8 +267,8 @@ def sitin_lab():
     lab = lab.split(' ')[1]
     print(lab, reason, date)
     response = reservation.add_sitin_details(
-                                                lab_id=reservation.retrieve_lab_id(lab), 
-                                                idno=student.idno, reason=reason,
+                                            lab_id=reservation.retrieve_lab_id(lab), 
+                                            idno=student.idno, reason=reason,
                                              )
     
     if response['success']:
@@ -346,7 +378,7 @@ def registerstudent():
                     email=email,
                     image=None,
                     session=None,
-            )
+                    )
     response = auth.user_is_registered(
                                 **student.__dict__,
                                 password=password,
