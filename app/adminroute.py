@@ -29,11 +29,55 @@ def dashboard():
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
-        return render_template('admindashboard.html',user_in_login_page=True, action='Logout',admin=admin_account)
+        return render_template(
+                                'admindashboard.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account
+                               )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
     
+
+@admin.route('/announcements')
+def announcements():
+    """Announcements"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        return render_template(
+                                'announcements.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account
+                                )
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+    
+@admin.route('/users')
+def users():
+    """Users"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        return render_template(
+                                'users.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account
+                                )
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+
 
 @admin.route('/managelab')
 def managelab():
@@ -44,7 +88,12 @@ def managelab():
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
-        return render_template('managelab.html',user_in_login_page=True, action='Logout',admin=admin_account)
+        return render_template(
+                                'managelab.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account
+                                )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
@@ -58,7 +107,12 @@ def adminusermgt():
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
-        return render_template('adminusermgt.html',user_in_login_page=True, action='Logout',admin=admin_account)
+        return render_template(
+                                'adminusermgt.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account
+                                )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
@@ -75,7 +129,11 @@ def loginadmin():
     idno:str = request.form['idno']
     password:str = request.form['password']
 
-    response = auth.user_account_exist_and_correct_credentials(idno=idno,password=password,url='admin') 
+    response = auth.user_account_exist_and_correct_credentials(
+                                                                idno=idno,
+                                                                password=password,
+                                                                url='admin',
+                                                                ) 
     if response['success']:
         del response['success']
         flash('Login successful!', 'success')
@@ -96,15 +154,15 @@ def addstaff():
 
         
         staff_data = {
-            'idno': request.form.get('idno'),
-            'firstname': request.form.get('firstname'),
-            'middlename': request.form.get('middlename'),
-            'lastname': request.form.get('lastname'),
-            'email': request.form.get('email'),
-            'course': request.form.get('course', ''),  # Default to empty string if not provided
-            'year': request.form.get('year', ''),  
-            'image': None,    # Set to None but will have new value later
-        }
+                    'idno': request.form.get('idno'),
+                    'firstname': request.form.get('firstname'),
+                    'middlename': request.form.get('middlename'),
+                    'lastname': request.form.get('lastname'),
+                    'email': request.form.get('email'),
+                    'course': request.form.get('course', ''),  # Default to empty string if not provided
+                    'year': request.form.get('year', ''),  
+                    'image': None,    # Set to None but will have new value later
+                    }   
 
         password = request.form['password']
         confirmpassword = request.form['confirmpassword']

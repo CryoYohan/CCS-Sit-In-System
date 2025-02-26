@@ -70,28 +70,6 @@ def dashboard():
 @main.route('/sitin')
 def sitin():
     """Render Sit-in page."""
-    labs2 = [
-        {
-        'name': 'Lab 530',
-        'description': 'A lab for 530',
-        'image': '530.jpg',
-        },
-        {
-        'name': 'Lab 544',
-        'description': 'A lab for 544',
-        'image': '544.avif',
-        },
-        {
-        'name': 'Lab 526',
-        'description': 'A lab for 526',
-        'image': '526.jpg',
-        },
-        {
-        'name': 'Lab 524',
-        'description': 'A lab for 524',
-        'image': '524.jpg',
-        },
-    ]
     global student
     labs = reservation.retrieve_labs()
     datenow = datetime.now()
@@ -125,7 +103,16 @@ def reserve():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
-            return render_template('reserve.html', student=student,user_in_login_page=True,action='Logout')
+            
+            labs = reservation.retrieve_labs()
+
+            return render_template(
+                                    'reserve.html', 
+                                    student=student,
+                                    user_in_login_page=True,
+                                    action='Logout',
+                                    labs=labs,
+                                   )
          
         else:
             message = "Please login first."
@@ -233,7 +220,7 @@ def profilesettings():
                                     'profilesettings.html', 
                                     student=student,
                                     user_in_login_page=True,
-                                    action='Logout'
+                                    action='Logout',
                                     )
          
         else:
@@ -250,7 +237,9 @@ def profilesettings():
 @main.route('/logout')
 def logout():
     """Logout page."""
+    global student
     session['student'] = None
+    student = None
     message = "You have been logged out."
     flash(message, 'success')
     return redirect(url_for('main.login'))
