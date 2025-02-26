@@ -6,13 +6,13 @@ class Reservation():
     def add_sitin_details(self,lab_id, idno,reason, sitin_datetime=None, sitinout_datetime=None, staff_idno=None,status='Pending'):
         try:
             self.db.add_record(
-                            table=self.table_reserve,
-                            lab_id=lab_id, idno=idno,
-                            reason=reason, 
-                            sitin_in=sitin_datetime, 
-                            sitin_out=sitinout_datetime,
-                            staff_idno=staff_idno,status=status,
-                           )
+                                table=self.table_reserve,
+                                lab_id=lab_id, idno=idno,
+                                reason=reason, 
+                                sitin_in=sitin_datetime, 
+                                sitin_out=sitinout_datetime,
+                                staff_idno=staff_idno,status=status,
+                            )
             return {'success': True}
         
         except Exception as e:
