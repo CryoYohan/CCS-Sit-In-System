@@ -98,8 +98,8 @@ def managelab():
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
     
-@admin.route('/records')
-def records():
+@admin.route('/adminrecords')
+def adminrecords():
     """Records"""
     global admin_account
     if not session['admin'] == None:
@@ -108,7 +108,7 @@ def records():
             admin_account = Admin(**admin_account)
 
         return render_template(
-                                'records.html',
+                                'adminrecords.html',
                                 user_in_login_page=True, 
                                 action='Logout',
                                 admin=admin_account
@@ -125,12 +125,16 @@ def adminusermgt():
         if admin_account == None:
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
+            
+        staffs = admin_account.retrieve_all_staff()
+        
 
         return render_template(
                                 'adminusermgt.html',
                                 user_in_login_page=True, 
                                 action='Logout',
-                                admin=admin_account
+                                admin=admin_account,
+                                staffs=staffs,
                                 )
     else:
         flash('Unauthorized Access is Prohibited', 'error')

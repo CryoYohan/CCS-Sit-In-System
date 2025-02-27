@@ -36,6 +36,11 @@ class Databasehelper:
         query = f"SELECT * FROM {table}"
         return self.getprocess(query)
 
+    def getall_records_rolebased(self,role:str)->list:
+        """Retrieves all staff"""
+        query = f"SELECT * FROM user WHERE role = '{role}' ORDER BY lastname"
+        return self.getprocess(query)
+
     def getall_sitinrecords(self, idno:str)->list:
         """Retrieve all records joined from user table and lab table"""
         if not idno == None:

@@ -23,6 +23,10 @@ class Admin(User):
             return {'success': True} 
         except Exception as e:
             return {'success': False, 'error': str(e)}
+    
+    def retrieve_all_staff(self):
+        """Retrieve all staff"""
+        return self.db.getall_records_rolebased(role='Staff')
 
 
     def delete(self):
