@@ -1,4 +1,4 @@
-from flask import session, url_for, Blueprint, render_template, request, flash, redirect
+from flask import session, url_for, Blueprint, render_template, request, flash, redirect, jsonify
 from .modules.user_mgt_module.staff import Staff
 from .modules.user_mgt_module.admin import Admin
 from .modules.login_register_module import Authorization
@@ -78,11 +78,14 @@ def users():
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
+        users = admin_account.retrieve_all_users()
+
         return render_template(
                                 'users.html',
                                 user_in_login_page=True, 
                                 action='Logout',
-                                admin=admin_account
+                                admin=admin_account,
+                                users=users,
                                 )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
@@ -215,7 +218,29 @@ def announce():
     else:
         flash(response['error'], 'error')
         return redirect(url_for('admin.admin_announcements'))
-    
+
+@admin.route('/filterusers', methods=['POST'])
+def filterusers():
+    global admin_account
+    if session.get('admin') is not None:
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
+
+        role = request.form['role']
+        
+        if role == "all":
+            filtered_users = admin_account.retrieve_all_students()
+        elif role == "staff":
+            filtered_users = admin_account.retrieve_all_staff()
+        else:
+            filtered_users = admin_account.retrieve_all_students()
+
+        # Convert sqlite3.Row objects to dictionaries
+        users_list = [dict(user) for user in filtered_users]
+
+        return jsonify(users=users_list)
+    else:
+        return jsonify(error="Unauthorized Access"), 401
 
 
 @admin.route('/addstaff', methods=['POST'])

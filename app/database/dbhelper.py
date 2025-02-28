@@ -35,6 +35,11 @@ class Databasehelper:
         """Retrieves all records from a specified table."""
         query = f"SELECT * FROM {table}"
         return self.getprocess(query)
+    
+    def get_all_users(self)->list:
+        """Retrieves all records from a specified table."""
+        query = f"SELECT * FROM user WHERE role <> 'Admin'"
+        return self.getprocess(query)
 
     def getall_records_rolebased(self,role:str)->list:
         """Retrieves all staff"""

@@ -28,6 +28,15 @@ class Admin(User):
         """Retrieve all staff"""
         return self.db.getall_records_rolebased(role='Staff')
 
+    def retrieve_all_students(self):
+        """Retrieve all students"""
+        return self.db.getall_records_rolebased(role='Student')
+    
+    def retrieve_all_users(self):
+        """Retrieve all users"""
+        return self.db.get_all_users()
+
+
     def add_announcement(self, **kwargs):
         """Add an announcement"""
         try:
