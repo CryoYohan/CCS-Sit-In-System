@@ -228,19 +228,27 @@ def filterusers():
 
         role = request.form['role']
         
+        users = admin_account.retrieve_all_students()
+
+        # If "all" is selected, do not filter
         if role == "all":
-            filtered_users = admin_account.retrieve_all_students()
+            filtered_users = users
         elif role == "staff":
             filtered_users = admin_account.retrieve_all_staff()
         else:
             filtered_users = admin_account.retrieve_all_students()
 
-        # Convert sqlite3.Row objects to dictionaries
-        users_list = [dict(user) for user in filtered_users]
-
-        return jsonify(users=users_list)
+        return render_template(
+            'users.html',
+            user_in_login_page=True,
+            action='Logout',
+            admin=admin_account,
+            users=filtered_users,
+        )
     else:
-        return jsonify(error="Unauthorized Access"), 401
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+
 
 
 @admin.route('/addstaff', methods=['POST'])
