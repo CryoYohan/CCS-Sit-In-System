@@ -28,6 +28,32 @@ class Admin(User):
         """Retrieve all staff"""
         return self.db.getall_records_rolebased(role='Staff')
 
+    def add_announcement(self, **kwargs):
+        """Add an announcement"""
+        try:
+            self.db.add_record(table='announcement',**kwargs) 
+            return {'success': True} 
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+    
+    def retrieve_all_announcements(self):
+        """Retrieve all announcements"""
+        try:
+            announcements = self.db.getall_records(table='announcement')
+            return{'success':True, 'announcements':announcements}
+        
+        except Exception as e:
+            return {'erorr':str(e)}
+    
+    def retrieve_all_sitinrecords(self):
+        """Retrieve all Joined Sitin Records"""
+        try:
+            sitinrecords = self.db.getall_sitinrecords(idno=None)
+            return{'success':True, 'sitinrecords':sitinrecords}
+        
+        except Exception as e:
+            return {'erorr':str(e)}
+
 
     def delete(self):
         pass

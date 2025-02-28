@@ -3,6 +3,8 @@ from .modules.user_mgt_module.staff import Staff
 from .modules.user_mgt_module.admin import Admin
 from .modules.login_register_module import Authorization
 from .database.dbhelper import Databasehelper
+from werkzeug.utils import secure_filename
+import os
 
 admin = Blueprint('admin', __name__, template_folder='templates/admin',url_prefix='/admin')
 
@@ -40,8 +42,8 @@ def dashboard():
         return redirect(url_for('admin.adminlogin'))
     
 
-@admin.route('/announcements')
-def announcements():
+@admin.route('/admin_announcements')
+def admin_announcements():
     """Announcements"""
     global admin_account
     if not session['admin'] == None:
@@ -49,12 +51,20 @@ def announcements():
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
-        return render_template(
-                                'announcements.html',
-                                user_in_login_page=True, 
-                                action='Logout',
-                                admin=admin_account
-                                )
+        response = admin_account.retrieve_all_announcements()
+
+        if response['success']:
+            return render_template(
+                                    'admin_announcements.html',
+                                    user_in_login_page=True, 
+                                    action='Logout',
+                                    admin=admin_account,
+                                    announcements=response['announcements'],
+                                    )
+        else:
+            flash('An error occured', 'error')
+            return redirect(url_for('admin.dashboard'))
+
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
@@ -106,13 +116,17 @@ def adminrecords():
         if admin_account == None:
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
+        
+        response = admin_account.retrieve_all_sitinrecords()
 
-        return render_template(
-                                'adminrecords.html',
-                                user_in_login_page=True, 
-                                action='Logout',
-                                admin=admin_account
-                                )
+        if response['success']:
+            return render_template(
+                                    'adminrecords.html',
+                                    user_in_login_page=True, 
+                                    action='Logout',
+                                    admin=admin_account,
+                                    records=response['sitinrecords'],
+                                    )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
@@ -166,6 +180,42 @@ def loginadmin():
     else:
         flash(response['error'], 'error')
         return redirect(url_for('admin.adminlogin'))
+
+
+@admin.route('/announce', methods=['POST'])
+def announce():
+    """Handle Announcements Post REQUESTS"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = Admin(**session.get('admin'))
+
+    title: str = request.form['title']
+    description: str = request.form['description']
+    #image = request.files['image']  # Use request.files for file uploads
+
+    # image_filename = None
+
+    # if image and image.filename:    
+          
+    #     UPLOAD_FOLDER = 'static/uploads'
+    #     if not os.path.exists(UPLOAD_FOLDER):
+    #         os.makedirs(UPLOAD_FOLDER)
+
+    #     image_filename = secure_filename(image.filename)
+    #     image_path = os.path.join(UPLOAD_FOLDER, image_filename)
+    #     image.save(image_path)  # Save the image file
+    
+    #print(f"Uploaded Image: {image_filename}")
+
+    response = admin_account.add_announcement(post_title=title, post_description=description, image=None, posted_by=admin_account.idno)
+    if response['success']:
+        flash('Announcement added', 'success')
+        return redirect(url_for('admin.admin_announcements'))
+    else:
+        flash(response['error'], 'error')
+        return redirect(url_for('admin.admin_announcements'))
+    
 
 
 @admin.route('/addstaff', methods=['POST'])

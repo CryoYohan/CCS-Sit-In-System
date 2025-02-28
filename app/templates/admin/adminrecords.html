@@ -46,23 +46,27 @@
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Name</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Lab</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Date</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Time</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Date/Time</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-                <!-- Sample Data -->
+                {% for record in records %}
                 <tr class="hover:bg-gray-50 transition">
-                    <td class="px-4 py-3 text-sm text-gray-700">001</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">John Doe</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">john.doe@example.com</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">Lab A</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">2023-10-15</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">10:00 AM - 12:00 PM</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ record['idno'] }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ record['lastname'].title() }}, {{ record['firstname'].title() }} {{ record['middlename'][0].capitalize() }}.</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ record['email'] }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ record['lab_name'] }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ record['sitin_out']}}</td>
                     <td class="px-4 py-3">
-                        <span class="px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">Pending</span>
+                        <span class="px-2 py-1 text-xs font-semibold 
+                    {% if record['status'] == 'Pending' %}bg-yellow-100 text-yellow-800
+                    {% elif record['status'] == 'Approved' %}bg-green-100 text-green-800
+                    {% elif record['status'] == 'Completed' %}bg-gray-100 text-gray-800
+                    {% elif record['status'] == 'Denied' %}bg-red-100 text-red-800
+                    {% endif %}
+                     rounded-full">{{record['status']}}</span>
                     </td>
                     <td class="px-4 py-3">
                         <!-- Edit Button -->
@@ -94,6 +98,7 @@
                         </button>
                     </td>
                 </tr>
+                {% endfor %}
                 <!-- Add more rows dynamically -->
             </tbody>
         </table>

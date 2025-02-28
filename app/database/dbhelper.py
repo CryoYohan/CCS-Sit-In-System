@@ -47,7 +47,7 @@ class Databasehelper:
             query = f"SELECT sr.reservation_id, l.lab_name, sr.idno, u.firstname, sr.status, sr.sitin_in, sr.sitin_out, sr.staff_idno FROM sitin_reservation sr JOIN user u ON u.idno =  sr.idno JOIN lab l ON l.lab_id = sr.lab_id WHERE sr.idno = ?"
             return self.getprocess(query, (idno,))
         else:
-            query = f"SELECT sr.reservation_id, l.lab_name, sr.idno, u.firstname, sr.status, sr.sitin_in, sr.sitin_out, sr.staff_idno FROM sitin_reservation sr JOIN user u ON u.idno = sr.idno JOIN lab l ON l.lab_id = sr.lab_id WHERE sr.status IN('Pending', 'Approved')"
+            query = f"SELECT sr.reservation_id, l.lab_name, sr.idno, u.firstname, u.lastname, u.middlename,sr.status, sr.sitin_in, sr.sitin_out, sr.staff_idno FROM sitin_reservation sr JOIN user u ON u.idno = sr.idno JOIN lab l ON l.lab_id = sr.lab_id WHERE sr.status IN('Pending', 'Approved')"
             return self.getprocess(query)
 
     def getall_sessionhistory(self, idno:str)->list:
