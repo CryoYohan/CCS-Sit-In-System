@@ -101,11 +101,14 @@ def managelab():
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
+        labs = admin_account.retrieve_all_labs()
+
         return render_template(
                                 'managelab.html',
                                 user_in_login_page=True, 
                                 action='Logout',
-                                admin=admin_account
+                                admin=admin_account,
+                                labs=labs,
                                 )
     else:
         flash('Unauthorized Access is Prohibited', 'error')

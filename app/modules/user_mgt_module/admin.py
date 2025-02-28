@@ -36,6 +36,11 @@ class Admin(User):
         """Retrieve all users"""
         return self.db.get_all_users()
 
+    def retrieve_all_labs(self):
+         """Retrieve all labs"""
+         return self.db.getall_records(table='lab')
+
+
 
     def add_announcement(self, **kwargs):
         """Add an announcement"""
