@@ -1,14 +1,46 @@
 {% extends 'dashboard.html' %}
 {% block content %}
+<style>
+    /* Check Icon Styling */
+    .relative {
+      position: relative;
+    }
+    .absolute {
+      position: absolute;
+    }
+    .hidden {
+      display: none;
+    }
+    .bg-green-500 {
+      background-color: #10B981;
+    }
+    .rounded-full {
+      border-radius: 9999px;
+    }
+    .p-1 {
+      padding: 0.25rem;
+    }
+    .text-white {
+      color: white;
+    }
+    .text-xs {
+      font-size: 0.75rem;
+    }
+  </style>
 <div class="w-full flex justify-center items-center p-5 bg-gradient-to-r from-blue-50 to-blue-100 min-h-screen animate-fadeIn">
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-4xl mx-auto opacity-0 translate-y-5 animate-slideUp">
         <h2 class="text-3xl font-bold text-center text-blue-700 mb-6 animate-fadeIn">Edit Profile</h2>
-        <!-- Profile Section -->
-        <div class="flex items-center mb-8 animate-fadeIn">
+         <!-- Profile Section -->
+         <div class="flex items-center mb-8 animate-fadeIn relative">
             <!-- Profile Icon (Circle) -->
-            <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl font-bold mr-4">
-                <img src="{{ url_for('static',filename='images/profileicons/'+student.image) }}" alt="Student Profile Picture" title="{{ student.image }}">
+            <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl font-bold mr-4 overflow-hidden">
+                <img src="{{ url_for('static', filename='images/profileicons/' + student.image) }}" alt="Student Profile Picture" title="{{ student.image }}" class="w-full h-full object-cover" id="profile-picture">
             </div>
+            <!-- Update Profile Picture Icon -->
+            <div title="Change Profile" class="absolute bottom-0 left-12 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 transition duration-200 shadow-md" onclick="openModal()">
+                <i class="fas fa-camera text-white text-xs"></i>
+            </div>
+            
             <!-- User's Full Name and Email -->
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">{{ student.firstname }} {{ student.middlename[0].capitalize() }}. {{ student.lastname }}</h1>
@@ -100,8 +132,102 @@
         </form>
     </div>
 </div>
+<!-- Modal for Profile Picture Selection -->
+<div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-lg w-full max-w-2xl">
+        <h3 class="text-xl font-bold mb-4">Choose Profile Picture</h3>
+        
+        <!-- List of Profile Icons -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+            {% for icon in profileicons %}
+                <div class="cursor-pointer relative" onclick="selectProfileIcon(this, '{{ icon }}')">
+                    <img src="{{ url_for('static', filename='images/profileicons/' + icon) }}" alt="Profile Icon" class="w-16 h-16 rounded-full object-cover">
+                    <!-- Check Icon (Hidden by default) -->
+                    <div id="check-{{ icon }}" class="absolute top-0 right-0 bg-green-500 rounded-full p-1 hidden">
+                        <i class="fas fa-check text-white text-xs"></i>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
 
+        <!-- Upload New Profile Picture -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Upload Your Own Picture</label>
+            <input type="file" id="upload-profile" name="profile_picture" accept="image/*" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+        </div>
+        <div class="flex justify-center gap-7">
+            <!-- Save Button -->
+            <div>
+                <button type="button" onclick="saveProfilePicture()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200">Save</button>
+            </div>
+            <!-- Close Button -->
+            <div>
+                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
+    // Track the selected profile icon
+let selectedProfileIcon = null;
+
+// Function to select a profile icon
+function selectProfileIcon(element, icon) {
+    // Remove the check icon from all other profile icons
+    document.querySelectorAll('.relative').forEach(el => {
+        el.querySelector('div').classList.add('hidden');
+    });
+
+    // Show the check icon on the selected profile icon
+    const checkIcon = element.querySelector('div');
+    checkIcon.classList.remove('hidden');
+
+    // Update the selected profile icon
+    selectedProfileIcon = icon;
+}
+
+// Function to save the selected profile picture
+function saveProfilePicture() {
+    if (!selectedProfileIcon) {
+        alert("Please select a profile picture.");
+        return;
+    }
+
+    // Send the selected profile icon to the server
+    fetch("{{ url_for('main.update_profile_picture') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ profile_picture: selectedProfileIcon })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the profile picture on the page
+            document.getElementById('profile-picture').src = "{{ url_for('static', filename='images/profileicons/') }}" + selectedProfileIcon;
+            flash("Profile picture updated successfully!", "success");
+            closeModal();
+        } else {
+            flash(data.error, "error");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        flash("An error occurred while updating the profile picture.", "error");
+    });
+}
+    // Function to open the modal
+function openModal() {
+    document.getElementById('profile-modal').classList.remove('hidden');
+}
+
+// Function to close the modal
+function closeModal() {
+    document.getElementById('profile-modal').classList.add('hidden');
+}
+
 function togglePassword(id) {
     const field = document.getElementById(id);
     field.type = field.type === "password" ? "text" : "password";

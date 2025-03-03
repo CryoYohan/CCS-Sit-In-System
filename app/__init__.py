@@ -14,9 +14,12 @@ def create_app():
     # Load configuration (optional)
     app.config.from_pyfile('config.py', silent=True)
 
-    # # Define the directory where images will be stored
-    # UPLOAD_FOLDER = 'static/uploads'
-    # app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    # File Upload Configuration
+    UPLOAD_FOLDER = '/path/to/the/uploads'
+    ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+    # Set the upload folder
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
     # Import and register blueprints (routes)
     from .routes import main  # Import your routes
