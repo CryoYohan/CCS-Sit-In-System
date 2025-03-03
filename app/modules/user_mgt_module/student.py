@@ -19,6 +19,12 @@ class Student(User):
     def __str__(self):
         return f"{self.firstname.title()} {self.middlename[0].capitalize()}. {self.lastname.title()}"
     
+    def retrieve_all_announcements(self):
+        """Retrieve all announcements"""
+        try:
+            announcements = self.db.getall_records(table='announcement')
+            return{'success':True, 'announcements':announcements}
+        
+        except Exception as e:
+            return {'erorr':str(e)}
     
-# Define a Blueprint for student-related routes
-# student_bp = Blueprint('student', __name__)

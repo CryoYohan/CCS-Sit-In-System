@@ -25,6 +25,15 @@ class User():
             return "No changes made."
 
         self.db.update_record(self.table,**kwargs)  # Update only provided fields
+    
+    def retrieve_all_announcements(self):
+        """Retrieve all announcements"""
+        try:
+            announcements = self.db.getall_records(table='announcement')
+            return{'success':True, 'announcements':announcements}
+        
+        except Exception as e:
+            return {'erorr':str(e)}
 
     def delete(self):
         pass

@@ -67,6 +67,39 @@ def dashboard():
         return redirect(url_for('main.login'))
 
 
+@main.route('/announcements')
+def announcements():
+    """Announcements page."""
+    global student
+    try:
+
+        if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
+                
+            response = student.retrieve_all_announcements()
+            print(announcements)
+            return render_template(
+                                    'announcements.html', 
+                                    student=student,
+                                    user_in_login_page=True,
+                                    action='Logout',
+                                    announcements=response['announcements'],
+                                   )
+         
+        else:
+            message = "Please login first."
+            flash(message)
+            return redirect(url_for('main.login'))
+        
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
+
+
 @main.route('/sitin')
 def sitin():
     """Render Sit-in page."""

@@ -1,277 +1,379 @@
 {% macro flash_message() -%}
 <!-- Flash Messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-    <div class="fixed top-4 left-4 space-y-4 z-50">
-        {% for category, message in messages %}
-            <div class="animate-fade-in transform transition-all duration-300 ease-in-out flex items-center justify-between p-4 rounded-lg shadow-lg text-white
-                {% if category == 'success' %} bg-green-500
-                {% elif category == 'error' %} bg-red-500
-                {% else %} bg-blue-500
-                {% endif %}">
-                <span>{{ message }}</span>
-                <button onclick="this.parentElement.remove()" class="ml-4 p-1 rounded-full hover:bg-opacity-25 focus:outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
-{% endwith %}
-{%- endmacro %}
-
-{% macro navbar(user_in_login_page, action,user, image) %}
-    {% if not user_in_login_page %}
-    <nav class="flex justify-between items-center p-4 bg-black text-white shadow-sm">
-        <!-- Title -->
-        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
-            <a href="{{ url_for('main.index') }}">CCSit.</a>
-        </div>   
-        <div class="flex space-x-8 text-l text-white pr-12">
-            <a href="{{ url_for('main.login') }}" class="text-white text-l hover:text-blue-600 transition duration-3000">{{ action }}</a>
+{% with messages = get_flashed_messages(with_categories=true) %} {% if messages
+%}
+<div class="fixed top-4 left-4 space-y-4 z-50">
+  {% for category, message in messages %}
+  <div
+    class="animate-fade-in transform transition-all duration-300 ease-in-out flex items-center justify-between p-4 rounded-lg shadow-lg text-white {% if category == 'success' %} bg-green-500 {% elif category == 'error' %} bg-red-500 {% else %} bg-blue-500 {% endif %}"
+  >
+    <span>{{ message }}</span>
+    <button
+      onclick="this.parentElement.remove()"
+      class="ml-4 p-1 rounded-full hover:bg-opacity-25 focus:outline-none"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %} {% endwith %} {%- endmacro %} {% macro navbar(user_in_login_page,
+action,user, image) %} {% if not user_in_login_page %}
+<nav
+  class="flex justify-between items-center p-4 bg-black text-white shadow-sm"
+>
+  <!-- Title -->
+  <div
+    class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text"
+  >
+    <a href="{{ url_for('main.index') }}">CCSit.</a>
+  </div>
+  <div class="flex space-x-8 text-l text-white pr-12">
+    <a
+      href="{{ url_for('main.login') }}"
+      class="text-white text-l hover:text-blue-600 transition duration-3000"
+      >{{ action }}</a
+    >
+  </div>
+</nav>
+{% elif user_in_login_page and action=='Logout' and user.role == 'Admin'%}
+<nav
+  class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm"
+>
+  <div
+    class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text"
+  >
+    <a href="{{ url_for('admin.dashboard') }}">CCSit.</a>
+  </div>
+  <div class="relative flex items-center space-x-8 pr-12">
+    <div class="relative">
+      <button
+        id="profile-menu-admin"
+        class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
+      >
+        <img
+          src="{{ url_for('static',filename='images/profileicons/'+user.image) }}"
+          alt="Profile"
+          class="w-10 h-10 rounded-full object-cover"
+        />
+        <div class="text-left hidden sm:block">
+          <span class="block font-semibold text-gray-900 dark:text-white"
+            >{{ user }}</span
+          >
+          <span class="text-sm text-gray-500 dark:text-gray-400">ADMIN</span>
         </div>
-    </nav>
-    {% elif user_in_login_page and action=='Logout' and user.role == 'Admin'%}
-    <nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm">
-        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
-            <a href="{{ url_for('admin.dashboard') }}">CCSit.</a>
-        </div>  
-        <div class="relative flex items-center space-x-8 pr-12">
-            <div class="relative">
-                <button id="profile-menu-admin" class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600">
-                    <img src="{{ url_for('static',filename='images/profileicons/'+user.image) }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
-                    <div class="text-left hidden sm:block">
-                        <span class="block font-semibold text-gray-900 dark:text-white">{{ user }}</span>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">ADMIN</span>
-                    </div>
-                </button>
-                <div id="dropdown-admin" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg">
-                    <a href="{{ url_for('main.profilesettings') }}" class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600">Profile Settings</a>
-                    <a href="{{ url_for('admin.adminlogout') }}" class="block px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600">Logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-    {% elif user_in_login_page and action=='Logout' and user.role == 'Student'%}
-    <nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm">
-        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
-            <a href="{{ url_for('main.dashboard') }}">CCSit.</a>
-        </div>  
-        <div class="relative flex items-center space-x-8 pr-12">
-            <div class="relative">
-                <button id="profile-menu-user" class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600">
-                    <img src="{{  url_for('static',filename='images/profileicons/'+user.image) }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
-                    <div class="text-left hidden sm:block">
-                        <span class="block font-semibold text-gray-900 dark:text-white">{{ user }}</span>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">STUDENT</span>
-                    </div>
-                </button>
-                <div id="dropdown-user" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-50">
-                    <a href="{{ url_for('main.profilesettings') }}" class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600">Profile Settings</a>
-                    <a href="{{ url_for('main.logout') }}" class="block px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600">Logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-    {% elif user_in_login_page and action=='Logout'  and user.role == 'Staff'%}
-    <nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm">
-        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
-            <a href="{{ url_for('staff.dashboard') }}">CCSit.</a>
-        </div>  
-        <div class="relative flex items-center space-x-8 pr-12">
-            <div class="relative">
-                <button id="profile-menu-user" class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600">
-                    <img src="{{  url_for('static',filename='images/profileicons/'+user.image) }}" alt="Profile" class="w-10 h-10 rounded-full object-cover">
-                    <div class="text-left hidden sm:block">
-                        <span class="block font-semibold text-gray-900 dark:text-white">{{ user }}</span>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">STAFF</span>
-                    </div>
-                </button>
-                <div id="dropdown-user" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-50">
-                    <a href="#" class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600">Profile Settings</a>
-                    <a href="{{ url_for('staff.logout') }}" class="block px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600">Logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-    {% else %}
-    <nav class="flex justify-between items-center p-4 bg-black text-white shadow-sm">
-        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
-            <a href="{{ url_for('main.index') }}">CCSit.</a>
-        </div>   
-        <div class="flex space-x-8 text-l text-white pr-12">
-            <a href="{{ url_for('main.index') }}" class="text-white text-l hover:text-blue-600">{{ action }}</a>
-        </div>
-    </nav>
-    {% endif %}
-
-    <script>
-        document.getElementById('profile-menu-admin')?.addEventListener('click', function() {
-            document.getElementById('dropdown-admin').classList.toggle('hidden');
-        });
-        document.getElementById('profile-menu-user')?.addEventListener('click', function() {
-            document.getElementById('dropdown-user').classList.toggle('hidden');
-        });
-    </script>
-{% endmacro %}
-
-
-{% macro user_card(student) -%}
-<!-- User Info Card -->
-<div class="mx-auto max-w-sm bg-white rounded-xl shadow-lg p-6 space-y-4 dark:bg-slate-800 dark:shadow-none dark:outline dark:outline-1 dark:outline-white/10">
-    <div class="text-center">
-      <h2 class="text-2xl font-semibold text-black dark:text-white">User Information</h2>
-      <p class="text-gray-500 dark:text-gray-400">Details for {{ student.lastname }}</p>
-    </div>
-    <!-- Role -->
-    <div class="flex items-center justify-between">
-      <span class="text-gray-600 dark:text-gray-300">Role:</span>
-      <span class="font-medium text-black dark:text-white">{{ student.role }}</span>
-    </div>
-    <div class="space-y-2">
-      <!-- ID Number -->
-      <div class="flex items-center justify-between">
-        <span class="text-gray-600 dark:text-gray-300">ID Number:</span>
-        <span class="font-medium text-black dark:text-white">{{ student.idno }}</span>
-      </div>
-  
-      <!-- Full Name -->
-      <div class="flex items-center justify-between">
-        <span class="text-gray-600 dark:text-gray-300">Full Name:</span>
-        <span class="font-medium text-black dark:text-white">{{ student }}</span>
-      </div>
-  
-      <!-- Course -->
-      <div class="flex items-center justify-between">
-        <span class="text-gray-600 dark:text-gray-300">Course:</span>
-        <span class="font-medium text-black dark:text-white">{{ student.course }}</span>
-      </div>
-  
-      <!-- Year -->
-      <div class="flex items-center justify-between">
-        <span class="text-gray-600 dark:text-gray-300">Year:</span>
-        <span class="font-medium text-black dark:text-white">{{ student.year }}</span>
-      </div>
-      <!-- Email -->
-      <div class="flex items-center justify-between">
-        <span class="text-gray-600 dark:text-gray-300">Email:</span>
-        <span class="font-medium text-black dark:text-white">{{ student.email }}</span>
+      </button>
+      <div
+        id="dropdown-admin"
+        class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-0"
+      >
+        <a
+          href="{{ url_for('main.profilesettings') }}"
+          class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
+          >Profile Settings</a
+        >
+        <a
+          href="{{ url_for('admin.adminlogout') }}"
+          class="block px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600"
+          >Logout</a
+        >
       </div>
     </div>
   </div>
-{%- endmacro %}
-
-
-{% macro logincard_for_admin_staff(user) -%}
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <div class="flex justify-center mb-6">
-            <button
-              id="login-tab"
-              class="px-6 py-2 text-lg font-semibold text-gray-700 border-b-2 border-blue-500 focus:outline-none"
-            >
-              {{ user.title() }} Login
-            </button>
-          </div>
-      
-          <!-- Login Form -->
-          <form
-            id="login-form"
-            action="{% if user == 'admin' %}{{ url_for('admin.loginadmin') }}{% else %}{{ url_for('staff.loginstaff') }}{% endif %}"
-            method="post"
-            class="space-y-4"
-            >
-            <div>
-              <label
-                for="login-email"
-                class="block text-sm font-medium text-gray-700"
-                >IDNO</label
-              >
-              <input
-                type="text"
-                name="idno"
-                placeholder="Enter your ID Number"
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-            <div>
-              <label
-                for="login-password"
-                class="block text-sm font-medium text-gray-700"
-                >Password</label
-              >
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Login
-            </button>
-          </form>
-        </div>
-{%- endmacro %}
-
-{%- macro logincard(user)%}
-<div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <div class="flex justify-center mb-6">
-        <button
-          id="login-tab"
-          class="px-6 py-2 text-lg font-semibold text-gray-700 border-b-2 border-blue-500 focus:outline-none"
-        >
-          {{ user }} Login
-        </button>
-      </div>
-  
-      <!-- Login Form -->
-      <form
-        id="login-form"
-        action="{{ url_for('admin.loginadmin') }}"
-        method="post"
-        class="space-y-4"
+</nav>
+{% elif user_in_login_page and action=='Logout' and user.role == 'Student'%}
+<nav
+  class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm"
+>
+  <div
+    class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text"
+  >
+    <a href="{{ url_for('main.dashboard') }}">CCSit.</a>
+  </div>
+  <div class="relative flex items-center space-x-8 pr-12">
+    <div class="relative">
+      <button
+        id="profile-menu-user"
+        class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
       >
-        <div>
-          <label
-            for="login-email"
-            class="block text-sm font-medium text-gray-700"
-            >IDNO</label
+        <img
+          src="{{  url_for('static',filename='images/profileicons/'+user.image) }}"
+          alt="Profile"
+          class="w-10 h-10 rounded-full object-cover"
+        />
+        <div class="text-left hidden sm:block">
+          <span class="block font-semibold text-gray-900 dark:text-white"
+            >{{ user }}</span
           >
-          <input
-            type="text"
-            name="idno"
-            placeholder="Enter your ID Number"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
+          <span class="text-sm text-gray-500 dark:text-gray-400">STUDENT</span>
         </div>
-        <div>
-          <label
-            for="login-password"
-            class="block text-sm font-medium text-gray-700"
-            >Password</label
-          >
-          <input
-            type="password"
-            name="password"
-            placeholder="Enter your password"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      </button>
+      <div
+        id="dropdown-user"
+        class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-1"
+      >
+        <a
+          href="{{ url_for('main.profilesettings') }}"
+          class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
+          >Profile Settings</a
         >
-          Login
-        </button>
-      </form>
+        <a
+          href="{{ url_for('main.logout') }}"
+          class="block px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600"
+          >Logout</a
+        >
+      </div>
     </div>
+  </div>
+</nav>
+{% elif user_in_login_page and action=='Logout' and user.role == 'Staff'%}
+<nav
+  class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm"
+>
+  <div
+    class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text"
+  >
+    <a href="{{ url_for('staff.dashboard') }}">CCSit.</a>
+  </div>
+  <div class="relative flex items-center space-x-8 pr-12">
+    <div class="relative">
+      <button
+        id="profile-menu-user"
+        class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
+      >
+        <img
+          src="{{  url_for('static',filename='images/profileicons/'+user.image) }}"
+          alt="Profile"
+          class="w-10 h-10 rounded-full object-cover"
+        />
+        <div class="text-left hidden sm:block">
+          <span class="block font-semibold text-gray-900 dark:text-white"
+            >{{ user }}</span
+          >
+          <span class="text-sm text-gray-500 dark:text-gray-400">STAFF</span>
+        </div>
+      </button>
+      <div
+        id="dropdown-user"
+        class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-50"
+      >
+        <a
+          href="#"
+          class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
+          >Profile Settings</a
+        >
+        <a
+          href="{{ url_for('staff.logout') }}"
+          class="block px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600"
+          >Logout</a
+        >
+      </div>
+    </div>
+  </div>
+</nav>
+{% else %}
+<nav
+  class="flex justify-between items-center p-4 bg-black text-white shadow-sm"
+>
+  <div
+    class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text"
+  >
+    <a href="{{ url_for('main.index') }}">CCSit.</a>
+  </div>
+  <div class="flex space-x-8 text-l text-white pr-12">
+    <a
+      href="{{ url_for('main.index') }}"
+      class="text-white text-l hover:text-blue-600"
+      >{{ action }}</a
+    >
+  </div>
+</nav>
+{% endif %}
+
+<script>
+  document
+    .getElementById("profile-menu-admin")
+    ?.addEventListener("click", function () {
+      document.getElementById("dropdown-admin").classList.toggle("hidden");
+    });
+  document
+    .getElementById("profile-menu-user")
+    ?.addEventListener("click", function () {
+      document.getElementById("dropdown-user").classList.toggle("hidden");
+    });
+</script>
+{% endmacro %} {% macro user_card(student) -%}
+<!-- User Info Card -->
+<div
+  class="mx-auto max-w-sm bg-white rounded-xl shadow-lg p-6 space-y-4 dark:bg-slate-800 dark:shadow-none dark:outline dark:outline-1 dark:outline-white/10"
+>
+  <div class="text-center">
+    <h2 class="text-2xl font-semibold text-black dark:text-white">
+      User Information
+    </h2>
+    <p class="text-gray-500 dark:text-gray-400">
+      Details for {{ student.lastname }}
+    </p>
+  </div>
+  <!-- Role -->
+  <div class="flex items-center justify-between">
+    <span class="text-gray-600 dark:text-gray-300">Role:</span>
+    <span class="font-medium text-black dark:text-white"
+      >{{ student.role }}</span
+    >
+  </div>
+  <div class="space-y-2">
+    <!-- ID Number -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 dark:text-gray-300">ID Number:</span>
+      <span class="font-medium text-black dark:text-white"
+        >{{ student.idno }}</span
+      >
+    </div>
+
+    <!-- Full Name -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 dark:text-gray-300">Full Name:</span>
+      <span class="font-medium text-black dark:text-white">{{ student }}</span>
+    </div>
+
+    <!-- Course -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 dark:text-gray-300">Course:</span>
+      <span class="font-medium text-black dark:text-white"
+        >{{ student.course }}</span
+      >
+    </div>
+
+    <!-- Year -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 dark:text-gray-300">Year:</span>
+      <span class="font-medium text-black dark:text-white"
+        >{{ student.year }}</span
+      >
+    </div>
+    <!-- Email -->
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600 dark:text-gray-300">Email:</span>
+      <span class="font-medium text-black dark:text-white"
+        >{{ student.email }}</span
+      >
+    </div>
+  </div>
+</div>
+{%- endmacro %} {% macro logincard_for_admin_staff(user) -%}
+<div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+  <div class="flex justify-center mb-6">
+    <button
+      id="login-tab"
+      class="px-6 py-2 text-lg font-semibold text-gray-700 border-b-2 border-blue-500 focus:outline-none"
+    >
+      {{ user.title() }} Login
+    </button>
+  </div>
+
+  <!-- Login Form -->
+  <form
+    id="login-form"
+    action="{% if user == 'admin' %}{{ url_for('admin.loginadmin') }}{% else %}{{ url_for('staff.loginstaff') }}{% endif %}"
+    method="post"
+    class="space-y-4"
+  >
+    <div>
+      <label for="login-email" class="block text-sm font-medium text-gray-700"
+        >IDNO</label
+      >
+      <input
+        type="text"
+        name="idno"
+        placeholder="Enter your ID Number"
+        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        required
+      />
+    </div>
+    <div>
+      <label
+        for="login-password"
+        class="block text-sm font-medium text-gray-700"
+        >Password</label
+      >
+      <input
+        type="password"
+        name="password"
+        placeholder="Enter your password"
+        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        required
+      />
+    </div>
+    <button
+      type="submit"
+      class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    >
+      Login
+    </button>
+  </form>
+</div>
+{%- endmacro %} {%- macro logincard(user)%}
+<div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+  <div class="flex justify-center mb-6">
+    <button
+      id="login-tab"
+      class="px-6 py-2 text-lg font-semibold text-gray-700 border-b-2 border-blue-500 focus:outline-none"
+    >
+      {{ user }} Login
+    </button>
+  </div>
+
+  <!-- Login Form -->
+  <form
+    id="login-form"
+    action="{{ url_for('admin.loginadmin') }}"
+    method="post"
+    class="space-y-4"
+  >
+    <div>
+      <label for="login-email" class="block text-sm font-medium text-gray-700"
+        >IDNO</label
+      >
+      <input
+        type="text"
+        name="idno"
+        placeholder="Enter your ID Number"
+        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        required
+      />
+    </div>
+    <div>
+      <label
+        for="login-password"
+        class="block text-sm font-medium text-gray-700"
+        >Password</label
+      >
+      <input
+        type="password"
+        name="password"
+        placeholder="Enter your password"
+        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        required
+      />
+    </div>
+    <button
+      type="submit"
+      class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    >
+      Login
+    </button>
+  </form>
+</div>
 {%- endmacro %}
