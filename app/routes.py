@@ -4,8 +4,11 @@ from .modules.login_register_module import Authorization
 from .modules.reservation_module.reserve_lab import Reservation
 from datetime import datetime
 
+
+
 # Register as a Blueprint for create_app() function to recognize as Flask app
 main = Blueprint('main', __name__, template_folder='templates/student')
+
 
 # Initialize Authorization instance Login Register Module
 auth = Authorization()
@@ -249,11 +252,15 @@ def profilesettings():
             if student == None:
                 student_data = session.get('student')
                 student = Student(**student_data)
+            
+            profileicons = student.profileicons
+
             return render_template(
                                     'profilesettings.html', 
                                     student=student,
                                     user_in_login_page=True,
                                     action='Logout',
+                                    profileicons=profileicons,
                                     )
          
         else:
@@ -264,7 +271,6 @@ def profilesettings():
     except Exception as e:
         flash(str(e),'error')
         flash("Please try again")
-        #session['student'] = None
         return redirect(url_for('main.login'))      
 
 @main.route('/logout')
@@ -282,24 +288,51 @@ def logout():
 def sitin_lab():
     """Handles POST method in sit-in functionality"""
     global student
+    try:
+        lab = request.form['lab']
+        reason = request.form['reason']
+        date = request.form['date']
+        print(lab, reason, date)
+        
+        response = reservation.add_sitin_details(
+                                                lab_id=reservation.retrieve_lab_id(lab), 
+                                                idno=student.idno, reason=reason,
+                                                )
+        
+        if response['success']:
+            flash('Request Sent!', 'success')
+            return redirect(url_for('main.sitin'))
 
-    lab = request.form['lab']
-    reason = request.form['reason']
-    date = request.form['date']
-    lab = lab.split(' ')[1]
-    print(lab, reason, date)
-    response = reservation.add_sitin_details(
-                                            lab_id=reservation.retrieve_lab_id(lab), 
-                                            idno=student.idno, reason=reason,
-                                             )
+        else:
+            flash(response['error'],'error')
+            return redirect(url_for('main.sitin'))
+    except Exception as e:
+        flash(str(e),'error')
+        return redirect(url_for('main.sitin'))
     
-    if response['success']:
-        flash('Request Sent!', 'success')
-        return redirect(url_for('main.sitin'))
+@main.route('/update_profile_picture', methods=['POST'])
+def update_profile_picture():
+    """Update the profile picture in the database."""
+    global student
 
-    else:
-        flash(response['error'],'error')
-        return redirect(url_for('main.sitin'))
+    # Get the selected profile picture from the request
+    data = request.get_json()
+    profile_picture = data.get('profile_picture')
+
+    if not profile_picture:
+        return jsonify({'success': False, 'error': 'No profile picture selected'})
+
+    try:
+        # Update the student's profile picture in the database
+        student.image = profile_picture
+        student.edit(image=profile_picture)
+
+        # Update the session
+        session['student']['image'] = profile_picture
+
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 
 @main.route('/editprofile', methods=['POST'])
