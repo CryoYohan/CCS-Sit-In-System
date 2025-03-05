@@ -1,0 +1,107 @@
+{% extends 'staffdashboardtemplate.html' %}
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-8 animate-fadeIn">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8 p-6 bg-white rounded-xl shadow-md animate-slideDown">
+        <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+            🛋️ Sit-in Reservation Requests
+            <span class="ml-2 text-2xl">📋</span>
+        </h1>
+        <div class="flex space-x-4">
+            <span class="text-2xl">🌟</span>
+            <span class="text-2xl">🔍</span>
+        </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden animate-slideUp">
+        <table class="w-full table-auto">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Reservation ID</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Laboratory Name</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Student IDNO</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Lab</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Request Time</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for record in records %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ record['reservation_id'] }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ record['lab_name'] }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ record['idno'] }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ record['reservation_id'] }}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-3 py-1 rounded-full text-sm font-semibold 
+                        {% if record['status'] == 'Completed' %}bg-gray-200
+                        {% elif record['status'] == 'Pending' %}bg-yellow-300
+                        {% elif record['status'] == 'Approved' %}bg-green-400
+                        {% elif record['status'] == 'Declined' %}bg-red-400 {% endif %}
+                        text-gray-700">{{ record['status'] }}</span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-700">{{ record['sitin_in'] }}</td>
+                    <td class="px-4 py-3 flex space-x-2">
+                        <button onclick="updateStatus(this, 'Confirmed')" class="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600 transition">
+                            Accept
+                        </button>
+                        <button onclick="updateStatus(this, 'Denied')" class="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600 transition">
+                            Deny
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Animations -->
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .animate-fadeIn { animation: fadeIn 0.8s ease-out forwards; }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slideDown { animation: slideDown 0.8s ease-out forwards; }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slideUp { animation: slideUp 0.8s ease-out forwards; }
+</style>
+
+<!-- JavaScript for Actions -->
+<script>
+    function updateStatus(button, status) {
+        const row = button.closest('tr');
+        const reservationId = row.querySelector('td:first-child').textContent;
+
+        fetch('/update-reservation-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ reservationId, status }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Reservation ${status.toLowerCase()} successfully!`);
+                location.reload(); // Refresh the page to reflect changes
+            } else {
+                alert('Failed to update status. Please try again.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock %}
