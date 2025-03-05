@@ -1,0 +1,28 @@
+{% extends 'staffdashboardtemplate.html' %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+    <!-- Modal -->
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h2 class="text-2xl font-bold mb-4 text-center">Welcome, {{ staff.firstname }}!</h2>
+        <p class="text-gray-600 mb-6 text-center">Please select the lab you are assigned to.</p>
+        
+        <!-- Lab Selection Form -->
+        <form action="{{ url_for('staff.select_lab') }}" method="POST">
+            <div class="mb-4">
+                <label for="lab_name" class="block text-sm font-medium text-gray-700">Select Lab</label>
+                <select name="lab_name" id="lab_name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="530">Lab 530</option>
+                    <option value="544">Lab 544</option>
+                    <option value="526">Lab 526</option>
+                    <option value="524">Lab 524</option>
+                    <option value="540">Lab 540</option>
+                    <option value="542">Lab 542</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                Confirm Lab Assignment
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -28,7 +28,11 @@
   </div>
   {% endfor %}
 </div>
-{% endif %} {% endwith %} {%- endmacro %} {% macro navbar(user_in_login_page,
+{% endif %} 
+{% endwith %} 
+{%- endmacro %} 
+
+{% macro navbar(user_in_login_page,
 action,user, image) %} {% if not user_in_login_page %}
 <nav
   class="flex justify-between items-center p-4 bg-black text-white shadow-sm"
@@ -76,7 +80,7 @@ action,user, image) %} {% if not user_in_login_page %}
       </button>
       <div
         id="dropdown-admin"
-        class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-0"
+        class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-50"
       >
         <a
           href="{{ url_for('main.profilesettings') }}"
@@ -120,20 +124,20 @@ action,user, image) %} {% if not user_in_login_page %}
         </div>
       </button>
       <div
-        id="dropdown-user"
-        class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-1"
+      id="dropdown-user"
+      class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-50"
+    >
+      <a
+        href="{{ url_for('main.profilesettings') }}"
+        class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
+        >Profile Settings</a
       >
-        <a
-          href="{{ url_for('main.profilesettings') }}"
-          class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
-          >Profile Settings</a
-        >
-        <a
-          href="{{ url_for('main.logout') }}"
-          class="block px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600"
-          >Logout</a
-        >
-      </div>
+      <a
+        href="{{ url_for('main.logout') }}"
+        class="block px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600"
+        >Logout</a
+      >
+    </div>
     </div>
   </div>
 </nav>
@@ -169,7 +173,7 @@ action,user, image) %} {% if not user_in_login_page %}
         class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-50"
       >
         <a
-          href="#"
+          href="{{ url_for('main.profilesettings') }}"
           class="block px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
           >Profile Settings</a
         >
@@ -213,7 +217,8 @@ action,user, image) %} {% if not user_in_login_page %}
       document.getElementById("dropdown-user").classList.toggle("hidden");
     });
 </script>
-{% endmacro %} {% macro user_card(student) -%}
+{% endmacro %} 
+{% macro user_card(student) -%}
 <!-- User Info Card -->
 <div
   class="mx-auto max-w-sm bg-white rounded-xl shadow-lg p-6 space-y-4 dark:bg-slate-800 dark:shadow-none dark:outline dark:outline-1 dark:outline-white/10"
