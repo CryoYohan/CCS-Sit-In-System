@@ -78,7 +78,22 @@ def users():
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
-        users = admin_account.retrieve_all_users()
+        # Get the search query from the URL parameters
+        search_query = request.args.get('query', '').strip()
+
+        # Retrieve all students
+        users = admin_account.retrieve_all_students()
+
+        # Filter users based on the search query
+        if search_query:
+            filtered_users = []
+            for user in users:
+                # Check if the query matches ID, first name, or last name
+                if (search_query.lower() in user['idno'].lower() or
+                    search_query.lower() in user['firstname'].lower() or
+                    search_query.lower() in user['lastname'].lower()):
+                    filtered_users.append(user)
+            users = filtered_users
 
         return render_template(
                                 'users.html',
@@ -221,36 +236,6 @@ def announce():
     else:
         flash(response['error'], 'error')
         return redirect(url_for('admin.admin_announcements'))
-
-@admin.route('/filterusers', methods=['POST'])
-def filterusers():
-    global admin_account
-    if session.get('admin') is not None:
-        if admin_account is None:
-            admin_account = Admin(**session.get('admin'))
-
-        role = request.form['role']
-        
-        users = admin_account.retrieve_all_students()
-
-        # If "all" is selected, do not filter
-        if role == "all":
-            filtered_users = users
-        elif role == "staff":
-            filtered_users = admin_account.retrieve_all_staff()
-        else:
-            filtered_users = admin_account.retrieve_all_students()
-
-        return render_template(
-            'users.html',
-            user_in_login_page=True,
-            action='Logout',
-            admin=admin_account,
-            users=filtered_users,
-        )
-    else:
-        flash('Unauthorized Access is Prohibited', 'error')
-        return redirect(url_for('admin.adminlogin'))
 
 
 

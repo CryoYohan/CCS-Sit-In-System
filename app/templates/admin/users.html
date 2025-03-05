@@ -15,33 +15,27 @@
 
     <!-- Search and Filter -->
     <div class="mb-8 bg-white p-6 rounded-xl shadow-md animate-slideUp">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flex justify-between">
             <!-- Search Bar -->
-            <div>
-                <label class="block text-sm font-medium text-gray-600 mb-2">Search</label>
-                <input type="text" id="searchInput" placeholder="Search by name, ID, or email"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-            </div>
+            <form action="/admin/users" method="GET" class="flex items-center gap-2">
+                <input type="text" name="query" placeholder="Search by name, ID, or email"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                    value="{{ request.args.get('query', '') }}">
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                    Search
+                </button>
+                <!-- Clear Filter Button -->
+                <a href="/admin/users" class="w-64 p-2 text-center bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                    Clear Filter
+                </a>
+            </form>
 
-            <!-- Filter by Role -->
+            <!-- Filter by Lab Status -->
             <div>
-                <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Role</label>
-                <form id="roleFilterForm" action="{{ url_for('admin.filterusers') }}" method="POST">
-                    <select name="role" onchange="this.form.submit()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <option value="all">All</option>
-                        <option value="Student">Student</option>
-                        <option value="Staff">Staff</option>
-                    </select>
-                </form>
-            </div>
-
-            <!-- Filter by Status -->
-            <div>
-                <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Status</label>
+                <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Lab Status</label>
                 <select id="statusFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                    <option value="all">All</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="all">Sit-in</option>
+                    <option value="active">Log-off</option>
                 </select>
             </div>
         </div>
@@ -58,14 +52,13 @@
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Year</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sessions</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Active Status</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Lab Status</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sit-in/Log-off</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-                <!-- Sample Data -->
-                 {% for user in users %}
+                {% for user in users %}
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['idno'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['lastname'] }}, {{ user['firstname'] }} {{ user['middlename'][0].capitalize() }}.</td>
@@ -74,10 +67,10 @@
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['email'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['session'] }}</td>
                     <td class="px-4 py-3">
-                        <span class="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">Active</span>
-                    </td>
-                    <td class="px-4 py-3">
                         <span class="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">{{ user['status'] }}Idle</span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-700">
+                        <button class="bg-green-500 p-3 rounded-xl w-16 text-white">Sit-in</button>
                     </td>
                     <td class="px-4 py-3">
                         <button onclick="openEditModal()" class="text-blue-500 hover:text-blue-700 transition">
@@ -98,7 +91,6 @@
                     </td>
                 </tr>
                 {% endfor %}
-                <!-- Add more rows dynamically -->
             </tbody>
         </table>
     </div>
