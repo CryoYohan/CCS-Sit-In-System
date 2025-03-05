@@ -37,8 +37,8 @@ def dashboard():
 
        
     
-@staff.route('/managesitin')
-def managesitin():
+@staff.route('/managerequest')
+def managerequest():
     """Staff Sit-in Management"""
     global staff_account
     if session['staff'] == None:
@@ -54,7 +54,7 @@ def managesitin():
         
     records = reservation.retrieve_sitinrecords(idno=None)
 
-    return render_template('managesitin.html',user_in_login_page=True, action='Logout',staff=staff_account, records=records)
+    return render_template('managerequest.html',user_in_login_page=True, action='Logout',staff=staff_account, records=records)
     
     
 @staff.route('/staffusermgt')
