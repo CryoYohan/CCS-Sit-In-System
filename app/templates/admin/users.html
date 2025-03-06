@@ -1,5 +1,6 @@
 {% extends 'admindashboardtemplate.html' %}
 {% block content %}
+{% import 'components.html' as component %}
 <div class="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-8 animate-fadeIn">
     <!-- Header -->
     <div class="flex justify-between items-center mb-8 p-6 bg-white rounded-xl shadow-md animate-slideDown">
@@ -20,12 +21,13 @@
             <form action="/admin/users" method="GET" class="flex items-center gap-2">
                 <input type="text" name="query" placeholder="Search by name, ID, or email"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                    value="{{ request.args.get('query', '') }}">
+                    value="{{ request.args.get('query', '') }}" />
                 <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                     Search
                 </button>
                 <!-- Clear Filter Button -->
-                <a href="/admin/users" class="w-64 p-2 text-center bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                <a href="/admin/users"
+                    class="w-64 p-2 text-center bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
                     Clear Filter
                 </a>
             </form>
@@ -33,7 +35,8 @@
             <!-- Filter by Lab Status -->
             <div>
                 <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Lab Status</label>
-                <select id="statusFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                <select id="statusFilter"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                     <option value="all">Sit-in</option>
                     <option value="active">Log-off</option>
                 </select>
@@ -42,50 +45,85 @@
     </div>
 
     <!-- User Table -->
-    <div class="bg-white rounded-2xl shadow-xl overflow-hidden animate-slideUp h-[450px] overflow-y-auto">
+    <div id="student-list-table"
+        class="bg-white rounded-2xl shadow-xl overflow-hidden animate-slideUp h-[450px] overflow-y-auto">
         <table class="w-full table-auto">
             <thead class="bg-gray-100">
                 <tr>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Student ID</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Full Name</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Course</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Year</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sessions</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Lab Status</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sit-in/Log-off</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                        Student ID
+                    </th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                        Full Name
+                    </th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                        Course
+                    </th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                        Year
+                    </th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                        Email
+                    </th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                        Sessions
+                    </th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                        Lab Status
+                    </th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                        Sit-in/Log-off
+                    </th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
+                        Actions
+                    </th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
                 {% for user in users %}
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['idno'] }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">{{ user['lastname'] }}, {{ user['firstname'] }} {{ user['middlename'][0].capitalize() }}.</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">
+                        {{ user['lastname'] }}, {{ user['firstname'] }} {{
+                        user['middlename'][0].capitalize() }}.
+                    </td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['course'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['year'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['email'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['session'] }}</td>
                     <td class="px-4 py-3">
-                        <span class="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">{{ user['status'] }}Idle</span>
+                        <span class="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">{{
+                            user['status'] }}Idle</span>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-700">
-                        <button class="bg-green-500 p-3 rounded-xl w-16 text-white">Sit-in</button>
+                        <button class="open-modal bg-green-500 p-3 rounded-xl w-16 text-white"
+                            data-fullname="{{ user.firstname.title() }} {{ user.middlename[0].capitalize() }}. {{ user.lastname.title() }}"
+                            data-idno="{{ user.idno }}" data-session="{{ user.session }}">
+                            Sit-in
+                        </button>
                     </td>
                     <td class="px-4 py-3">
-                        <button onclick="openEditModal()" class="text-blue-500 hover:text-blue-700 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        <button class="text-blue-500 hover:text-blue-700 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                             </svg>
                         </button>
                         <button class="text-yellow-500 hover:text-yellow-700 transition ml-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.072 0 1 1 0 000 1.415z" clip-rule="evenodd" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.072 0 1 1 0 000 1.415z"
+                                    clip-rule="evenodd" />
                             </svg>
                         </button>
                         <button class="text-red-500 hover:text-red-700 transition ml-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
                             </svg>
                         </button>
                     </td>
@@ -101,17 +139,22 @@
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-4xl mx-auto animate-slideUp relative">
         <!-- Close Button -->
         <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
 
-        <h2 class="text-3xl font-bold text-center text-blue-700 mb-6">Edit Profile</h2>
+        <h2 class="text-3xl font-bold text-center text-blue-700 mb-6">
+            Edit Profile
+        </h2>
         <!-- Profile Section -->
         <div class="flex items-center mb-8">
             <!-- Profile Icon (Circle) -->
-            <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl font-bold mr-4">
-                <img src="{{ url_for('static',filename='images/profileicons/default.png') }}" alt="Profile Picture" title="Profile Picture">
+            <div
+                class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl font-bold mr-4">
+                <img src="{{ url_for('static',filename='images/profileicons/default.png') }}" alt="Profile Picture"
+                    title="Profile Picture" />
             </div>
             <!-- User's Full Name and Email -->
             <div>
@@ -123,28 +166,29 @@
             <!-- First Name -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">First Name</label>
-                <input type="text" name="editfirstname" placeholder="John" 
-                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                <input type="text" name="editfirstname" placeholder="John"
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
             </div>
 
             <!-- Middle Name -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Middle Name</label>
-                <input type="text" name="editmiddlename" placeholder="Doe" 
-                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                <input type="text" name="editmiddlename" placeholder="Doe"
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
             </div>
 
             <!-- Last Name -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Last Name</label>
-                <input type="text" name="editlastname" placeholder="Smith" 
-                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                <input type="text" name="editlastname" placeholder="Smith"
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
             </div>
 
             <!-- Course (ComboBox) -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Course</label>
-                <select name="editcourse" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                <select name="editcourse"
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
                     <option>BSIT</option>
                     <option>BSCS</option>
                     <option>ACT</option>
@@ -154,7 +198,8 @@
             <!-- Year Level (ComboBox) -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Year</label>
-                <select name="edityear" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                <select name="edityear"
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
                     <option>1</option>
                     <option>2</option>
                     <option>3</option>
@@ -165,8 +210,8 @@
             <!-- Email -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" name="editemail" placeholder="john.doe@example.com" 
-                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                <input type="email" name="editemail" placeholder="john.doe@example.com"
+                    class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
             </div>
 
             <!-- Password Fields -->
@@ -174,7 +219,7 @@
                 <label class="block text-sm font-medium text-gray-700">New Password</label>
                 <div class="relative">
                     <input type="password" name="editpassword" id="password"
-                        class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                        class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
                     <button type="button" onclick="togglePassword('password')"
                         class="absolute right-3 top-2 text-gray-600 hover:text-blue-600 transition">
                         👁️
@@ -186,7 +231,7 @@
                 <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
                 <div class="relative">
                     <input type="password" name="editconfirmpassword" id="confirmpassword"
-                        class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
+                        class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
                     <button type="button" onclick="togglePassword('confirmpassword')"
                         class="absolute right-3 top-2 text-gray-600 hover:text-blue-600 transition">
                         👁️
@@ -204,43 +249,102 @@
         </form>
     </div>
 </div>
-
+<!-- SIT-IN MODAL -->
+{{ component.sitin_modal() }}
 <!-- JavaScript -->
 <script>
+    document.querySelectorAll(".open-modal").forEach(button => {
+        button.addEventListener("click", function () {
+            // Get user data from button attributes
+            const idno = this.getAttribute("data-idno");
+            const fullname = this.getAttribute("data-fullname");
+            const session = this.getAttribute("data-session");
+
+            // Set modal content
+            document.getElementById("modal-idno").value = idno;
+            document.getElementById("modal-fullname").value = fullname;
+            document.getElementById("modal-session").value = session;
+
+            // Show modal
+            document.getElementById("sitInModal").classList.remove("hidden");
+        });
+    });
+
+    // Function to close the modal
+    function closeSitInModal() {
+        const modalID = 'sitInModal'
+        document.getElementById(modalID).classList.add("hidden");
+    }
+
+    // Close modal if clicked outside the modal content
+    window.onclick = function (event) {
+        const modal = document.getElementById("sitInModal");
+        if (event.target === modal) {
+            closeSitInModal();
+        }
+    };
     function togglePassword(id) {
         const field = document.getElementById(id);
         field.type = field.type === "password" ? "text" : "password";
     }
 
     function openEditModal() {
-        const modal = document.getElementById('editModal');
-        modal.classList.remove('hidden');
+        const modal = document.getElementById("editModal");
+        modal.classList.remove("hidden");
     }
 
     function closeEditModal() {
-        const modal = document.getElementById('editModal');
-        modal.classList.add('hidden');
+        const modal = document.getElementById("editModal");
+        modal.classList.add("hidden");
     }
 </script>
 
 <!-- Animations -->
 <style>
     @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
-    .animate-fadeIn { animation: fadeIn 0.8s ease-out forwards; }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
 
     @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    .animate-slideDown { animation: slideDown 0.8s ease-out forwards; }
+
+    .animate-slideDown {
+        animation: slideDown 0.8s ease-out forwards;
+    }
 
     @keyframes slideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    .animate-slideUp { animation: slideUp 0.8s ease-out forwards; }
+
+    .animate-slideUp {
+        animation: slideUp 0.8s ease-out forwards;
+    }
 </style>
 {% endblock %}
