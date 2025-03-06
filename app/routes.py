@@ -317,13 +317,11 @@ def sitin_lab():
     except Exception as e:
         flash(str(e),'error')
         return redirect(url_for('main.sitin'))
-    
-import os
-from flask import request, redirect, url_for, flash, current_app
-from werkzeug.utils import secure_filename
 
 @main.route('/uploadprofile', methods=['POST'])
 def uploadprofile():
+    """Upload Profile Picture Route"""
+    global student
     print("Request files:", request.files)  # Debugging: Print received files
 
     if 'profile_picture' not in request.files:
@@ -355,8 +353,17 @@ def uploadprofile():
         else:
             print("❌ File was NOT saved!")
 
-        flash("Profile picture uploaded successfully!", "success")
-        return redirect(url_for('main.profilesettings', filename=filename))
+        
+        response = student.upload_profile_icon(profile_icon=filename, student=student)
+
+        if response['success']:
+            flash("Profile picture uploaded successfully!", "success")
+            student = response['student'] # reload new student object with new image
+            session['student'] = student.__dict__ # reload new student session with new image from new student object
+            return redirect(url_for('main.profilesettings'))
+        else:
+            flash(response['error'], "error")
+            return redirect(url_for('main.profilesettings'))
 
 
 

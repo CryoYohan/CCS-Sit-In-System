@@ -28,3 +28,12 @@ class Student(User):
         except Exception as e:
             return {'erorr':str(e)}
     
+    def upload_profile_icon(self,profile_icon,student):
+        """Upload profile icon"""
+        try:
+            self.db.update_record(table='user',idno=self.idno, image=profile_icon)
+            student.image = profile_icon
+            return {'success':True, 'student':student}
+        except Exception as e:
+            return {'success':False, 'error':str(e)}
+    
