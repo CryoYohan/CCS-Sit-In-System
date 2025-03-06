@@ -55,8 +55,8 @@ def dashboard():
     global student
     try:
 
-        if not session['student'] == None:
-            if student == None:
+        if session.get('student') is not None:
+            if student is None:
                 student_data = session.get('student')
                 student = Student(**student_data)
             return render_template(
@@ -84,8 +84,8 @@ def announcements():
     global student
     try:
 
-        if not session['student'] == None:
-            if student == None:
+        if session.get('student') is not None:
+            if student is None:
                 student_data = session.get('student')
                 student = Student(**student_data)
                 
@@ -322,50 +322,75 @@ def sitin_lab():
 def uploadprofile():
     """Upload Profile Picture Route"""
     global student
-    filenamefromicon = request.form['profile_icon']
+    if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
+
+    filenamefromicon = request.form['profile_icon2'] # Extract default icon selection
+
+
     print(f'Filename from icon: {filenamefromicon}')
     print("Request files:", request.files)  # Debugging: Print received files
 
-    if 'profile_picture' not in request.files:
-        flash("No file part")
-        return redirect(url_for('main.profilesettings'))
+    profile_picture_uploaded = 'profile_picture' in request.files
+    print(f'Profile picture uploaded: {profile_picture_uploaded}')
 
-    file = request.files['profile_picture']
+    if profile_picture_uploaded and not filenamefromicon: 
 
-    if file.filename == '':
-        flash("No selected file")
-        return redirect(url_for('main.profilesettings'))
+        file = request.files['profile_picture']
 
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)  # Secure filename
-        upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/profileicons"))
-        filepath = os.path.join(upload_folder, filename)
-
-        # 🔥 FIX: Don't create a new folder—only check if it exists!
-        if not os.path.isdir(upload_folder):
-            print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
-            flash("Upload folder missing. Contact admin.", "danger")
+        if file.filename == '':
+            flash("No selected file")
             return redirect(url_for('main.profilesettings'))
 
-        print(f"Saving file to: {filepath}")  # Debugging line
-        file.save(filepath.replace("\\", "/"))  # Fix Windows backslash issue
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)  # Secure filename
 
-        if os.path.exists(filepath):  # Verify if the file was actually saved
-            print("✅ File successfully saved!")
-        else:
-            print("❌ File was NOT saved!")
+            upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/profileicons"))
+            filepath = os.path.join(upload_folder, filename)
 
-        
-        response = student.upload_profile_icon(profile_icon=filename, student=student)
+            # 🔥 FIX: Don't create a new folder—only check if it exists!
+            if not os.path.isdir(upload_folder):
+                print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
+                flash("Upload folder missing. Contact admin.", "danger")
+                return redirect(url_for('main.profilesettings'))
+
+            print(f"Saving file to: {filepath}")  # Debugging line
+            file.save(filepath.replace("\\", "/"))  # Fix Windows backslash issue
+
+            if os.path.exists(filepath):  # Verify if the file was actually saved
+                print("✅ File successfully saved!")
+            else:
+                print("❌ File was NOT saved!")
+
+            
+            response = student.upload_profile_icon(profile_icon=filename, student=student)
+
+            if response['success']:
+                flash("Profile picture uploaded successfully!", "success")
+                student = response['student'] # reload new student object with new image
+                session['student'] = student.__dict__ # reload new student session with new image from new student object
+                return redirect(url_for('main.profilesettings'))
+            else:
+                flash(response['error'], "error")
+                return redirect(url_for('main.profilesettings'))
+
+    elif filenamefromicon and profile_picture_uploaded:
+        response = student.upload_profile_icon(profile_icon=filenamefromicon, student=student)
 
         if response['success']:
-            flash("Profile picture uploaded successfully!", "success")
-            student = response['student'] # reload new student object with new image
+            flash("Profile picture uploaded successfully2!", "success")
+            student = response['student']
             session['student'] = student.__dict__ # reload new student session with new image from new student object
             return redirect(url_for('main.profilesettings'))
         else:
             flash(response['error'], "error")
             return redirect(url_for('main.profilesettings'))
+    else:
+        flash("Please select a profile picture or upload one.", "error")
+        return redirect(url_for('main.profilesettings'))
+
 
 
 
