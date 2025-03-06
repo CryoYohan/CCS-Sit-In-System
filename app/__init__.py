@@ -15,9 +15,7 @@ def create_app():
     app.config.from_pyfile('config.py', silent=True)
 
     # File Upload Configuration
-    UPLOAD_FOLDER = '/path/to/the/uploads'
-    ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-
+    UPLOAD_FOLDER = 'static/images/profileicons'
     # Set the upload folder
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 

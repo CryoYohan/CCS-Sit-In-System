@@ -1,14 +1,17 @@
-from flask import render_template, request, redirect, url_for, Blueprint, session, abort,jsonify, flash
+from flask import render_template, request, redirect, url_for, Blueprint, session, flash, current_app
 from .modules.user_mgt_module.student import Student
 from .modules.login_register_module import Authorization
 from .modules.reservation_module.reserve_lab import Reservation
 from datetime import datetime
-
+import os
+from werkzeug.utils import secure_filename
 
 
 # Register as a Blueprint for create_app() function to recognize as Flask app
 main = Blueprint('main', __name__, template_folder='templates/student')
 
+# Allowed extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 # Initialize Authorization instance Login Register Module
 auth = Authorization()
@@ -17,6 +20,11 @@ auth = Authorization()
 reservation = Reservation()
 
 student = None # Global student object to be reusable
+
+# Function to check if the file extension is valid
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @main.after_request
 def after_request(response):
     response.headers['Cache-Control'] = 'no-cache,no-store,must-revalidate'
@@ -310,29 +318,46 @@ def sitin_lab():
         flash(str(e),'error')
         return redirect(url_for('main.sitin'))
     
-@main.route('/update_profile_picture', methods=['POST'])
-def update_profile_picture():
-    """Update the profile picture in the database."""
-    global student
+import os
+from flask import request, redirect, url_for, flash, current_app
+from werkzeug.utils import secure_filename
 
-    # Get the selected profile picture from the request
-    data = request.get_json()
-    profile_picture = data.get('profile_picture')
+@main.route('/uploadprofile', methods=['POST'])
+def uploadprofile():
+    print("Request files:", request.files)  # Debugging: Print received files
 
-    if not profile_picture:
-        return jsonify({'success': False, 'error': 'No profile picture selected'})
+    if 'profile_picture' not in request.files:
+        flash("No file part")
+        return redirect(url_for('main.profilesettings'))
 
-    try:
-        # Update the student's profile picture in the database
-        student.image = profile_picture
-        student.edit(image=profile_picture)
+    file = request.files['profile_picture']
 
-        # Update the session
-        session['student']['image'] = profile_picture
+    if file.filename == '':
+        flash("No selected file")
+        return redirect(url_for('main.profilesettings'))
 
-        return jsonify({'success': True})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)  # Secure filename
+        upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/profileicons"))
+        filepath = os.path.join(upload_folder, filename)
+
+        # 🔥 FIX: Don't create a new folder—only check if it exists!
+        if not os.path.isdir(upload_folder):
+            print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
+            flash("Upload folder missing. Contact admin.", "danger")
+            return redirect(url_for('main.profilesettings'))
+
+        print(f"Saving file to: {filepath}")  # Debugging line
+        file.save(filepath.replace("\\", "/"))  # Fix Windows backslash issue
+
+        if os.path.exists(filepath):  # Verify if the file was actually saved
+            print("✅ File successfully saved!")
+        else:
+            print("❌ File was NOT saved!")
+
+        flash("Profile picture uploaded successfully!", "success")
+        return redirect(url_for('main.profilesettings', filename=filename))
+
 
 
 @main.route('/editprofile', methods=['POST'])
