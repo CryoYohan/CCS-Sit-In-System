@@ -213,21 +213,6 @@ def announce():
 
     title: str = request.form['title']
     description: str = request.form['description']
-    #image = request.files['image']  # Use request.files for file uploads
-
-    # image_filename = None
-
-    # if image and image.filename:    
-          
-    #     UPLOAD_FOLDER = 'static/uploads'
-    #     if not os.path.exists(UPLOAD_FOLDER):
-    #         os.makedirs(UPLOAD_FOLDER)
-
-    #     image_filename = secure_filename(image.filename)
-    #     image_path = os.path.join(UPLOAD_FOLDER, image_filename)
-    #     image.save(image_path)  # Save the image file
-    
-    #print(f"Uploaded Image: {image_filename}")
 
     response = admin_account.add_announcement(post_title=title, post_description=description, image=None, posted_by=admin_account.idno)
     if response['success']:
