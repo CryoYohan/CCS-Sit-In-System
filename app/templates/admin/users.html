@@ -150,9 +150,9 @@
         <div class="flex items-center mb-8">
             <!-- Profile Icon (Circle) -->
             <div
-                class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl font-bold mr-4">
-                <img id="image" src="{{ url_for('static',filename='images/profileicons/default.png') }}"
-                    alt="Profile Picture" title="Profile Picture" />
+                class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl font-bold mr-4 overflow-hidden">
+                <img src="{{ url_for('static', filename='images/profileicons/staff.png') }}"
+                    alt="Student Profile Picture" title="Profile Icon" class="w-full h-full object-cover" id="image">
             </div>
             <!-- User's Full Name and Email -->
             <div>
@@ -160,7 +160,9 @@
                 <p id="emaildisplay" class="text-gray-600">john.doe@example.com</p>
             </div>
         </div>
-        <form action="/editprofile" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form action="{{ url_for('admin.admin_editstudent') }}" method="post"
+            class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <input type="hidden" id="idno" name="idno" />
             <!-- First Name -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">First Name</label>
@@ -216,7 +218,7 @@
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700">New Password</label>
                 <div class="relative">
-                    <input type="password" name="editpassword" id="password"
+                    <input type="password" name="password" id="password"
                         class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
                     <button type="button" onclick="togglePassword('password')"
                         class="absolute right-3 top-2 text-gray-600 hover:text-blue-600 transition">
@@ -228,7 +230,7 @@
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
                 <div class="relative">
-                    <input type="password" name="editconfirmpassword" id="confirmpassword"
+                    <input type="password" name="confirmpassword" id="confirmpassword"
                         class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
                     <button type="button" onclick="togglePassword('confirmpassword')"
                         class="absolute right-3 top-2 text-gray-600 hover:text-blue-600 transition">
@@ -281,6 +283,13 @@
             closeSitInModal();
         }
     };
+    // Close modal if clicked outside the modal content
+    window.onclick = function (event) {
+        const modal = document.getElementById("editModal");
+        if (event.target === modal) {
+            closeEditModal();
+        }
+    };
     function togglePassword(id) {
         const field = document.getElementById(id);
         field.type = field.type === "password" ? "text" : "password";
@@ -299,6 +308,7 @@
             const image = this.getAttribute("data-image");
 
             // Set modal content
+            document.getElementById("idno").value = idno;
             document.getElementById("fullname").textContent = `${firstname} ${middlename} ${lastname}`;
             document.getElementById("emaildisplay").textContent = email;
             document.getElementById("image").src = "/static/images/profileicons/" + image;

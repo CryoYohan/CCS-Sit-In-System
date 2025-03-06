@@ -77,6 +77,20 @@ class Admin(User):
             return {'success':False, 'error':str(e)}
 
 
+    def update(self, **kwargs):
+        """Edit Student Info and Reset Passwords"""
+        try:
+            if 'password' in kwargs:
+                kwargs['password'] = self.auth.hashpassword(kwargs['password'])
+                self.db.update_record(table='user',**kwargs)
+                return {'success': True, 'message': 'Password Reset Successful'}
+            else:
+                self.db.update_record(table='user',**kwargs)
+                return {'success': True, 'message': 'Update Successful'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+        
+
     def delete(self):
         pass
 

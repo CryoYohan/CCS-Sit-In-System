@@ -181,6 +181,45 @@ def adminlogout():
     flash('Admin logged out', 'error')
     return redirect(url_for('admin.adminlogin'))
 
+@admin.route('/admin_editstudent', methods=['POST'])
+def admin_editstudent():
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = Admin(**session.get('admin'))
+
+        form_data = {
+            "idno": request.form["idno"],
+            "firstname": request.form["firstname"],
+            "middlename": request.form["middlename"],
+            "lastname": request.form["lastname"],
+            "email": request.form["email"],
+            "course": request.form["course"],
+            "year": request.form["year"],
+            "password": request.form["password"],
+            "confirmpassword": request.form["confirmpassword"]
+        }
+
+
+        if form_data['password'] != form_data['confirmpassword']:
+            flash('Password do not match', 'error')
+            return redirect(url_for('admin.users'))
+
+        del form_data['confirmpassword']
+
+        response = admin_account.update(**{k:v for k,v in form_data.items() if v != ''})
+
+
+        if response['success']:
+            flash(response['message'], 'success')
+            return redirect(url_for('admin.users'))
+        else:
+            flash(response['error'], 'error')
+            return redirect(url_for('admin.users'))
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+
 @admin.route('/adminlogin', methods=['POST'])
 def loginadmin():
     global admin_account
