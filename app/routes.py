@@ -322,6 +322,8 @@ def sitin_lab():
 def uploadprofile():
     """Upload Profile Picture Route"""
     global student
+    filenamefromicon = request.form['profile_icon']
+    print(f'Filename from icon: {filenamefromicon}')
     print("Request files:", request.files)  # Debugging: Print received files
 
     if 'profile_picture' not in request.files:

@@ -144,7 +144,7 @@
                         <div class="cursor-pointer relative" onclick="selectProfileIcon(this, '{{ icon }}')">
                             <img src="{{ url_for('static', filename='images/profileicons/' + icon) }}" alt="Profile Icon" class="w-16 h-16 rounded-full object-cover">
                             <!-- Check Icon (Hidden by default) -->
-                            <div id="check-{{ icon }}" class="absolute top-0 right-0 bg-green-500 rounded-full p-1 hidden">
+                            <div id="check-{{ icon }}" class="absolute top-7 right-17 bg-green-500 rounded-full p-1 hidden">
                                 <i class="fas fa-check text-white text-xs"></i>
                             </div>
                         </div>
@@ -167,6 +167,10 @@
                     <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200">
                         Save
                     </button>
+                    <!-- Clear Button -->
+                    <button type="button" onclick="clearProfileSelection()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200">
+                        Clear
+                    </button>
             
                     <!-- Close Button -->
                     <button type="button" onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200">
@@ -179,6 +183,27 @@
     
 </div>
 <script>
+    function selectProfileIcon(element, icon) {
+        // Set the selected icon filename in the hidden input
+        document.getElementById('selectedProfileIcon').value = icon;
+
+        // Remove checkmark from all icons
+        document.querySelectorAll('[id^="check-"]').forEach(el => el.classList.add('hidden'));
+
+        // Show checkmark on the selected icon
+        document.getElementById(`check-${icon}`).classList.remove('hidden');
+
+        // Clear file upload input
+        document.getElementById('upload-profile').value = "";
+    }
+
+    function clearProfileSelection() {
+        // Clear the hidden input value (since user uploaded a file instead)
+        document.getElementById('selectedProfileIcon').value = "";
+
+        // Hide all checkmarks
+        document.querySelectorAll('[id^="check-"]').forEach(el => el.classList.add('hidden'));
+    }
     // Function to open the modal
 function openModal() {
     document.getElementById('profile-modal').classList.remove('hidden');
