@@ -1,6 +1,7 @@
 from .user import User
 from ..security.hashpw import PasswordHashing
 from random import choice
+from datetime import datetime
 
 class Admin(User):
     auth = PasswordHashing()
@@ -49,15 +50,7 @@ class Admin(User):
             return {'success': True} 
         except Exception as e:
             return {'success': False, 'error': str(e)}
-    
-    def retrieve_all_announcements(self):
-        """Retrieve all announcements"""
-        try:
-            announcements = self.db.getall_records(table='announcement')
-            return{'success':True, 'announcements':announcements}
-        
-        except Exception as e:
-            return {'erorr':str(e)}
+
     
     def retrieve_all_sitinrecords(self):
         """Retrieve all Joined Sitin Records"""
@@ -67,6 +60,17 @@ class Admin(User):
         
         except Exception as e:
             return {'erorr':str(e)}
+    
+    def sit_in_student(self,**kwargs):
+        """Sit in a student"""
+        sitin_datetime = datetime.now()
+        kwargs['sitin_in'] = sitin_datetime
+        kwargs['status'] = 'In-lab'
+        try:
+            self.db.add_record(table='sitin_reservation',**kwargs)
+            return {'success':True}
+        except Exception as e:
+            return {'success':False, 'error':str(e)}
 
 
     def delete(self):

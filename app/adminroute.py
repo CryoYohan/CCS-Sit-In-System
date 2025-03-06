@@ -223,6 +223,27 @@ def announce():
         return redirect(url_for('admin.admin_announcements'))
 
 
+@admin.route('/sitin_student', methods=['POST'])
+def sitin_student():
+    """Sit In Student"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = Admin(**session.get('admin'))
+
+    idno = request.form['idno']
+    lab_id = request.form['lab_id']
+    reason = request.form['reason']
+
+    response = admin_account.sit_in_student(idno=idno, lab_id=lab_id, reason=reason,staff_idno=admin_account.idno)
+
+    if response['success']:
+        flash('Student sat in', 'success')
+        return redirect(url_for('admin.adminrecords'))
+    else:
+        flash(response['error'], 'error')
+        return redirect(url_for('admin.adminrecords'))
+
 
 @admin.route('/addstaff', methods=['POST'])
 def addstaff():
