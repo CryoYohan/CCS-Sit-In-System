@@ -32,6 +32,10 @@ class Admin(User):
     def retrieve_all_students(self):
         """Retrieve all students"""
         return self.db.getall_records_rolebased(role='Student')
+
+    def retrieve_all_students_to_sitin(self):
+        """ Retrieve all students joined sitin reservation"""
+        return self.db.retrieve_all_students_to_sitin()
     
     def retrieve_all_users(self):
         """Retrieve all users"""

@@ -69,9 +69,6 @@
                         Sessions
                     </th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
-                        Lab Status
-                    </th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
                         Sit-in/Log-off
                     </th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">
@@ -84,24 +81,20 @@
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['idno'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">
-                        {{ user['lastname'] }}, {{ user['firstname'] }} {{
-                        user['middlename'][0].capitalize() }}.
+                        {{ user['fullname'].title() }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['course'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['year'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['email'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['session'] }}</td>
-                    <td class="px-4 py-3">
-                        <span class="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">{{
-                            user['status'] }}Idle</span>
-                    </td>
                     <td class="px-4 py-3 text-sm text-gray-700">
-                        <button class="open-modal bg-green-500 p-3 rounded-xl w-16 text-white"
-                            data-fullname="{{ user.firstname.title() }} {{ user.middlename[0].capitalize() }}. {{ user.lastname.title() }}"
-                            data-idno="{{ user.idno }}" data-session="{{ user.session }}">
+                        <button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white text-center"
+                            data-fullname="{{ user.fullname }}" data-idno="{{ user.idno }}"
+                            data-session="{{ user.session }}">
                             Sit-in
                         </button>
                     </td>
+
                     <td class="px-4 py-3">
                         <button class="text-blue-500 hover:text-blue-700 transition">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"

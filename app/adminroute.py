@@ -82,7 +82,7 @@ def users():
         search_query = request.args.get('query', '').strip()
 
         # Retrieve all students
-        users = admin_account.retrieve_all_students()
+        users = admin_account.retrieve_all_students_to_sitin()
 
         # Filter users based on the search query
         if search_query:
@@ -240,6 +240,7 @@ def sitin_student():
     if response['success']:
         flash('Student sat in', 'success')
         return redirect(url_for('admin.adminrecords'))
+        
     else:
         flash(response['error'], 'error')
         return redirect(url_for('admin.adminrecords'))
