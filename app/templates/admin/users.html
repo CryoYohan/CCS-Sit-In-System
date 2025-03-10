@@ -33,14 +33,15 @@
             </form>
 
             <!-- Filter by Lab Status -->
-            <div>
+            <form action="/admin/users" method="GET" class="flex items-center gap-2">
                 <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Lab Status</label>
                 <select id="statusFilter"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <option value="all" selected>All Students</option>
                     <option value="all">Sit-in</option>
                     <option value="active">Log-off</option>
                 </select>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -88,11 +89,19 @@
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['email'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ user['session'] }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">
+                        {%  if not user['status'] == 'In-lab' %}
                         <button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white text-center"
                             data-fullname="{{ user.firstname }} {{ user.middlename }} {{ user.lastname }}"
                             data-idno="{{ user.idno }}" data-session="{{ user.session }}">
                             Sit-in
                         </button>
+                        {% else %}
+                        <button class="bg-red-500 px-6 py-2 rounded-lg w-auto text-white text-center"
+                            data-fullname="{{ user.firstname }} {{ user.middlename }} {{ user.lastname }}"
+                            data-idno="{{ user.idno }}" data-session="{{ user.session }}">
+                            Log-off
+                        </button>
+                        {% endif %}
                     </td>
 
                     <td class="px-4 py-3">
