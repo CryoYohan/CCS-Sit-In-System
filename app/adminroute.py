@@ -80,13 +80,14 @@ def admin_announcements():
 def users():
     """Users"""
     global admin_account
-    if not session['admin'] == None:
-        if admin_account == None:
+    if session.get('admin') is not None:
+        if admin_account is None:
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
-        # Get the search query from the URL parameters
+        # Get the search query and filter query from the URL parameters
         search_query = request.args.get('query', '').strip()
+        filter_query = request.args.get('filter', '').strip()
 
         # Retrieve all students
         users = admin_account.retrieve_all_students_to_sitin()
@@ -102,16 +103,21 @@ def users():
                     filtered_users.append(user)
             users = filtered_users
 
+        # Filter users based on the filter query (Lab Status)
+        if filter_query and filter_query != 'all':
+            users = [user for user in users if user['status'] == filter_query]
+
         return render_template(
-                                'users.html',
-                                user_in_login_page=True, 
-                                action='Logout',
-                                admin=admin_account,
-                                users=users,
-                                )
+            'users.html',
+            user_in_login_page=True,
+            action='Logout',
+            admin=admin_account,
+            users=users,
+        )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
+
 
 
 @admin.route('/managelab')
