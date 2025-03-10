@@ -39,7 +39,7 @@
     </div>
     <div class="mt-4">
       <img
-        src="https://via.placeholder.com/400x200"
+        src="{{ url_for('static',filename='images/announcements/'+announcement['image']) }}"
         alt="Announcement Photo"
         class="w-full rounded-lg"
       />
