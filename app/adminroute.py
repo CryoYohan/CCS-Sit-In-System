@@ -1,4 +1,4 @@
-from flask import session, url_for, Blueprint, render_template, request, flash, redirect, current_app
+from flask import session, url_for, Blueprint, render_template, request, flash, redirect, current_app, jsonify
 from .modules.user_mgt_module.staff import Staff
 from .modules.user_mgt_module.admin import Admin
 from .modules.login_register_module import Authorization
@@ -85,34 +85,11 @@ def users():
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
-        # Get the search query and filter query from the URL parameters
-        search_query = request.args.get('query', '').strip()
-        filter_query = request.args.get('filter', '').strip()
-
-        # Retrieve all students
-        users = admin_account.retrieve_all_students_to_sitin()
-
-        # Filter users based on the search query
-        if search_query:
-            filtered_users = []
-            for user in users:
-                # Check if the query matches ID, first name, or last name
-                if (search_query.lower() in user['idno'].lower() or
-                    search_query.lower() in user['firstname'].lower() or
-                    search_query.lower() in user['lastname'].lower()):
-                    filtered_users.append(user)
-            users = filtered_users
-
-        # Filter users based on the filter query (Lab Status)
-        if filter_query and filter_query != 'all':
-            users = [user for user in users if user['status'] == filter_query]
-
         return render_template(
             'users.html',
             user_in_login_page=True,
             action='Logout',
             admin=admin_account,
-            users=users,
         )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
@@ -193,6 +170,38 @@ def adminlogout():
     session['admin'] = None
     flash('Admin logged out', 'error')
     return redirect(url_for('admin.adminlogin'))
+
+
+@admin.route('/api/users')
+def api_users():
+    global admin_account
+    """AJAX filtering of users"""
+    if session.get('admin') is None:
+        return jsonify({'error': 'Unauthorized access'}), 403
+
+    if admin_account is None:
+        admin_account = session.get('admin')
+        admin_account = Admin(**admin_account)
+
+    search_query = request.args.get('query', '').strip()
+    filter_query = request.args.get('filter', '').strip()
+
+    users = admin_account.retrieve_all_students_to_sitin()
+
+    if search_query:
+        users = [
+            user for user in users if
+            search_query.lower() in user['idno'].lower() or
+            search_query.lower() in user['firstname'].lower() or
+            search_query.lower() in user['lastname'].lower()
+        ]
+
+    if filter_query and filter_query != 'all':
+        users = [user for user in users if user['status'] == filter_query]
+
+    return jsonify(users)
+
+
 
 @admin.route('/admin_editstudent', methods=['POST'])
 def admin_editstudent():
