@@ -1,4 +1,4 @@
-from flask import session, url_for, Blueprint, render_template, request, flash, redirect, jsonify
+from flask import session, url_for, Blueprint, render_template, request, flash, redirect, current_app
 from .modules.user_mgt_module.staff import Staff
 from .modules.user_mgt_module.admin import Admin
 from .modules.login_register_module import Authorization
@@ -12,6 +12,13 @@ auth = Authorization()
 
 admin_account = None
 db = Databasehelper()
+
+# Allowed extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+# Function to check if the file extension is valid
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @admin.after_request
 def after_request(response):
@@ -250,10 +257,36 @@ def announce():
         if admin_account == None:
             admin_account = Admin(**session.get('admin'))
 
-    title: str = request.form['title']
-    description: str = request.form['description']
+    file = request.files['image']
+    filename = ''
 
-    response = admin_account.add_announcement(post_title=title, post_description=description, image=None, posted_by=admin_account.idno)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename) # Secure file name
+        upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/announcements"))
+        filepath = os.path.join(upload_folder, filename)
+
+        if not os.path.isdir(upload_folder):
+            print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
+            flash("Upload folder missing. Contact admin.", "danger")
+            return redirect(url_for('admin.admin_announcement'))
+        
+        print(f"Saving file to: {filepath}")  # Debugging line
+        file.save(filepath.replace("\\", "/"))  # Fix Windows backslash issue
+
+        if os.path.exists(filepath):  # Verify if the file was actually saved
+            print("✅ File successfully saved!")
+
+
+
+    announcement_data = {
+        "post_title": request.form['title'],
+        "post_description": request.form['description'],
+        "image": filename,
+        "posted_by":admin_account.idno,
+    }
+
+
+    response = admin_account.add_announcement(**{k:v for k,v in announcement_data.items() if not v is None})
     if response['success']:
         flash('Announcement added', 'success')
         return redirect(url_for('admin.admin_announcements'))
