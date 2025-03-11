@@ -175,7 +175,7 @@ def adminlogout():
 @admin.route('/api/users')
 def api_users():
     global admin_account
-    """AJAX filtering of users"""
+    """API for fetching of users"""
     if session.get('admin') is None:
         return jsonify({'error': 'Unauthorized access'}), 403
 
@@ -183,23 +183,99 @@ def api_users():
         admin_account = session.get('admin')
         admin_account = Admin(**admin_account)
 
-    search_query = request.args.get('query', '').strip()
-    filter_query = request.args.get('filter', '').strip()
+    users = admin_account.retrieve_all_students_to_sitin()
+
+    # Convert objects to dictionaries
+    users_list = []
+    for user in users:
+        users_list.append(
+            {
+            "idno": user['idno'],
+            "firstname": user['firstname'],
+            "middlename": user['middlename'],
+            "lastname": user['lastname'],
+            "course": user['course'],
+            "year": user['year'],
+            "email": user['email'],
+            "session": user['session'],
+            "status": user['status']
+            }
+        )
+
+    return jsonify(users_list)  # Send JSON response
+
+@admin.route('/api/users/search', methods=['GET'])
+def search_users():
+    global admin_account
+    """API for fetching of filtered users"""
+    if session.get('admin') is None:
+        return jsonify({'error': 'Unauthorized access'}), 403
+
+    if admin_account is None:
+        admin_account = session.get('admin')
+        admin_account = Admin(**admin_account)
+
+    query = request.args.get('q','').strip()
 
     users = admin_account.retrieve_all_students_to_sitin()
 
-    if search_query:
-        users = [
-            user for user in users if
-            search_query.lower() in user['idno'].lower() or
-            search_query.lower() in user['firstname'].lower() or
-            search_query.lower() in user['lastname'].lower()
-        ]
+    filtered_users = [
+        {
+            "idno": user['idno'],
+            "firstname": user['firstname'],
+            "middlename": user['middlename'],
+            "lastname": user['lastname'],
+            "course": user['course'],
+            "year": user['year'],
+            "email": user['email'],
+            "session": user['session'],
+            "status": user['status']
+        }
+        for user in users if (
+            query.lower() in user['idno'].lower() or  # ✅ FIXED: user['idno'] (Dictionary)
+            query.lower() in user['firstname'].lower() or
+            query.lower() in user['middlename'].lower() or
+            query.lower() in user['lastname'].lower() or
+            query.lower() in user['email'].lower()
+        )
 
-    if filter_query and filter_query != 'all':
-        users = [user for user in users if user['status'] == filter_query]
+    ]
 
-    return jsonify(users)
+    return jsonify(filtered_users)
+
+@admin.route('/api/users/filter-status', methods=['GET'])
+def filter_status():
+    global admin_account
+    """API for fetching of filtered users"""
+    if session.get('admin') is None:
+        return jsonify({'error': 'Unauthorized access'}), 403
+
+    if admin_account is None:
+        admin_account = session.get('admin')
+        admin_account = Admin(**admin_account)
+
+    query = request.args.get('q', '')
+
+    users = admin_account.retrieve_all_students_to_sitin()
+
+    filtered_users_status = [
+         {
+            "idno": user['idno'],
+            "firstname": user['firstname'],
+            "middlename": user['middlename'],
+            "lastname": user['lastname'],
+            "course": user['course'],
+            "year": user['year'],
+            "email": user['email'],
+            "session": user['session'],
+            "status": user['status']
+        }
+        for user in users if (
+            query.lower() in user['status']  # ✅ FIXED: user['idno'] (Dictionary)
+        )
+    ]
+
+    return jsonify(filtered_users_status)
 
 
 

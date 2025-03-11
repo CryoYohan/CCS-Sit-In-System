@@ -18,32 +18,34 @@
     <div class="mb-8 bg-white p-6 rounded-xl shadow-md animate-slideUp">
         <div class="flex justify-between">
             <!-- Search Bar -->
-            <form action="/admin/users" method="GET" class="flex items-center gap-2">
-                <input type="text" id="search" placeholder="Search name or ID" class="border px-2 py-1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500
+            <div class="flex items-center gap-2">
+                <input type="text" id="search-user" placeholder="Search name or ID" class="border px-2 py-1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500
                 focus:border-blue-500 transition" value="{{ request.args.get('query', '') }}" />
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                <button type="button" onclick="searchUser()"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                     Search
                 </button>
                 <!-- Clear Filter Button -->
-                <a href="/admin/users"
+                <button type="button" onclick="clearFilter()"
                     class="w-64 p-2 text-center bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
                     Clear Filter
-                </a>
-            </form>
+                </button>
+            </div>
 
             <!-- Filter by Lab Status -->
-            <form action="/admin/users" method="GET" class="flex items-center gap-2">
+            <div class="flex items-center gap-2">
                 <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Lab Status</label>
-                <select id="filter" class="border px-2 py-1">
+                <select id="filter-status" class="border px-2 py-1">
                     <option value="all">All</option>
-                    <option value="In-lab">In-lab</option>
-                    <option value="Not-in-lab">Not in-lab</option>
+                    <option value="Idle">Sit-in</option>
+                    <option value="In-lab">Log-off</option>
                 </select>
 
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                <button type="button" onclick="filterStatus()"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                     Filter
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -282,56 +284,137 @@
         modal.classList.add("hidden");
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const searchInput = document.getElementById("search");
-        const filterSelect = document.getElementById("filter");
-        const tbody = document.querySelector("tbody");
+    async function filterStatus() {
+        const tableBody = document.getElementById('userTableBody');
 
-        function fetchUsers() {
-            const query = searchInput.value.trim();
-            const filter = filterSelect.value;
+        filter_option = document.getElementById('filter-status')
 
-            fetch(`/api/users?query=${query}&filter=${filter}`)
-                .then(response => response.json())
-                .then(users => {
-                    tbody.innerHTML = ""; // Clear table
+        const response = await fetch(`/admin/api/users/filter-status?q=${encodeURIComponent(filter_option)}`)
+        const users = response.json();
 
-                    users.forEach(user => {
-                        const row = document.createElement("tr");
-                        row.classList.add("hover:bg-gray-50", "transition");
+        tableBody.innerHTML = "";
 
-                        row.innerHTML = `
-                            <td class="px-4 py-3 text-sm text-gray-700">${user.idno}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">${user.email}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">${user.session}</td>
-                            <td class="px-4 py-3 text-sm text-gray-700">
-                                ${user.status !== "In-lab"
-                                ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
-                                        data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
-                                        data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
-                                : `<button class="bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
-                                        data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
-                                        data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
-                            }
-                            </td>
-                        `;
+        users.forEach(user => {
+            const row = `<tr>
+                <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+                <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.email}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.session}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">
+                    ${user.status !== "In-lab"
+                    ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
+                    : `<button class="bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
+                }
+                </td>
+            </tr>`
+            tableBody.innerHTML += row;
+        })
 
-                        tbody.appendChild(row);
-                    });
-                })
-                .catch(error => console.error("Error fetching users:", error));
-        }
+    }
 
-        // Fetch on page load
-        fetchUsers();
+    async function clearFilter() {
+        const tableBody = document.getElementById('userTableBody');
+        tableBody.innerHTML = '';
 
-        // Attach event listeners
-        searchInput.addEventListener("input", fetchUsers);
-        filterSelect.addEventListener("change", fetchUsers);
-    });
+        const response = await fetch("{{ url_for('admin.api_users') }}")
+        const users = await response.json();
+
+        users.forEach(user => {
+            const row = `<tr>
+                <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+                <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.email}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.session}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">
+                    ${user.status !== "In-lab"
+                    ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
+                    : `<button class="bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
+                }
+                </td>
+            </tr>`
+            tableBody.innerHTML += row;
+        })
+    }
+
+    async function searchUser() {
+        const searchInput = document.getElementById('search-user').value.trim()
+
+        const response = await fetch(`/admin/api/users/search?q=${encodeURIComponent(searchInput)}`);
+        const users = await response.json();
+
+        const tableBody = document.getElementById('userTableBody');
+
+        tableBody.innerHTML = '';
+
+        users.forEach(user => {
+            const row = `<tr>
+                <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+                <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.email}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.session}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">
+                    ${user.status !== "In-lab"
+                    ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
+                    : `<button class="bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
+                }
+                </td>
+            </tr>`
+            tableBody.innerHTML += row;
+        });
+    }
+
+    function loadUsers() {
+        // FETCH USERS UPON RENDER OF WEBPAGE
+        document.addEventListener("DOMContentLoaded", async () => {
+            const response = await fetch("{{ url_for('admin.api_users') }}"); // Call API
+            const users = await response.json();
+
+            const tableBody = document.getElementById("userTableBody");
+            tableBody.innerHTML = ''; // Clear previous content upon load
+
+            users.forEach(user => {
+                const row = `<tr>
+            <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+            <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">${user.email}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">${user.session}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">
+                ${user.status !== "In-lab"
+                        ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
+                        data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                        data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
+                        : `<button class="bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                        data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                        data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
+                    }
+            </td>
+        </tr>`
+                tableBody.innerHTML += row;
+            });
+        });
+    }
+
+    loadUsers();
 </script>
 
 <!-- Animations -->
