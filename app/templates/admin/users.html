@@ -20,7 +20,7 @@
             <!-- Search Bar -->
             <div class="flex items-center gap-2">
                 <input type="text" id="search-user" placeholder="Search name or ID" class="border px-2 py-1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500
-                focus:border-blue-500 transition" value="{{ request.args.get('query', '') }}" />
+                focus:border-blue-500 transition" value="{{ dash_search }}" />
                 <button type="button" onclick="searchUser()"
                     class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                     Search
@@ -211,12 +211,22 @@
 {{ component.sitin_modal() }}
 <!-- JavaScript -->
 <script>
-    document.querySelectorAll(".open-modal").forEach(button => {
-        button.addEventListener("click", function () {
+    document.addEventListener("DOMContentLoaded", function () {
+        let searchTerm = "{{ dash_search }}";  // Get the search term passed from Flask
+        if (searchTerm) {
+            searchUser();
+        }
+        else {
+            loadUsers();
+        }
+    });
+    // Attach event listener to the document using event delegation
+    document.addEventListener("click", function (event) {
+        if (event.target.classList.contains("open-modal")) {
             // Get user data from button attributes
-            const idno = this.getAttribute("data-idno");
-            const fullname = this.getAttribute("data-fullname");
-            const session = this.getAttribute("data-session");
+            const idno = event.target.getAttribute("data-idno");
+            const fullname = event.target.getAttribute("data-fullname");
+            const session = event.target.getAttribute("data-session");
 
             // Set modal content
             document.getElementById("modal-idno").value = idno;
@@ -225,8 +235,9 @@
 
             // Show modal
             document.getElementById("sitInModal").classList.remove("hidden");
-        });
+        }
     });
+
 
     // Function to close the modal
     function closeSitInModal() {
@@ -417,7 +428,6 @@
         });
     }
 
-    loadUsers();
 </script>
 
 <!-- Animations -->

@@ -84,12 +84,15 @@ def users():
         if admin_account is None:
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
+        
+        dash_search = request.args.get('dash_search', '') 
 
         return render_template(
             'users.html',
             user_in_login_page=True,
             action='Logout',
             admin=admin_account,
+            dash_search=dash_search  # Pass the search term to template,
         )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
@@ -182,6 +185,8 @@ def api_users():
     if admin_account is None:
         admin_account = session.get('admin')
         admin_account = Admin(**admin_account)
+
+    
 
     users = admin_account.retrieve_all_students_to_sitin()
 
@@ -421,11 +426,11 @@ def sitin_student():
 
     if response['success']:
         flash('Student sat in', 'success')
-        return redirect(url_for('admin.adminrecords'))
+        return redirect(url_for('admin.users'))
         
     else:
         flash(response['error'], 'error')
-        return redirect(url_for('admin.adminrecords'))
+        return redirect(url_for('admin.users'))
 
 
 @admin.route('/addstaff', methods=['POST'])

@@ -11,14 +11,10 @@
                         </div>
                         <!-- Search Bar -->
                         <div class="flex items-center h-3 intro-y">
-                            <form action="/admin/users" method="GET" class="flex items-center gap-2">
-                                <input type="text" name="query" placeholder="Search by name or ID"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                                    value="{{ request.args.get('query', '') }}">
-                                <button type="submit"
-                                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                                    Search
-                                </button>
+                            <form action="{{ url_for('admin.users') }}" method="GET" class="flex items-center gap-2">
+                                <input type="text" name="dash_search" placeholder="Search students..."
+                                    value="{{ dash_search }}" required>
+                                <button type="submit">Search</button>
                             </form>
                         </div>
                     </div>
@@ -28,13 +24,13 @@
                             href="#">
                             <div class="p-5">
                                 <div class="flex justify-between">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-400" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeWidth=5
+                                        stroke="currentColor" class="h-7 w-7 text-blue-400" fill="none">
+                                        <path strokeLinecap="round" strokeLinejoin="round"
+                                            d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
                                     </svg>
                                     <div
-                                        class="bg-green-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
+                                        class="bg-blue-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
                                         <span class="flex items-center">30%</span>
                                     </div>
                                 </div>
@@ -51,11 +47,13 @@
                             href="#">
                             <div class="p-5">
                                 <div class="flex justify-between">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-yellow-400" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" stroke-width="1.5" stroke="currentColor"
+                                        class="h-7 w-7 text-pink-600" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                                     </svg>
+
                                     <div
                                         class="bg-red-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
                                         <span class="flex items-center">30%</span>
@@ -65,7 +63,7 @@
                                     <div>
                                         <div class="mt-3 text-3xl font-bold leading-8">7</div>
 
-                                        <div class="mt-1 text-base text-gray-600">Total Labs</div>
+                                        <div class="mt-1 text-base text-gray-600">Current-Sit-ins</div>
                                     </div>
                                 </div>
                             </div>
@@ -74,13 +72,13 @@
                             href="#">
                             <div class="p-5">
                                 <div class="flex justify-between">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-pink-600" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" stroke-width="1.5" stroke="currentColor"
+                                        class="h-7 w-7 text-yellow-500" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">>
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                     </svg>
+
                                     <div
                                         class="bg-yellow-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
                                         <span class="flex items-center">30%</span>
@@ -90,7 +88,7 @@
                                     <div>
                                         <div class="mt-3 text-3xl font-bold leading-8">49</div>
 
-                                        <div class="mt-1 text-base text-gray-600">Sit-in Count</div>
+                                        <div class="mt-1 text-base text-gray-600">Pending Requests</div>
                                     </div>
                                 </div>
                             </div>
@@ -105,15 +103,15 @@
                                             d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                                     </svg>
                                     <div
-                                        class="bg-blue-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
+                                        class="bg-green-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
                                         <span class="flex items-center">30%</span>
                                     </div>
                                 </div>
                                 <div class="ml-2 w-full flex-1">
                                     <div>
-                                        <div class="mt-3 text-3xl font-bold leading-8">Lab 530</div>
+                                        <div class="mt-3 text-3xl font-bold leading-8">7</div>
 
-                                        <div class="mt-1 text-base text-gray-600">Top Lab</div>
+                                        <div class="mt-1 text-base text-gray-600">Total Laboratories</div>
                                     </div>
                                 </div>
                             </div>
@@ -247,7 +245,7 @@
                     },
                     total: {
                         show: true,
-                        label: 'Total',
+                        label: 'Total Sit-ins by Lab',
                         formatter: function (w) {
                             // By default this function returns the average of all series. The below is just an example to show the use of custom formatter function
                             return 249
@@ -256,9 +254,31 @@
                 }
             }
         },
-        labels: ['Apples', 'Oranges', 'Bananas', 'Berries'],
+        labels: ['Lab 530', 'Oranges', 'Bananas', 'Berries'],
+        title: {
+            text: 'Laboratory Sit-ins',
+            align: 'center',
+
+        },
+        legend: {
+            show: true,
+            position: 'bottom', // Places the legend at the bottom
+            horizontalAlign: 'center' // Centers the legend
+        }
     };
     var chart = new ApexCharts(chart, options);
     chart.render();
+
+    document.getElementById("searchButton").addEventListener("click", function () {
+        const searchInput = document.getElementById("searchInput").value.trim(); // Get search value
+
+        if (searchInput) {
+            window.location.href = `/users/${encodeURIComponent(searchInput)}`;
+        } else {
+            window.location.href = `/users/`; // Redirect without search query
+        }
+    });
+
+
 </script>
 {% endblock %}
