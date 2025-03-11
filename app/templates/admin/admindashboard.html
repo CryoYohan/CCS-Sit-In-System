@@ -12,9 +12,13 @@
                         <!-- Search Bar -->
                         <div class="flex items-center h-3 intro-y">
                             <form action="{{ url_for('admin.users') }}" method="GET" class="flex items-center gap-2">
-                                <input type="text" name="dash_search" placeholder="Search students..."
-                                    value="{{ dash_search }}" required>
-                                <button type="submit">Search</button>
+                                <input type="text" name="dash_search" placeholder="Search by name or ID"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                    value="{{ request.args.get('query', '') }}">
+                                <button type="submit"
+                                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                                    Search
+                                </button>
                             </form>
                         </div>
                     </div>
