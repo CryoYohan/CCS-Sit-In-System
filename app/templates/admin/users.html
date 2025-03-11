@@ -32,18 +32,18 @@
             </form>
 
             <!-- Filter by Lab Status -->
-            <form action="/admin/users" method="GET" class="flex items-center gap-2">
+            <div class="flex items-center gap-2">
                 <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Lab Status</label>
                 <select id="filter" class="border px-2 py-1">
                     <option value="all">All</option>
                     <option value="In-lab">In-lab</option>
-                    <option value="Not-in-lab">Not in-lab</option>
+                    <option value="Pending">Not in-lab</option>
                 </select>
 
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                     Filter
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -285,7 +285,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("search");
         const filterSelect = document.getElementById("filter");
-        const tbody = document.querySelector("tbody");
+        const tbody = document.querySelector("userTableBody");
 
         function fetchUsers() {
             const query = searchInput.value.trim();
