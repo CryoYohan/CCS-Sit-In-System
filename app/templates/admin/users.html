@@ -212,14 +212,24 @@
 <!-- JavaScript -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        let searchTerm = "{{ dash_search }}";  // Get the search term passed from Flask
-        if (searchTerm) {
+        const searchbar = document.getElementById('search-user');
+        let searchTerm = searchbar.value.trim();  // Trim any whitespace
+
+        if (searchTerm && searchTerm !== "None") {
             searchUser();
-        }
-        else {
-            loadUsers();
+        } else {
+            console.log("Im here");
+
+            // Ensure input is cleared before loading users
+            searchbar.value = '';
+
+            // Add a slight delay to allow UI updates before loading users
+            setTimeout(() => {
+                clearFilter();
+            }, 100);
         }
     });
+
     // Attach event listener to the document using event delegation
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("open-modal")) {
@@ -321,7 +331,7 @@
                     ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
-                    : `<button class="bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                    : `<button class="open-modal2 bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                 }

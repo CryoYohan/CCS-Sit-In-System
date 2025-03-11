@@ -80,23 +80,24 @@ def admin_announcements():
 def users():
     """Users"""
     global admin_account
+    dash_search = request.args.get('dash_search', None)  # Get search query from URL parameters
+    
     if session.get('admin') is not None:
         if admin_account is None:
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
-        
-        dash_search = request.args.get('dash_search', '') 
 
         return render_template(
             'users.html',
             user_in_login_page=True,
             action='Logout',
             admin=admin_account,
-            dash_search=dash_search  # Pass the search term to template,
+            dash_search=dash_search  # Pass the search term to the template
         )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
+
 
 
 
