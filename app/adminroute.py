@@ -238,7 +238,6 @@ def search_users():
             query.lower() in user['lastname'].lower() or
             query.lower() in user['email'].lower()
         )
-
     ]
 
     return jsonify(filtered_users)
@@ -258,8 +257,31 @@ def filter_status():
 
     users = admin_account.retrieve_all_students_to_sitin()
 
-    filtered_users_status = [
-         {
+    if not query == 'all':
+        filtered_users_status = [
+            {
+                "idno": user['idno'],
+                "firstname": user['firstname'],
+                "middlename": user['middlename'],
+                "lastname": user['lastname'],
+                "course": user['course'],
+                "year": user['year'],
+                "email": user['email'],
+                "session": user['session'],
+                "status": user['status']
+            }
+            for user in users if (
+                query.lower() in user['status'].lower()  # ✅ FIXED: user['idno'] (Dictionary)
+            )
+        ]
+
+        return jsonify(filtered_users_status)
+    
+    # Convert objects to dictionaries
+    users_list = []
+    for user in users:
+        users_list.append(
+            {
             "idno": user['idno'],
             "firstname": user['firstname'],
             "middlename": user['middlename'],
@@ -269,15 +291,12 @@ def filter_status():
             "email": user['email'],
             "session": user['session'],
             "status": user['status']
-        }
-        for user in users if (
-            query.lower() in user['status']  # ✅ FIXED: user['idno'] (Dictionary)
+            }
         )
-    ]
 
-    return jsonify(filtered_users_status)
+    return jsonify(users_list)
 
-
+    
 
 @admin.route('/admin_editstudent', methods=['POST'])
 def admin_editstudent():

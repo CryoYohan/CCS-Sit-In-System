@@ -289,10 +289,11 @@
     async function filterStatus() {
         const tableBody = document.getElementById('userTableBody');
 
-        filter_option = document.getElementById('filter-status')
+        filter_option = document.getElementById('filter-status').value;
+
 
         const response = await fetch(`/admin/api/users/filter-status?q=${encodeURIComponent(filter_option)}`)
-        const users = response.json();
+        const users = await response.json();
 
         tableBody.innerHTML = "";
 
@@ -316,7 +317,7 @@
                 </td>
             </tr>`
             tableBody.innerHTML += row;
-        })
+        });
 
     }
 
