@@ -34,17 +34,19 @@
 
             <!-- Filter by Lab Status -->
             <div class="flex items-center gap-2">
-                <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Lab Status</label>
-                <select id="filter-status" class="border px-2 py-1">
-                    <option value="all">All</option>
-                    <option value="Idle">Sit-in</option>
-                    <option value="In-lab">Log-off</option>
-                </select>
+                <div class="flex items-center gap-2">
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Lab Status</label>
+                    <select id="filter-status" class="border px-2 py-1">
+                        <option value="all">All</option>
+                        <option value="Idle">Sit-in</option>
+                        <option value="In-lab">Log-off</option>
+                    </select>
 
-                <button type="button" onclick="filterStatus()"
-                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                    Filter
-                </button>
+                    <button type="button" onclick="filterStatus()"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                        Filter
+                    </button>
+                </div>
             </div>
         </div>
     </div>
