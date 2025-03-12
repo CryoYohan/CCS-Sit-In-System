@@ -37,6 +37,10 @@ class Admin(User):
         """ Retrieve all students joined sitin reservation"""
         return self.db.retrieve_all_students_to_sitin()
     
+    def retrieve_all_current_sitins(self):
+        """ Retrieve all students who currently in lab"""
+        return self.db.retrieve_all_current_sitins()
+    
     def retrieve_all_users(self):
         """Retrieve all users"""
         return self.db.get_all_users()
@@ -72,6 +76,17 @@ class Admin(User):
         kwargs['status'] = 'In-lab'
         try:
             self.db.add_record(table='sitin_reservation',**kwargs)
+            return {'success':True}
+        except Exception as e:
+            return {'success':False, 'error':str(e)}
+        
+    def log_off_student(self,**kwargs):
+        """ Log-off student from lab"""
+        logoff_datetime = datetime.now()
+        kwargs['status'] = 'Idle'
+        kwargs['sitin_out'] = logoff_datetime
+        try:
+            self.db.update_record(table='sitin_reservation',**kwargs)
             return {'success':True}
         except Exception as e:
             return {'success':False, 'error':str(e)}

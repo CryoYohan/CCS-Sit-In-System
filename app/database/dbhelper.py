@@ -60,6 +60,11 @@ class Databasehelper:
         """ Retrieve all students joined sitin reservation"""
         query = f"SELECT * FROM students_to_sitin"
         return self.getprocess(query)
+    
+    def retrieve_all_current_sitins(self):
+        """ Retrieve all students who currently in lab"""
+        query = "SELECT * FROM current_sitin"
+        return self.getprocess(query)
 
     def getall_sessionhistory(self, idno:str)->list:
         """Retrieve session history"""
