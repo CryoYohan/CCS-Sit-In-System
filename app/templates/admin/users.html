@@ -18,33 +18,36 @@
     <div class="mb-8 bg-white p-6 rounded-xl shadow-md animate-slideUp">
         <div class="flex justify-between">
             <!-- Search Bar -->
-            <form action="/admin/users" method="GET" class="flex items-center gap-2">
-                <input type="text" name="query" placeholder="Search by name, ID, or email"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                    value="{{ request.args.get('query', '') }}" />
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+            <div class="flex items-center gap-2">
+                <input type="text" id="search-user" placeholder="Search name or ID" class="border px-2 py-1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500
+                focus:border-blue-500 transition" value="{{ dash_search }}" />
+                <button type="button" onclick="searchUser()"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                     Search
                 </button>
                 <!-- Clear Filter Button -->
-                <a href="/admin/users"
+                <button type="button" onclick="clearFilter()"
                     class="w-64 p-2 text-center bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
                     Clear Filter
-                </a>
-            </form>
-
-           <!-- Filter by Lab Status -->
-            <form action="/admin/users" method="GET" class="flex items-center gap-2">
-                <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Lab Status</label>
-                <select id="statusFilter" name="filter"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                    <option value="all" {% if request.args.get('filter') == 'all' %}selected{% endif %}>All Students</option>
-                    <option value="Pending" {% if request.args.get('filter') == 'I' %}selected{% endif %}>Sit-in</option>
-                    <option value="In-lab" {% if request.args.get('filter') == 'active' %}selected{% endif %}>Log-off</option>
-                </select>
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                    Filter
                 </button>
-            </form>
+            </div>
+
+            <!-- Filter by Lab Status -->
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Lab Status</label>
+                    <select id="filter-status" class="border px-2 py-1">
+                        <option value="all">All</option>
+                        <option value="Idle">Sit-in</option>
+                        <option value="In-lab">Log-off</option>
+                    </select>
+
+                    <button type="button" onclick="filterStatus()"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                        Filter
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -80,65 +83,8 @@
                     </th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
-                {% for user in users %}
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-4 py-3 text-sm text-gray-700">{{ user['idno'] }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">
-                        {{ user.firstname }} {{ user.middlename }} {{ user.lastname }}
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-700">{{ user['course'] }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">{{ user['year'] }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">{{ user['email'] }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">{{ user['session'] }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-700">
-                        {%  if not user['status'] == 'In-lab' %}
-                        <button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white text-center"
-                            data-fullname="{{ user.firstname }} {{ user.middlename }} {{ user.lastname }}"
-                            data-idno="{{ user.idno }}" data-session="{{ user.session }}">
-                            Sit-in
-                        </button>
-                        {% else %}
-                        <button class="bg-red-500 px-6 py-2 rounded-lg w-auto text-white text-center"
-                            data-fullname="{{ user.firstname }} {{ user.middlename }} {{ user.lastname }}"
-                            data-idno="{{ user.idno }}" data-session="{{ user.session }}">
-                            Log-off
-                        </button>
-                        {% endif %}
-                    </td>
-
-                    <td class="px-4 py-3">
-                        <button class="open-modal2 text-blue-500 hover:text-blue-700 transition"
-                            data-firstname="{{ user.firstname }}" data-middlename="{{ user.middlename }}"
-                            data-lastname="{{ user.lastname }}" data-course="{{ user.course }}"
-                            data-year="{{ user.year }}" data-email="{{ user.email }}" data-idno="{{ user.idno }}"
-                            data-image="{{ user.image }}">
-
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                            </svg>
-                        </button>
-                        <button class="text-yellow-500 hover:text-yellow-700 transition ml-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.072 0 1 1 0 000 1.415z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <button class="text-red-500 hover:text-red-700 transition ml-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </td>
-                </tr>
-                {% endfor %}
+            <tbody id="userTableBody" class="divide-y divide-gray-200">
+                <!--AJAX will fill this table-->
             </tbody>
         </table>
     </div>
@@ -265,12 +211,32 @@
 {{ component.sitin_modal() }}
 <!-- JavaScript -->
 <script>
-    document.querySelectorAll(".open-modal").forEach(button => {
-        button.addEventListener("click", function () {
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchbar = document.getElementById('search-user');
+        let searchTerm = searchbar.value.trim();  // Trim any whitespace
+
+        if (searchTerm && searchTerm !== "None") {
+            searchUser();
+        } else {
+            console.log("Im here");
+
+            // Ensure input is cleared before loading users
+            searchbar.value = '';
+
+            // Add a slight delay to allow UI updates before loading users
+            setTimeout(() => {
+                clearFilter();
+            }, 100);
+        }
+    });
+    // Sit-in Button
+    // Attach event listener to the document using event delegation
+    document.addEventListener("click", function (event) {
+        if (event.target.classList.contains("open-modal")) {
             // Get user data from button attributes
-            const idno = this.getAttribute("data-idno");
-            const fullname = this.getAttribute("data-fullname");
-            const session = this.getAttribute("data-session");
+            const idno = event.target.getAttribute("data-idno");
+            const fullname = event.target.getAttribute("data-fullname");
+            const session = event.target.getAttribute("data-session");
 
             // Set modal content
             document.getElementById("modal-idno").value = idno;
@@ -279,8 +245,49 @@
 
             // Show modal
             document.getElementById("sitInModal").classList.remove("hidden");
-        });
+        }
     });
+    document.addEventListener("click", function (event) {
+        if (event.target.classList.contains("open-modal2")) {
+            // Get the clicked button
+            const button = event.target;
+
+            // Get user data from button attributes
+            const idno = button.getAttribute("data-idno");
+            const fullname = button.getAttribute("data-fullname");
+            const session = button.getAttribute("data-session");
+            const firstname = button.getAttribute("data-firstname") || "";
+            const middlename = button.getAttribute("data-middlename") || "";
+            const lastname = button.getAttribute("data-lastname") || "";
+            const course = button.getAttribute("data-course") || "";
+            const year = button.getAttribute("data-year") || "";
+            const email = button.getAttribute("data-email") || "";
+            const image = button.getAttribute("data-image") || "default.png"; // Default profile image
+
+            // Set modal content
+            document.getElementById("idno").value = idno;
+            document.getElementById("fullname").textContent = fullname;
+            document.getElementById("email").textContent = email;
+            document.getElementById("image").src = `/static/images/profileicons/${image}`;
+            document.getElementById("firstname").value = firstname;
+            document.getElementById("middlename").value = middlename;
+            document.getElementById("lastname").value = lastname;
+            document.getElementById("course").value = course;
+            document.getElementById("year").value = year;
+            document.getElementById("email").value = email;
+
+            // Show modal
+            document.getElementById("editModal").classList.remove("hidden");
+        }
+    });
+
+    // Close modal function
+    function closeEditModal() {
+        document.getElementById("editModal").classList.add("hidden");
+    }
+
+
+
 
     // Function to close the modal
     function closeSitInModal() {
@@ -307,38 +314,142 @@
         field.type = field.type === "password" ? "text" : "password";
     }
 
-    document.querySelectorAll(".open-modal2").forEach(button => {
-        button.addEventListener("click", function () {
-            // Get user data from button attributes
-            const idno = this.getAttribute("data-idno");
-            const firstname = this.getAttribute("data-firstname");
-            const middlename = this.getAttribute("data-middlename");
-            const lastname = this.getAttribute("data-lastname");
-            const course = this.getAttribute("data-course");
-            const year = this.getAttribute("data-year");
-            const email = this.getAttribute("data-email");
-            const image = this.getAttribute("data-image");
-
-            // Set modal content
-            document.getElementById("idno").value = idno;
-            document.getElementById("fullname").textContent = `${firstname} ${middlename} ${lastname}`;
-            document.getElementById("emaildisplay").textContent = email;
-            document.getElementById("image").src = "/static/images/profileicons/" + image;
-            document.getElementById("firstname").value = firstname;
-            document.getElementById("middlename").value = middlename;
-            document.getElementById("lastname").value = lastname;
-            document.getElementById("course").ariaSelected = course;
-            document.getElementById("year").ariaSelected = year;
-            document.getElementById("email").value = email;
-
-            // Show modal
-            document.getElementById("editModal").classList.remove("hidden");
-        });
-    });
     function closeEditModal() {
         const modal = document.getElementById("editModal");
         modal.classList.add("hidden");
     }
+
+    async function filterStatus() {
+        const tableBody = document.getElementById('userTableBody');
+
+        filter_option = document.getElementById('filter-status').value;
+
+
+        const response = await fetch(`/admin/api/users/filter-status?q=${encodeURIComponent(filter_option)}`)
+        const users = await response.json();
+
+        tableBody.innerHTML = "";
+
+        users.forEach(user => {
+            const row = `<tr>
+                <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+                <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.email}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.session}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">
+                    ${user.status !== "In-lab"
+                    ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
+                    : `<button class="open-modal2 bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
+                }
+                </td>
+            </tr>`
+            tableBody.innerHTML += row;
+        });
+
+    }
+
+    async function clearFilter() {
+        const tableBody = document.getElementById('userTableBody');
+        tableBody.innerHTML = '';
+
+        const response = await fetch("{{ url_for('admin.api_users') }}")
+        const users = await response.json();
+
+        users.forEach(user => {
+            const row = `<tr>
+                <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+                <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.email}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.session}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">
+                    ${user.status !== "In-lab"
+                    ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
+                    : `<button class="open-modal2  bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
+                }
+                </td>
+            </tr>`
+            tableBody.innerHTML += row;
+        })
+    }
+
+    async function searchUser() {
+        const searchInput = document.getElementById('search-user').value.trim()
+
+        const response = await fetch(`/admin/api/users/search?q=${encodeURIComponent(searchInput)}`);
+        const users = await response.json();
+
+        const tableBody = document.getElementById('userTableBody');
+
+        tableBody.innerHTML = '';
+
+        users.forEach(user => {
+            const row = `<tr>
+                <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+                <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.email}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${user.session}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">
+                    ${user.status !== "In-lab"
+                    ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
+                    : `<button class="open-modal2  bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                            data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                            data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
+                }
+                </td>
+            </tr>`
+            tableBody.innerHTML += row;
+        });
+    }
+
+    function loadUsers() {
+        // FETCH USERS UPON RENDER OF WEBPAGE
+        document.addEventListener("DOMContentLoaded", async () => {
+            const response = await fetch("{{ url_for('admin.api_users') }}"); // Call API
+            const users = await response.json();
+
+            const tableBody = document.getElementById("userTableBody");
+            tableBody.innerHTML = ''; // Clear previous content upon load
+
+            users.forEach(user => {
+                const row = `<tr>
+            <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+            <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">${user.email}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">${user.session}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">
+                ${user.status !== "In-lab"
+                        ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
+                        data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                        data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
+                        : `<button class="open-modal2 bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                        data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
+                        data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
+                    }
+            </td>
+        </tr>`
+                tableBody.innerHTML += row;
+            });
+        });
+    }
+
 </script>
 
 <!-- Animations -->
