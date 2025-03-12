@@ -210,6 +210,7 @@
 <!-- SIT-IN MODAL -->
 {{ component.sitin_modal() }}
 <!-- JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Include SweetAlert2 -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const searchbar = document.getElementById('search-user');
@@ -281,6 +282,53 @@
         }
     });
 
+    // Log-off with SweetAlert2 Confirmation
+    document.addEventListener("click", function (event) {
+        if (event.target.classList.contains("log-off")) {
+            console.log("Clicked Element:", event.target);
+            console.log("Dataset:", event.target.dataset);
+
+            const studentId = event.target.dataset.idno;
+            const studentName = event.target.dataset.fullname; // Get student's full name
+
+            console.log("Extracted Student ID:", studentId);
+
+            if (!studentId) {
+                console.error("Student ID is missing! Check your button.");
+                return;
+            }
+
+            // SweetAlert2 Confirmation
+            Swal.fire({
+                title: "Confirm Log-off",
+                text: `Are you sure you want to log off ${studentName}?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, log off",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with log-off request
+                    fetch(`/admin/api/users/${studentId}/logoff`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Log-off response:", data);
+                            Swal.fire("Logged Off!", `${studentName} has been logged off.`, "success");
+                            clearFilter();
+                        })
+                        .catch(error => {
+                            console.error("Log-off error:", error);
+                            Swal.fire("Error", "Failed to log off the student.", "error");
+                        });
+                }
+            });
+        }
+    });
+
+
+
     // Close modal function
     function closeEditModal() {
         document.getElementById("editModal").classList.add("hidden");
@@ -332,7 +380,7 @@
 
         users.forEach(user => {
             const row = `<tr>
-                <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+                <td data-student-id='${user.idno}' class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
                 <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
@@ -343,7 +391,7 @@
                     ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
-                    : `<button class="open-modal2 bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                    : `<button class="log-off bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                 }
@@ -356,6 +404,8 @@
 
     async function clearFilter() {
         const tableBody = document.getElementById('userTableBody');
+        const searchBar = document.getElementById('search-user')
+
         tableBody.innerHTML = '';
 
         const response = await fetch("{{ url_for('admin.api_users') }}")
@@ -363,7 +413,7 @@
 
         users.forEach(user => {
             const row = `<tr>
-                <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+                <td data-student-id='${user.idno}' class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
                 <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
@@ -374,7 +424,7 @@
                     ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
-                    : `<button class="open-modal2  bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                    : `<button class="log-off bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                 }
@@ -382,6 +432,8 @@
             </tr>`
             tableBody.innerHTML += row;
         })
+
+        searchBar.value = ''
     }
 
     async function searchUser() {
@@ -396,7 +448,7 @@
 
         users.forEach(user => {
             const row = `<tr>
-                <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+                <td data-student-id='${user.idno}' class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
                 <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
@@ -407,7 +459,7 @@
                     ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
-                    : `<button class="open-modal2  bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                    : `<button class="log-off bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                 }
@@ -428,7 +480,7 @@
 
             users.forEach(user => {
                 const row = `<tr>
-            <td class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
+            <td data-student-id='${user.idno}' class="px-4 py-3 text-sm text-gray-700" > ${user.idno}</td >
             <td class="px-4 py-3 text-sm text-gray-700">${user.firstname} ${user.middlename} ${user.lastname}</td>
             <td class="px-4 py-3 text-sm text-gray-700">${user.course}</td>
             <td class="px-4 py-3 text-sm text-gray-700">${user.year}</td>
@@ -439,7 +491,7 @@
                         ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
                         data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                         data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
-                        : `<button class="open-modal2 bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                        : `<button class="log-off bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
                         data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                         data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                     }
