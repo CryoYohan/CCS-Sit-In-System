@@ -62,12 +62,7 @@ class Admin(User):
     
     def retrieve_all_sitinrecords(self):
         """Retrieve all Joined Sitin Records"""
-        try:
-            sitinrecords = self.db.getall_sitinrecords(idno=None)
-            return{'success':True, 'sitinrecords':sitinrecords}
-        
-        except Exception as e:
-            return {'erorr':str(e)}
+        return self.db.getall_sitinrecords()
     
     def sit_in_student(self,**kwargs):
         """Sit in a student"""

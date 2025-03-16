@@ -128,20 +128,18 @@ def adminrecords():
     """Records"""
     global admin_account
     if not session['admin'] == None:
+        
         if admin_account == None:
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
         
-        response = admin_account.retrieve_all_sitinrecords()
 
-        if response['success']:
-            return render_template(
-                                    'adminrecords.html',
-                                    user_in_login_page=True, 
-                                    action='Logout',
-                                    admin=admin_account,
-                                    records=response['sitinrecords'],
-                                    )
+        return render_template(
+                                'adminrecords.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account,
+                                )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
@@ -350,6 +348,41 @@ def current_sitin():
 
     return jsonify(json_format_users)
 
+
+@admin.route('/api/sitinrecords')
+def sitinrecords():
+    """API to retrieve sitin records"""
+    global admin_account
+
+    if session.get('admin') is None:
+        return jsonify({'success': False, 'message': 'Unauthorized access'}), 403
+
+    if admin_account is None:
+        admin_account = session.get('admin')
+        admin_account = Admin(**admin_account)
+
+    users = admin_account.retrieve_all_sitinrecords()
+
+    # Convert objects to dictionaries
+    users_list = []
+    for user in users:
+        users_list.append({
+            "record_id": user["record_id"],
+            "reservation_id": user["reservation_id"],
+            "idno": user["idno"],
+            "lab_id": user["lab_id"],
+            "sitin_in": user["sitin_in"],
+            "sitin_out": user["sitin_out"],
+            "staff_idno": user["staff_idno"],
+            "logged_off_by": user["logged_off_by"],
+            "status": user["status"],
+            "reason": user["reason"],
+            "completed_at": user["completed_at"]
+        })
+
+    return jsonify(users_list)
+
+ 
 @admin.route('/admin_editstudent', methods=['POST'])
 def admin_editstudent():
     global admin_account
