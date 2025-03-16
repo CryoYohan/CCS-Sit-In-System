@@ -302,6 +302,25 @@ def filter_status():
 
     return jsonify(users_list)
 
+@admin.route('/api/users/<idno>/logoff')
+def logoff(idno):
+    """API to Log-off student from laboratory"""
+    global admin_account
+    if session.get('admin') is None:
+        return jsonify({'success': False, 'message': 'Unauthorized access'}), 403
+
+    if admin_account is None:
+        admin_account = session.get('admin')
+        admin_account = Admin(**admin_account)
+
+    response = admin_account.logoff_student(idno=idno, staff_idno=admin_account.idno)
+
+    if response['success']:
+        return jsonify({'success': True, 'message': 'Student logged off successfully!'})
+    else:
+        return jsonify({'success': False, 'message': response['message']}), 400
+
+
     
 
 @admin.route('/admin_editstudent', methods=['POST'])

@@ -76,6 +76,38 @@ class Admin(User):
         except Exception as e:
             return {'success':False, 'error':str(e)}
 
+    def logoff_student(self, idno,staff_idno):
+        """Log-off student"""
+        try:
+            reservation = self.db.find_record(table='sitin_reservation',idno=idno)
+            print(reservation)
+            print(reservation[0])
+            print(reservation[0]['idno'])
+            self.db.delete_record(table='sitin_reservation', idno=idno)
+
+            data={
+                    'reservation_id': reservation[0]['reservation_id'],
+                    'idno': reservation[0]['idno'],
+                    'lab_id': reservation[0]['lab_id'],
+                    'sitin_in': reservation[0]['sitin_in'],
+                    'sitin_out': datetime.now(),  # Log the current time
+                    'staff_idno': reservation[0]['staff_idno'],
+                    'logged_off_by': staff_idno,  # Admin/Staff who logs off the student
+                    'status': reservation[0]['status'],
+                    'reason': reservation[0]['reason'],
+                    'completed_at': datetime.now()
+            }
+            
+            # Insert into sitin_record with the correct log-off time and logged_off_by
+            self.db.add_record(
+                table='sitin_record',
+                **data
+            )
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
+
+
 
     def update(self, **kwargs):
         """Edit Student Info and Reset Passwords"""

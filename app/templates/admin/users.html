@@ -210,6 +210,7 @@
 <!-- SIT-IN MODAL -->
 {{ component.sitin_modal() }}
 <!-- JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const searchbar = document.getElementById('search-user');
@@ -247,6 +248,46 @@
             document.getElementById("sitInModal").classList.remove("hidden");
         }
     });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Delegate event listener to handle dynamically added buttons
+        document.body.addEventListener("click", async (event) => {
+            if (event.target.classList.contains("log-off")) {
+                const button = event.target;
+                const idno = button.getAttribute("data-idno");
+                const fullname = button.getAttribute("data-fullname");
+
+                Swal.fire({
+                    title: `Log off ${fullname}?`,
+                    text: "Are you sure you want to log off this student?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, log off",
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        try {
+                            const response = await fetch(`/admin/api/users/${idno}/logoff`, {
+                                method: "GET",
+                            });
+                            const data = await response.json();
+
+                            if (data.success) {
+                                Swal.fire("Logged Off!", "Student has been logged off.", "success")
+                                    .then(() => clearFilter()); // Refresh the table without reloading the page
+                            } else {
+                                Swal.fire("Error!", data.message, "error");
+                            }
+                        } catch (error) {
+                            Swal.fire("Error!", "Something went wrong.", "error");
+                        }
+                    }
+                });
+            }
+        });
+    });
+
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("open-modal2")) {
             // Get the clicked button
@@ -343,7 +384,7 @@
                     ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
-                    : `<button class="open-modal2 bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                    : `<button class="log-off bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                 }
@@ -374,7 +415,7 @@
                     ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
-                    : `<button class="open-modal2  bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                    : `<button class="log-off  bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                 }
@@ -407,7 +448,7 @@
                     ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
-                    : `<button class="open-modal2  bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                    : `<button class="log-off  bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
                             data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                             data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                 }
@@ -439,7 +480,7 @@
                         ? `<button class="open-modal bg-green-500 px-6 py-2 rounded-lg w-24 text-white"
                         data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                         data-idno="${user.idno}" data-session="${user.session}">Sit-in</button>`
-                        : `<button class="open-modal2 bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
+                        : `<button class="log-off bg-red-500 px-6 py-2 rounded-lg w-auto text-white"
                         data-fullname="${user.firstname} ${user.middlename} ${user.lastname}"
                         data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                     }
