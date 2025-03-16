@@ -61,6 +61,11 @@ class Databasehelper:
         query = f"SELECT * FROM students_to_sitin"
         return self.getprocess(query)
 
+    def retrieve_all_current_sitins(self):
+        """ Retrieve all students who currently in lab"""
+        query = "SELECT * FROM current_sitin"
+        return self.getprocess(query)
+
     def getall_sessionhistory(self, idno:str)->list:
         """Retrieve session history"""
         query = f"SELECT sr.sitin_out, l.lab_name, sr.status, sr.sitin_out FROM sitin_reservation sr JOIN lab l ON l.lab_id = sr.lab_id WHERE sr.idno = ? AND sr.status= 'Completed'"

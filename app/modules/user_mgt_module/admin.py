@@ -45,6 +45,10 @@ class Admin(User):
          """Retrieve all labs"""
          return self.db.getall_records(table='lab')
 
+    def retrieve_all_current_sitins(self):
+        """ Retrieve all students who currently in lab"""
+        return self.db.retrieve_all_current_sitins()
+
 
 
     def add_announcement(self, **kwargs):
@@ -80,10 +84,7 @@ class Admin(User):
         """Log-off student"""
         try:
             reservation = self.db.find_record(table='sitin_reservation',idno=idno)
-            print(reservation)
-            print(reservation[0])
-            print(reservation[0]['idno'])
-            self.db.delete_record(table='sitin_reservation', idno=idno)
+            self.db.update_record(table='sitin_reservation', idno=idno, status='Idle')
 
             data={
                     'reservation_id': reservation[0]['reservation_id'],
@@ -93,7 +94,7 @@ class Admin(User):
                     'sitin_out': datetime.now(),  # Log the current time
                     'staff_idno': reservation[0]['staff_idno'],
                     'logged_off_by': staff_idno,  # Admin/Staff who logs off the student
-                    'status': reservation[0]['status'],
+                    'status': 'Completed',
                     'reason': reservation[0]['reason'],
                     'completed_at': datetime.now()
             }

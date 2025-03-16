@@ -320,8 +320,35 @@ def logoff(idno):
     else:
         return jsonify({'success': False, 'message': response['message']}), 400
 
+@admin.route('/api/users/currentsitin')
+def current_sitin():
+    """ API for retrieving all students currently in-lab """
+    if 'admin' not in session:
+        return jsonify({'error': 'Unauthorized access'}), 403
 
-    
+    admin_account = session.get('admin')
+    if not admin_account:
+        return jsonify({'error': 'Admin account not found'}), 404
+
+    admin_account = Admin(**admin_account)
+    users = admin_account.retrieve_all_current_sitins()
+
+    json_format_users = [
+        {
+            "idno": user['idno'],
+            "firstname": user['firstname'],
+            "middlename": user['middlename'],
+            "lastname": user['lastname'],
+            "course": user['course'],
+            "year": user['year'],
+            "email": user['email'],
+            "session": user['session'],
+            "status": user['status'],
+        }
+        for user in users
+    ]
+
+    return jsonify(json_format_users)
 
 @admin.route('/admin_editstudent', methods=['POST'])
 def admin_editstudent():
