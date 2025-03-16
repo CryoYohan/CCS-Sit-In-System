@@ -58,7 +58,7 @@ class Databasehelper:
     
     def retrieve_all_students_to_sitin(self):
         """ Retrieve all students joined sitin reservation"""
-        query = f"SELECT * FROM students_to_sitin"
+        query = f"SELECT DISTINCT * FROM students_to_sitin ORDER BY lastname ASC"
         return self.getprocess(query)
 
     def retrieve_all_current_sitins(self):

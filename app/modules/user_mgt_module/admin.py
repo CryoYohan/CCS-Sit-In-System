@@ -83,8 +83,11 @@ class Admin(User):
     def logoff_student(self, idno,staff_idno):
         """Log-off student"""
         try:
+
             reservation = self.db.find_record(table='sitin_reservation',idno=idno)
+            user = self.db.find_record(table='user', idno=idno)
             self.db.update_record(table='sitin_reservation', idno=idno, status='Idle')
+            self.db.update_record(table='user', idno=idno, session=user[0]['session']-1)
 
             data={
                     'reservation_id': reservation[0]['reservation_id'],
