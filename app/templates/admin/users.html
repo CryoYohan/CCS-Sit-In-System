@@ -288,6 +288,49 @@
         });
     });
 
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("sitInModal").addEventListener("submit", async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const lab = formData.get("lab_id");
+            const reason = formData.get("reason");
+
+            // Validate Select Fields
+            if (lab === "#" || reason === "#") {
+                Swal.fire("Error", "Please select a valid lab and purpose.", "error");
+                return;
+            }
+
+            try {
+                const response = await fetch("/admin/sitin_student", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire("Success", data.message, "success").then(() => {
+                        closeSitInModal();
+                        clearFilter(); // Refresh user list
+                    });
+                } else {
+                    Swal.fire("Error", data.error, "error");
+                }
+            } catch (error) {
+                Swal.fire("Error", "Something went wrong.", "error");
+            }
+        });
+    });
+
+    // Function to close modal
+    function closeSitInModal() {
+        document.getElementById("sitInModal").classList.add("hidden");
+    }
+
+
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("open-modal2")) {
             // Get the clicked button

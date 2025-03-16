@@ -434,23 +434,26 @@ def announce():
 def sitin_student():
     """Sit In Student"""
     global admin_account
-    if not session['admin'] == None:
-        if admin_account == None:
-            admin_account = Admin(**session.get('admin'))
+    if not session.get('admin'):
+        return jsonify({'success': False, 'error': 'Unauthorized access'}), 403
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
 
     idno = request.form['idno']
     lab_id = request.form['lab_id']
     reason = request.form['reason']
 
-    response = admin_account.sit_in_student(idno=idno, lab_id=lab_id, reason=reason,staff_idno=admin_account.idno)
+    if lab_id == "#" or reason == "#":
+        return jsonify({'success': False, 'error': 'Please select a valid lab and purpose'}), 400
+
+    response = admin_account.sit_in_student(idno=idno, lab_id=lab_id, reason=reason, staff_idno=admin_account.idno)
 
     if response['success']:
-        flash('Student sat in', 'success')
-        return redirect(url_for('admin.users'))
-        
-    else:
-        flash(response['error'], 'error')
-        return redirect(url_for('admin.users'))
+        return jsonify({'success': True, 'message': 'Student successfully sat in'})
+
+    return jsonify({'success': False, 'error': response['error']}), 400
+
 
 
 @admin.route('/addstaff', methods=['POST'])
