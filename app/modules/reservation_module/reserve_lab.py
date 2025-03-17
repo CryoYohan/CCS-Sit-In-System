@@ -39,7 +39,7 @@ class Reservation():
 
     def retrieve_sitinrecords(self, idno:str):
         """Retrieve all sitin records"""
-        return self.db.getall_sitinrecords(idno=idno)
+        return self.db.getall_sitinrecords()
 
     def retrieve_sessionhistory(self, idno:str):
         """Retrieve all session history"""

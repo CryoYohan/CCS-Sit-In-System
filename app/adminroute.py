@@ -14,7 +14,7 @@ admin_account = None
 db = Databasehelper()
 
 # Allowed extensions
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 # Function to check if the file extension is valid
 def allowed_file(filename):

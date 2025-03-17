@@ -180,7 +180,7 @@ def records():
                 student_data = session.get('student')
                 student = Student(**student_data)
             
-            records = reservation.retrieve_sitinrecords(idno=student.idno)
+            records = reservation.retrieve_sitinrecords()
 
             return render_template('records.html', student=student,user_in_login_page=True,action='Logout', records=records)
 
