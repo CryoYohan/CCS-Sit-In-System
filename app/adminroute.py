@@ -176,93 +176,56 @@ def adminlogout():
 
 @admin.route('/api/users')
 def api_users():
-    global admin_account
     """API for fetching of users"""
-    if session.get('admin') is None:
-        return jsonify({'error': 'Unauthorized access'}), 403
+    global admin_account
 
-    if admin_account is None:
-        admin_account = session.get('admin')
-        admin_account = Admin(**admin_account)
+    if session.get('admin'):
+        if admin_account is None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
 
     
 
-    users = admin_account.retrieve_all_students_to_sitin()
+        users = admin_account.retrieve_all_students_to_sitin()
 
-    # Convert objects to dictionaries
-    users_list = []
-    for user in users:
-        users_list.append(
-            {
-            "idno": user['idno'],
-            "firstname": user['firstname'],
-            "middlename": user['middlename'],
-            "lastname": user['lastname'],
-            "course": user['course'],
-            "year": user['year'],
-            "email": user['email'],
-            "session": user['session'],
-            "status": user['status']
-            }
-        )
+        # Convert objects to dictionaries
+        users_list = []
+        for user in users:
+            users_list.append(
+                {
+                "idno": user['idno'],
+                "firstname": user['firstname'],
+                "middlename": user['middlename'],
+                "lastname": user['lastname'],
+                "course": user['course'],
+                "year": user['year'],
+                "email": user['email'],
+                "session": user['session'],
+                "status": user['status']
+                }
+            )
 
-    return jsonify(users_list)  # Send JSON response
+        return jsonify(users_list)  # Send JSON response
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+    
 
 @admin.route('/api/users/search', methods=['GET'])
 def search_users():
-    global admin_account
     """API for fetching of filtered users"""
-    if session.get('admin') is None:
-        return jsonify({'error': 'Unauthorized access'}), 403
-
-    if admin_account is None:
-        admin_account = session.get('admin')
-        admin_account = Admin(**admin_account)
-
-    query = request.args.get('q','').strip()
-
-    users = admin_account.retrieve_all_students_to_sitin()
-
-    filtered_users = [
-        {
-            "idno": user['idno'],
-            "firstname": user['firstname'],
-            "middlename": user['middlename'],
-            "lastname": user['lastname'],
-            "course": user['course'],
-            "year": user['year'],
-            "email": user['email'],
-            "session": user['session'],
-            "status": user['status']
-        }
-        for user in users if (
-            query.lower() in user['idno'].lower() or  # ✅ FIXED: user['idno'] (Dictionary)
-            query.lower() in user['firstname'].lower() or
-            query.lower() in user['middlename'].lower() or
-            query.lower() in user['lastname'].lower() or
-            query.lower() in user['email'].lower()
-        )
-    ]
-
-    return jsonify(filtered_users)
-
-@admin.route('/api/users/filter-status', methods=['GET'])
-def filter_status():
     global admin_account
-    """API for fetching of filtered users"""
-    if session.get('admin') is None:
-        return jsonify({'error': 'Unauthorized access'}), 403
 
-    if admin_account is None:
-        admin_account = session.get('admin')
-        admin_account = Admin(**admin_account)
+    if session.get('admin'):
+        if admin_account is None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
 
-    query = request.args.get('q', '')
+        query = request.args.get('q','').strip()
 
-    users = admin_account.retrieve_all_students_to_sitin()
+        users = admin_account.retrieve_all_students_to_sitin()
 
-    if not query == 'all':
-        filtered_users_status = [
+        filtered_users = [
             {
                 "idno": user['idno'],
                 "firstname": user['firstname'],
@@ -275,78 +238,128 @@ def filter_status():
                 "status": user['status']
             }
             for user in users if (
-                query.lower() in user['status'].lower()  # ✅ FIXED: user['idno'] (Dictionary)
+                query.lower() in user['idno'].lower() or  # ✅ FIXED: user['idno'] (Dictionary)
+                query.lower() in user['firstname'].lower() or
+                query.lower() in user['middlename'].lower() or
+                query.lower() in user['lastname'].lower() or
+                query.lower() in user['email'].lower()
             )
         ]
 
-        return jsonify(filtered_users_status)
-    
-    # Convert objects to dictionaries
-    users_list = []
-    for user in users:
-        users_list.append(
-            {
-            "idno": user['idno'],
-            "firstname": user['firstname'],
-            "middlename": user['middlename'],
-            "lastname": user['lastname'],
-            "course": user['course'],
-            "year": user['year'],
-            "email": user['email'],
-            "session": user['session'],
-            "status": user['status']
-            }
-        )
+        return jsonify(filtered_users)
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
 
-    return jsonify(users_list)
+@admin.route('/api/users/filter-status', methods=['GET'])
+def filter_status():
+    """API for fetching of filtered users"""
+    global admin_account
+
+    if session.get('admin'):
+        if admin_account is None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        query = request.args.get('q', '')
+
+        users = admin_account.retrieve_all_students_to_sitin()
+
+        if not query == 'all':
+            filtered_users_status = [
+                {
+                    "idno": user['idno'],
+                    "firstname": user['firstname'],
+                    "middlename": user['middlename'],
+                    "lastname": user['lastname'],
+                    "course": user['course'],
+                    "year": user['year'],
+                    "email": user['email'],
+                    "session": user['session'],
+                    "status": user['status']
+                }
+                for user in users if (
+                    query.lower() in user['status'].lower()  # ✅ FIXED: user['idno'] (Dictionary)
+                )
+            ]
+
+            return jsonify(filtered_users_status)
+        
+        # Convert objects to dictionaries
+        users_list = []
+        for user in users:
+            users_list.append(
+                {
+                "idno": user['idno'],
+                "firstname": user['firstname'],
+                "middlename": user['middlename'],
+                "lastname": user['lastname'],
+                "course": user['course'],
+                "year": user['year'],
+                "email": user['email'],
+                "session": user['session'],
+                "status": user['status']
+                }
+            )
+
+        return jsonify(users_list)
+    
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
 
 @admin.route('/api/users/<idno>/logoff')
 def logoff(idno):
     """API to Log-off student from laboratory"""
     global admin_account
-    if session.get('admin') is None:
-        return jsonify({'success': False, 'message': 'Unauthorized access'}), 403
 
-    if admin_account is None:
-        admin_account = session.get('admin')
-        admin_account = Admin(**admin_account)
+    if session.get('admin'):
+        if admin_account is None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
 
-    response = admin_account.logoff_student(idno=idno, staff_idno=admin_account.idno)
+        response = admin_account.logoff_student(idno=idno, staff_idno=admin_account.idno)
 
-    if response['success']:
-        return jsonify({'success': True, 'message': 'Student logged off successfully!'})
+        if response['success']:
+            return jsonify({'success': True, 'message': 'Student logged off successfully!'})
+        else:
+            return jsonify({'success': False, 'message': response['message']}), 400
     else:
-        return jsonify({'success': False, 'message': response['message']}), 400
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
 
 @admin.route('/api/users/currentsitin')
 def current_sitin():
     """ API for retrieving all students currently in-lab """
-    if 'admin' not in session:
-        return jsonify({'error': 'Unauthorized access'}), 403
+    global admin_account
 
-    admin_account = session.get('admin')
-    if not admin_account:
-        return jsonify({'error': 'Admin account not found'}), 404
+    if session.get('admin'):
+        if admin_account is None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
 
-    admin_account = Admin(**admin_account)
-    users = admin_account.retrieve_all_current_sitins()
+        users = admin_account.retrieve_all_current_sitins()
 
-    json_format_users = [
-        {
-            "idno": user['idno'],
-            "firstname": user['firstname'],
-            "middlename": user['middlename'],
-            "lastname": user['lastname'],
-            "course": user['course'],
-            "year": user['year'],
-            "email": user['email'],
-            "session": user['session'],
-            "status": user['status'],
-        }
-        for user in users
-    ]
+        json_format_users = [
+            {
+                "idno": user['idno'],
+                "firstname": user['firstname'],
+                "middlename": user['middlename'],
+                "lastname": user['lastname'],
+                "course": user['course'],
+                "year": user['year'],
+                "email": user['email'],
+                "session": user['session'],
+                "status": user['status'],
+            }
+            for user in users
+        ]
 
-    return jsonify(json_format_users)
+        return jsonify(json_format_users)
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+
 
 
 @admin.route('/api/sitinrecords')
@@ -354,33 +367,34 @@ def sitinrecords():
     """API to retrieve sitin records"""
     global admin_account
 
-    if session.get('admin') is None:
-        return jsonify({'success': False, 'message': 'Unauthorized access'}), 403
+    if session.get('admin'):
+        if admin_account is None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
 
-    if admin_account is None:
-        admin_account = session.get('admin')
-        admin_account = Admin(**admin_account)
+        users = admin_account.retrieve_all_sitinrecords()
 
-    users = admin_account.retrieve_all_sitinrecords()
+        # Convert objects to dictionaries
+        users_list = []
+        for user in users:
+            users_list.append({
+                "record_id": user["record_id"],
+                "reservation_id": user["reservation_id"],
+                "idno": user["idno"],
+                "lab_id": user["lab_id"],
+                "sitin_in": user["sitin_in"],
+                "sitin_out": user["sitin_out"],
+                "staff_idno": user["staff_idno"],
+                "logged_off_by": user["logged_off_by"],
+                "status": user["status"],
+                "reason": user["reason"],
+                "completed_at": user["completed_at"]
+            })
 
-    # Convert objects to dictionaries
-    users_list = []
-    for user in users:
-        users_list.append({
-            "record_id": user["record_id"],
-            "reservation_id": user["reservation_id"],
-            "idno": user["idno"],
-            "lab_id": user["lab_id"],
-            "sitin_in": user["sitin_in"],
-            "sitin_out": user["sitin_out"],
-            "staff_idno": user["staff_idno"],
-            "logged_off_by": user["logged_off_by"],
-            "status": user["status"],
-            "reason": user["reason"],
-            "completed_at": user["completed_at"]
-        })
-
-    return jsonify(users_list)
+        return jsonify(users_list)
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
 
  
 @admin.route('/admin_editstudent', methods=['POST'])
@@ -452,67 +466,107 @@ def announce():
         if admin_account == None:
             admin_account = Admin(**session.get('admin'))
 
-    file = request.files['image']
-    filename = ''
+        file = request.files['image']
+        filename = ''
 
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename) # Secure file name
-        upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/announcements"))
-        filepath = os.path.join(upload_folder, filename)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename) # Secure file name
+            upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/announcements"))
+            filepath = os.path.join(upload_folder, filename)
 
-        if not os.path.isdir(upload_folder):
-            print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
-            flash("Upload folder missing. Contact admin.", "danger")
-            return redirect(url_for('admin.admin_announcement'))
-        
-        print(f"Saving file to: {filepath}")  # Debugging line
-        file.save(filepath.replace("\\", "/"))  # Fix Windows backslash issue
+            if not os.path.isdir(upload_folder):
+                print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
+                flash("Upload folder missing. Contact admin.", "danger")
+                return redirect(url_for('admin.admin_announcement'))
+            
+            print(f"Saving file to: {filepath}")  # Debugging line
+            file.save(filepath.replace("\\", "/"))  # Fix Windows backslash issue
 
-        if os.path.exists(filepath):  # Verify if the file was actually saved
-            print("✅ File successfully saved!")
-
-
-
-    announcement_data = {
-        "post_title": request.form['title'],
-        "post_description": request.form['description'],
-        "image": filename,
-        "posted_by":admin_account.idno,
-    }
+            if os.path.exists(filepath):  # Verify if the file was actually saved
+                print("✅ File successfully saved!")
 
 
-    response = admin_account.add_announcement(**{k:v for k,v in announcement_data.items() if not v is None})
-    if response['success']:
-        flash('Announcement added', 'success')
-        return redirect(url_for('admin.admin_announcements'))
+
+        announcement_data = {
+            "post_title": request.form['title'],
+            "post_description": request.form['description'],
+            "image": filename,
+            "posted_by":admin_account.idno,
+        }
+
+
+        response = admin_account.add_announcement(**{k:v for k,v in announcement_data.items() if not v is None})
+        if response['success']:
+            flash('Announcement added', 'success')
+            return redirect(url_for('admin.admin_announcements'))
+        else:
+            flash(response['error'], 'error')
+            return redirect(url_for('admin.admin_announcements'))
     else:
-        flash(response['error'], 'error')
-        return redirect(url_for('admin.admin_announcements'))
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+    
+@admin.route('/edit-announcement')
+def editAnnoucement():
+    """Edit announcement for Admin"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = Admin(**session.get('admin'))
+
+        post_title = request.form['editTitle']
+        post_description = request.form['editDescription']
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+
+
+
+
+    
+@admin.route('/api/delete/<post_id>/announcement')
+def deleteAnnouncement(post_id):
+    """Delete an announcement"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = Admin(**session.get('admin'))
+
+        response = admin_account.delete_announcement(post_id)
+        
+        return jsonify(response)
+    
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+
 
 
 @admin.route('/sitin_student', methods=['POST'])
 def sitin_student():
     """Sit In Student"""
     global admin_account
-    if not session.get('admin'):
-        return jsonify({'success': False, 'error': 'Unauthorized access'}), 403
+    if  session.get('admin'):
 
-    if admin_account is None:
-        admin_account = Admin(**session.get('admin'))
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
 
-    idno = request.form['idno']
-    lab_id = request.form['lab_id']
-    reason = request.form['reason']
+        idno = request.form['idno']
+        lab_id = request.form['lab_id']
+        reason = request.form['reason']
 
-    if lab_id == "#" or reason == "#":
-        return jsonify({'success': False, 'error': 'Please select a valid lab and purpose'}), 400
+        if lab_id == "#" or reason == "#":
+            return jsonify({'success': False, 'error': 'Please select a valid lab and purpose'}), 400
 
-    response = admin_account.sit_in_student(idno=idno, lab_id=lab_id, reason=reason, staff_idno=admin_account.idno)
+        response = admin_account.sit_in_student(idno=idno, lab_id=lab_id, reason=reason, staff_idno=admin_account.idno)
 
-    if response['success']:
-        return jsonify({'success': True, 'message': 'Student successfully sat in'})
+        if response['success']:
+            return jsonify({'success': True, 'message': 'Student successfully sat in'})
 
-    return jsonify({'success': False, 'error': response['error']}), 400
+        return jsonify({'success': False, 'error': response['error']}), 400
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
 
 
 
