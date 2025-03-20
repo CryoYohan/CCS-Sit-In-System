@@ -5,6 +5,7 @@ from .modules.login_register_module import Authorization
 from .database.dbhelper import Databasehelper
 from werkzeug.utils import secure_filename
 import os
+from datetime import datetime
 
 admin = Blueprint('admin', __name__, template_folder='templates/admin',url_prefix='/admin')
 
@@ -66,7 +67,6 @@ def admin_announcements():
                                     user_in_login_page=True, 
                                     action='Logout',
                                     admin=admin_account,
-                                    announcements=response['announcements'],
                                     )
         else:
             flash('An error occured', 'error')
@@ -492,6 +492,7 @@ def announce():
             "post_description": request.form['description'],
             "image": filename,
             "posted_by":admin_account.idno,
+            "date_posted": datetime.now(),
         }
 
 
@@ -506,8 +507,46 @@ def announce():
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
     
-@admin.route('/edit-announcement')
-def editAnnoucement():
+
+@admin.route('/api/announcements')
+def get_announcements():
+    """FETCH ALL ANNOUNCEMENTS"""
+    global admin_account
+    if not session.get('admin'):
+        return jsonify({
+            'success': False,
+            'message': 'Unauthorized access is prohibited.'
+        }), 401  # Unauthorized status code
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    response = admin_account.retrieve_all_announcements()
+
+    if response['success']:
+        announcements = []
+        for announcement in response['data']:
+            announcements.append({
+                'post_id': announcement['post_id'],
+                'post_title': announcement['post_title'],
+                'post_description': announcement['post_description'],
+                'image': announcement['image'],
+                'posted_by': announcement['posted_by'],
+                'date_posted': announcement['date_posted'],
+            })
+
+        return jsonify({
+            'success': True,
+            'data': announcements
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': response['message']
+        })
+    
+@admin.route('/api/<post_id>/editannouncement')
+def editAnnoucement(post_id):
     """Edit announcement for Admin"""
     global admin_account
     if not session['admin'] == None:
@@ -519,9 +558,6 @@ def editAnnoucement():
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
-
-
-
 
     
 @admin.route('/api/delete/<post_id>/announcement')

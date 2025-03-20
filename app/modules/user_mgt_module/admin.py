@@ -49,6 +49,14 @@ class Admin(User):
         """ Retrieve all students who currently in lab"""
         return self.db.retrieve_all_current_sitins()
 
+    def retrieve_all_announcements(self):
+        """Retrieve all announcements from DB"""
+        try:
+            announcements = self.db.getall_records('announcement')
+            return {'success': True, 'data': announcements}
+
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
 
 
     def add_announcement(self, **kwargs):
