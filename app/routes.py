@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, Blueprint, session, flash, current_app
+from flask import render_template, request, redirect, url_for, Blueprint, session, flash, current_app, jsonify
 from .modules.user_mgt_module.student import Student
 from .modules.login_register_module import Authorization
 from .modules.reservation_module.reserve_lab import Reservation
@@ -96,7 +96,6 @@ def announcements():
                                     student=student,
                                     user_in_login_page=True,
                                     action='Logout',
-                                    announcements=response['announcements'],
                                    )
          
         else:
@@ -511,3 +510,42 @@ def registerstudent():
         # If registration failed, show an error alert
         flash(response['error'], 'error')
         return redirect(url_for('main.login'))
+    
+
+@main.route('/api/announcements')
+def get_announcements():
+    """FETCH ALL ANNOUNCEMENTS"""
+    global student
+    if not session.get('student'):
+        return jsonify({
+            'success': False,
+            'message': 'Unauthorized access is prohibited.'
+        }), 401  # Unauthorized status code
+
+    if student is None:
+        student = Student(**session.get('student'))
+
+    response = student.get_announcements_for_student()
+
+    if response['success']:
+        announcements = []
+        for announcement in response['data']:
+            announcements.append({
+                'post_id': announcement['post_id'],
+                'post_title': announcement['post_title'],
+                'post_description': announcement['post_description'],
+                'image': announcement['image'],
+                'posted_by': announcement['posted_by'],
+                'date_posted': announcement['date_posted'],
+            })
+
+        return jsonify({
+            'success': True,
+            'data': announcements
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': response['message']
+        })
+    

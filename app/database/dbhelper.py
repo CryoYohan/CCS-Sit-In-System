@@ -36,6 +36,11 @@ class Databasehelper:
         query = f"SELECT * FROM {table}"
         return self.getprocess(query)
     
+    def get_all_announcements(self):
+        """Retrieves all records from announcement table with order by date."""
+        query = f"SELECT * FROM announcement ORDER BY date_posted DESC"
+        return self.getprocess(query)
+    
     def get_all_users(self)->list:
         """Retrieves all records from a specified table."""
         query = f"SELECT * FROM user WHERE role <> 'Admin'"

@@ -52,7 +52,7 @@ class Admin(User):
     def retrieve_all_announcements(self):
         """Retrieve all announcements from DB"""
         try:
-            announcements = self.db.getall_records('announcement')
+            announcements = self.db.get_all_announcements()
             return {'success': True, 'data': announcements}
 
         except Exception as e:

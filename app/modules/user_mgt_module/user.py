@@ -27,13 +27,13 @@ class User():
         self.db.update_record(self.table,**kwargs)  # Update only provided fields
     
     def retrieve_all_announcements(self):
-        """Retrieve all announcements"""
+        """Retrieve all announcements from DB"""
         try:
-            announcements = self.db.getall_records(table='announcement')
-            return{'success':True, 'announcements':announcements}
-        
+            announcements = self.db.get_all_announcements()
+            return {'success': True, 'data': announcements}
+
         except Exception as e:
-            return {'erorr':str(e)}
+            return {'success': False, 'message': str(e)}
 
     def delete(self):
         pass
