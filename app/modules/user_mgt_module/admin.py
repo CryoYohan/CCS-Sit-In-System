@@ -46,11 +46,11 @@ class Admin(User):
         """ Retrieve all students who currently in lab"""
         return self.db.retrieve_all_current_sitins()
 
-    def retrieve_all_announcements(self):
+    def get_announcements_for_students(self):
         """Retrieve all announcements from DB"""
         try:
-            announcements = self.db.get_all_announcements()
-            return {'success': True, 'data': announcements}
+            announcements = self.retrieve_all_announcements()
+            return{'success':True, 'data':announcements['data']}
 
         except Exception as e:
             return {'success': False, 'message': str(e)}
@@ -63,6 +63,13 @@ class Admin(User):
             return {'success': True} 
         except Exception as e:
             return {'success': False, 'error': str(e)}
+
+    def delete_announcement(self,idno):
+        """Delete a announcement"""
+        try:
+            pass
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
 
     
     def retrieve_all_sitinrecords(self):

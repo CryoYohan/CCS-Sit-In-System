@@ -59,7 +59,7 @@ def admin_announcements():
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
-        response = admin_account.retrieve_all_announcements()
+        response = admin_account.get_announcements_for_students()
 
         if response['success']:
             return render_template(
@@ -521,7 +521,7 @@ def get_announcements():
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
 
-    response = admin_account.retrieve_all_announcements()
+    response = admin_account.get_announcements_for_students()
 
     if response['success']:
         announcements = []
@@ -560,22 +560,22 @@ def editAnnoucement(post_id):
         return redirect(url_for('admin.adminlogin'))
 
     
-@admin.route('/api/delete/<post_id>/announcement')
+@admin.route('/api/delete/announcement/<post_id>')
 def deleteAnnouncement(post_id):
     """Delete an announcement"""
     global admin_account
-    if not session['admin'] == None:
-        if admin_account == None:
-            admin_account = Admin(**session.get('admin'))
+    if not session.get('admin'):
+        return jsonify({
+            'success': False,
+            'message': 'Unauthorized access is prohibited.'
+        }), 401  # Unauthorized status code
 
-        response = admin_account.delete_announcement(post_id)
-        
-        return jsonify(response)
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    response = admin_account.delete_announcement(post_id)
     
-    else:
-        flash('Unauthorized Access is Prohibited', 'error')
-        return redirect(url_for('admin.adminlogin'))
-
+    return jsonify(response)
 
 
 @admin.route('/sitin_student', methods=['POST'])
@@ -647,7 +647,6 @@ def addstaff():
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
-
 
 
 
