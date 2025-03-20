@@ -560,21 +560,28 @@ def editAnnoucement(post_id):
         return redirect(url_for('admin.adminlogin'))
 
     
-@admin.route('/api/delete/announcement/<post_id>')
-def deleteAnnouncement(post_id):
+@admin.route('/api/announcements/<post_id>', methods=['DELETE'])
+def delete_announcement(post_id):
     """Delete an announcement"""
     global admin_account
+
+    print(f"This is the announcement ID : {post_id}")
+
+    # Check if the admin is logged in
     if not session.get('admin'):
         return jsonify({
             'success': False,
             'message': 'Unauthorized access is prohibited.'
         }), 401  # Unauthorized status code
 
+    # Initialize admin_account if not already initialized
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
 
-    response = admin_account.delete_announcement(post_id)
-    
+    # Delete the announcement
+    response = admin_account.delete_announcement(post_id=post_id)
+    print(f"Response {response}")
+    # Return the response
     return jsonify(response)
 
 

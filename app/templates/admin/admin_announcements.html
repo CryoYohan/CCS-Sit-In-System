@@ -181,7 +181,7 @@
               </svg>
             </button>
             <!-- Delete Button -->
-            <button onclick="deleteAnnouncement(${announcement.id})" class="text-red-500 hover:text-red-700 transition">
+            <button onclick="deleteAnnouncement(${announcement.post_id})" class="text-red-500 hover:text-red-700 transition">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
@@ -198,21 +198,56 @@
 
   }
 
-  // Function to delete an announcement
   function deleteAnnouncement(id) {
-    fetch(`/api/announcements/${id}`, {
-      method: 'DELETE',
-    })
-      .then(response => {
-        if (response.ok) {
-          fetchAnnouncements(); // Refresh the list after deletion
-        } else {
-          console.error('Failed to delete the announcement');
-        }
-      })
-      .catch(error => {
-        console.error('There was a problem with the delete operation:', error);
-      });
+    // SweetAlert2 confirmation dialog
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Send DELETE request to the server
+        fetch(`/admin/api/announcements/${id}`, {
+          method: 'DELETE',
+          credentials: 'include'  // Include cookies for session management
+        })
+          .then(response => response.json())  // Parse the response as JSON
+          .then(data => {
+            if (data.success) {
+              // Show success message
+              Swal.fire({
+                icon: 'success',
+                title: 'Deleted!',
+                text: 'The announcement has been deleted.',
+                timer: 1500,  // Auto-close after 1.5 seconds
+                showConfirmButton: false
+              });
+              // Refresh the announcements list
+              fetchAnnouncements();
+            } else {
+              // Show error message if the server responds with an error
+              Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: data.message || 'Failed to delete the announcement.'
+              });
+            }
+          })
+          .catch(error => {
+            console.error('There was a problem with the delete operation:', error);
+            // Show error message for network or other errors
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: 'There was a problem deleting the announcement. Please try again later.'
+            });
+          });
+      }
+    });
   }
 
   function formatDate(dateString) {

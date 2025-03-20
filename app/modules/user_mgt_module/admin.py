@@ -64,11 +64,14 @@ class Admin(User):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    def delete_announcement(self,idno):
+    def delete_announcement(self,post_id):
         """Delete a announcement"""
         try:
-            pass
+            self.db.delete_record(table='announcement', post_id=post_id)
+            print('Deleted the announcement')
+            return {'success': True}
         except Exception as e:
+            print(f'Cannot Delete the announcement\n{str(e)}')
             return {'success': False, 'message': str(e)}
 
     
