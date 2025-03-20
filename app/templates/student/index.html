@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,18 +10,29 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .animate-fade-in {
             animation: fadeIn 0.5s ease-out;
         }
+
         body {
             font-family: 'Poppins', sans-serif;
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans"  style="background-image: url('{{ url_for('static', filename='images/landingBG.jpg') }}'); background-size: cover; background-position: center;">
+
+<body class="bg-gray-100 font-sans"
+    style="background-image: url('{{ url_for('static', filename='images/landingBG.jpg') }}'); background-size: cover; background-position: center;">
     {% import '/components.html' as component %}
     {{ component.navbar(user_in_login_page, action, user) }}
     <!-- Header Section -->
@@ -28,12 +40,17 @@
     <header id="header-bg" class="flex items-center justify-center h-screen relative">
         <div class="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-70 filter brightness-75"></div>
         <div class="text-center relative z-10 animate-fade-in">
-            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">Simplify Your Workflow with CCSit</h1>
-            <p class="text-l text-gray-200 mb-8">The ultimate tool for managing your projects efficiently and effectively.</p>
-            <a href="{{ url_for('main.login') }}" class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300">Get Started</a>
+            <h1
+                class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
+                Simplify Your Workflow with CCSit</h1>
+            <p class="text-l text-gray-200 mb-8">The ultimate tool for managing your projects efficiently and
+                effectively.</p>
+            <a href="{{ url_for('main.login') }}"
+                class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300">Get
+                Started</a>
         </div>
-    </header>    
-        
+    </header>
+
     {% endif %}
 
     {{ component.flash_message() }}
@@ -41,7 +58,7 @@
     {% block content %}
     {% endblock %}
 
-    {%  if not user_in_login_page%}
+    {% if not user_in_login_page%}
     <!-- Additional Content Section -->
     <section class="py-16 bg-gray-50">
         <div class="container mx-auto px-6">
@@ -70,4 +87,5 @@
 
 
 </body>
+
 </html>

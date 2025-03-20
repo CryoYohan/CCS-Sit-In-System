@@ -4,8 +4,11 @@
   <!-- Laboratory Selection -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     {% for lab in labs %}
-    <div class="bg-white shadow-md rounded-lg overflow-hidden transform transition-transform hover:scale-105 cursor-pointer" onclick="openModal('Lab {{ lab['lab_name'] }}', {{ lab['slots'] }})">
-      <img src="{{ url_for('static', filename='images/laboratories/'+lab['image']) }}" alt="{{ lab.name }}" class="w-full h-32 object-cover">
+    <div
+      class="bg-white shadow-md rounded-lg overflow-hidden transform transition-transform hover:scale-105 cursor-pointer"
+      onclick="openModal('Lab {{ lab['lab_name'] }}', {{ lab['slots'] }})">
+      <img src="{{ url_for('static', filename='images/laboratories/'+lab['image']) }}" alt="{{ lab.name }}"
+        class="w-full h-32 object-cover">
       <div class="p-4">
         <h3 class="text-lg font-semibold text-gray-800">Lab {{ lab['lab_name'] }}</h3>
         <p class="text-sm text-gray-600">{{ lab['lab_description'] }}</p>
@@ -18,36 +21,42 @@
   <div class="bg-white shadow-md rounded-lg p-6">
     <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sit-in Laboratory</h2>
     <form action="{{ url_for('main.sitin_lab') }}" method="POST" class="space-y-4">
-        <div>
-            <label for="date" class="block text-sm font-medium text-gray-700">Sit-in Date and Time</label>
-            <input type="text" id="date" name="date" value="{{ datenow }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-blue-200 focus:ring-blue-500 focus:border-blue-500" readonly>
-        </div> 
-        <div>
-            <label for="lab" class="block text-sm font-medium text-gray-700">Select Laboratory</label>
-            <select id="lab" name="lab" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-            {% for lab in labs %}
-            <option value="{{ lab['lab_name'] }}">Lab {{ lab['lab_name'] }}</option>
-            {% endfor %}
-            </select>
-        </div>
-        <div>
-            <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Sit-in</label>
-            <select id="reason" name="reason" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-            <option value="Programming Related Projects">Programming Related Projects</option>
-            <option value="Java">Java</option>
-            <option value="Python">Python</option>
-            <option value="C">C</option>
-            <option value="C#">C#</option>
-            <option value="Web Dev">Web Dev</option>
-            <option value="School purposes">School purposes</option>
-            <!-- Add more options as needed -->
-            </select>
-        </div>
-        <div>
+      <div>
+        <label for="date" class="block text-sm font-medium text-gray-700">Sit-in Date and Time</label>
+        <input type="text" id="date" name="date" readonly
+          class="mt-1 bg-blue-400 text-white block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm cursor-not-allowed">
+      </div>
+      <div>
+        <label for="lab" class="block text-sm font-medium text-gray-700">Select Laboratory</label>
+        <select id="lab" name="lab"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required>
+          {% for lab in labs %}
+          <option value="{{ lab['lab_name'] }}">Lab {{ lab['lab_name'] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Sit-in</label>
+        <select id="reason" name="reason"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required>
+          <option value="Programming Related Projects">Programming Related Projects</option>
+          <option value="Java">Java</option>
+          <option value="Python">Python</option>
+          <option value="C">C</option>
+          <option value="C#">C#</option>
+          <option value="Web Dev">Web Dev</option>
+          <option value="School purposes">School purposes</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+      <div>
         <div class="flex justify-center">
-            <button type="submit" class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-2 rounded-lg text-lg hover:bg-blue-700 transition duration-300 shadow-md">
+          <button type="submit"
+            class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-2 rounded-lg text-lg hover:bg-blue-700 transition duration-300 shadow-md">
             Request Sit-in
-            </button>
+          </button>
         </div>
     </form>
   </div>
@@ -64,12 +73,33 @@
       <!-- Add more details as needed -->
     </div>
     <div class="p-4 border-t flex justify-end">
-      <button onclick="closeModal()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300">Close</button>
+      <button onclick="closeModal()"
+        class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300">Close</button>
     </div>
   </div>
 </div>
 
 <script>
+  // Function to format the date
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    // Extract components
+    const month = date.toLocaleString('default', { month: 'long' }); // Full month name (e.g., "October")
+    const day = date.getDate(); // Day of the month (e.g., 5)
+    const year = date.getFullYear(); // Year (e.g., 2023)
+    const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); // Time (e.g., "02:30 PM")
+
+    // Format as "Month Day, Year, Time"
+    return `${month} ${day}, ${year}, ${time}`;
+  }
+
+  // Set the current date and time in the input field
+  document.addEventListener('DOMContentLoaded', () => {
+    const currentDate = new Date(); // Get the current date and time
+    const formattedDate = formatDate(currentDate); // Format the date
+    document.getElementById('date').value = formattedDate; // Set the value of the input field
+  });
   function openModal(labName, availableSeats) {
     document.getElementById('modalLabName').innerText = labName;
     document.getElementById('modalAvailableSeats').innerText = availableSeats;

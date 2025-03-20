@@ -33,9 +33,6 @@ class Admin(User):
         """Retrieve all students"""
         return self.db.getall_records_rolebased(role='Student')
 
-    def retrieve_all_students_to_sitin(self):
-        """ Retrieve all students joined sitin reservation"""
-        return self.db.retrieve_all_students_to_sitin()
     
     def retrieve_all_users(self):
         """Retrieve all users"""
@@ -76,9 +73,15 @@ class Admin(User):
         """Sit in a student"""
         sitin_datetime = datetime.now()
         kwargs['sitin_in'] = sitin_datetime
-        kwargs['status'] = 'In-lab'
+
+        update_student_status = {
+            'idno': kwargs.get('idno'),
+            'status': 'In-lab',
+        }
+
         try:
             self.db.add_record(table='sitin_reservation',**kwargs)
+            self.db.update_record(table='user',**update_student_status)
             return {'success':True}
         except Exception as e:
             return {'success':False, 'error':str(e)}
@@ -86,11 +89,16 @@ class Admin(User):
     def logoff_student(self, idno,staff_idno):
         """Log-off student"""
         try:
-
             reservation = self.db.find_record(table='sitin_reservation',idno=idno)
             user = self.db.find_record(table='user', idno=idno)
-            self.db.update_record(table='sitin_reservation', idno=idno, status='Idle')
-            self.db.update_record(table='user', idno=idno, session=user[0]['session']-1)
+
+            update_status_session = {
+                'idno' : idno,
+                'session': user[0]['session']-1,
+                'status': 'Idle'
+            }
+
+            self.db.update_record(table='user',**update_status_session)
 
             data={
                     'reservation_id': reservation[0]['reservation_id'],

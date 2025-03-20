@@ -64,7 +64,7 @@ class Databasehelper:
 
     def retrieve_all_current_sitins(self):
         """ Retrieve all students who currently in lab"""
-        query = "SELECT * FROM current_sitin"
+        query = "SELECT * FROM user WHERE status = 'In-lab'"
         return self.getprocess(query)
 
     def getall_sessionhistory(self, idno:str)->list:

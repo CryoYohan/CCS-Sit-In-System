@@ -186,7 +186,7 @@ def api_users():
 
     
 
-        users = admin_account.retrieve_all_students_to_sitin()
+        users = admin_account.retrieve_all_students()
 
         # Convert objects to dictionaries
         users_list = []
@@ -223,7 +223,7 @@ def search_users():
 
         query = request.args.get('q','').strip()
 
-        users = admin_account.retrieve_all_students_to_sitin()
+        users = admin_account.retrieve_all_students()
 
         filtered_users = [
             {
@@ -263,7 +263,7 @@ def filter_status():
 
         query = request.args.get('q', '')
 
-        users = admin_account.retrieve_all_students_to_sitin()
+        users = admin_account.retrieve_all_students()
 
         if not query == 'all':
             filtered_users_status = [
