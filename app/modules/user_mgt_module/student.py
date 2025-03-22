@@ -49,4 +49,16 @@ class Student(User):
         except Exception as e:
             return {'success':False, 'error':str(e)}
 
+    def request_reservation(self, **kwargs):
+        """Request a reservation"""
+        try:
+            already_reserved = self.db.find_record('reservation', kwargs.get('idno'))
+            if already_reserved:
+                return {'success':False, 'error': 'You already made a reservation. Cancel current reservation to reserve again.'}
+            else:
+                self.db.add_record(table='reservation', **kwargs)
+                return {'success':True}
+        except Exception as e:
+            return {'success':False, 'error':str(e)}
+
     

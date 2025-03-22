@@ -1,30 +1,71 @@
 {% extends 'dashboard_template.html' %}
 {% block content %}
 <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4 text-center">Computer Laboratory Seat Reservation</h1>
-    <div class="bg-white shadow-md rounded-lg p-6">
-      <div class="flex justify-between items-center mb-4 bg-gray-100 p-3 rounded-lg shadow-md">
-        <button id="prevMonth" class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-200 active:scale-95 transition-all duration-200 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M12.707 15.707a1 1 0 0 1-1.414 0l-5-5a1 1 0 0 1 0-1.414l5-5a1 1 0 1 1 1.414 1.414L8.414 10l4.293 4.293a1 1 0 0 1 0 1.414z" clip-rule="evenodd"/>
-            </svg>
-            Prev
-        </button>
-    
-        <h2 id="monthYear" class="text-xl font-bold text-gray-700"></h2>
-    
-        <button id="nextMonth" class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-200 active:scale-95 transition-all duration-200 flex items-center gap-2">
-            Next
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M7.293 16.707a1 1 0 0 1 0-1.414L11.586 10 7.293 5.707a1 1 0 1 1 1.414-1.414l5 5a1 1 0 0 1 0 1.414l-5 5a1 1 0 0 1-1.414 0z" clip-rule="evenodd"/>
-            </svg>
-        </button>
+    <div class="mb-6 p-3">
+        <h1
+            class="text-3xl font-bold text-center mb-4 text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
+            Computer Laboratory Reservation</h1>
+        <p class="text-gray-600 text-center">Manage your laboratory reservations efficiently.</p>
     </div>
-    
-        <div class="grid grid-cols-7 gap-2 text-center font-semibold bg-gray-200 p-2 rounded">
-            <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+    <div class="flex gap-6 p-6">
+        <!-- Left Side: Calendar -->
+        <div class="flex-1 bg-white shadow-md rounded-lg p-6">
+            <div class="flex justify-between items-center mb-4 bg-gray-100 p-3 rounded-lg shadow-md">
+                <button id="prevMonth"
+                    class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-200 active:scale-95 transition-all duration-200 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M12.707 15.707a1 1 0 0 1-1.414 0l-5-5a1 1 0 0 1 0-1.414l5-5a1 1 0 1 1 1.414 1.414L8.414 10l4.293 4.293a1 1 0 0 1 0 1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    Prev
+                </button>
+
+                <h2 id="monthYear" class="text-xl font-bold text-gray-700"></h2>
+
+                <button id="nextMonth"
+                    class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-200 active:scale-95 transition-all duration-200 flex items-center gap-2">
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M7.293 16.707a1 1 0 0 1 0-1.414L11.586 10 7.293 5.707a1 1 0 1 1 1.414-1.414l5 5a1 1 0 0 1 0 1.414l-5 5a1 1 0 0 1-1.414 0z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-7 gap-2 text-center font-semibold bg-gray-200 p-2 rounded">
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+                <div>Sun</div>
+            </div>
+            <div id="calendar" class="grid grid-cols-7 gap-2 mt-2 text-center"></div>
         </div>
-        <div id="calendar" class="grid grid-cols-7 gap-2 mt-2 text-center"></div>
+
+        <!-- Right Side: Reservation History -->
+        <div class="flex-1 bg-white shadow-md rounded-lg p-6">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Reservation History</h3>
+            <div class="overflow-y-auto max-h-[calc(100vh-200px)]"> <!-- Adjust height as needed -->
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 border-b text-center">Request Date</th>
+                            <th class="py-2 px-4 border-b text-center">Reservation Date</th>
+                            <th class="py-2 px-4 border-b text-center">Purpose</th>
+                            <th class="py-2 px-4 border-b text-center">Status</th>
+                            <th class="py-2 px-4 border-b text-center">Staff ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservationHistoryTable">
+                        <!-- Reservation History dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -35,36 +76,49 @@
         <form action="#">
             <div>
                 <label for="lab" class="block text-sm font-medium text-gray-700">Select Laboratory</label>
-                <select id="lab" name="lab" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-                {% for lab in labs %}
-                <option value="{{ lab['lab_name'] }}">Lab {{ lab['lab_name'] }}</option>
-                {% endfor %}
+                <select id="lab" name="lab"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    required>
+                    {% for lab in labs %}
+                    <option value="{{ lab['lab_name'] }}">Lab {{ lab['lab_name'] }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div>
+                <!-- Hidden input to store the selected date (month and day) -->
+                <input type="hidden" id="selected-date" name="selected-date">
+
                 <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Sit-in</label>
-                <select id="reason" name="reason" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-                <option value="Programming Related Projects">Programming Related Projects</option>
-                <option value="Java">Java</option>
-                <option value="Python">Python</option>
-                <option value="C">C</option>
-                <option value="C#">C#</option>
-                <option value="Web Dev">Web Dev</option>
-                <option value="School purposes">School purposes</option>
-                <!-- Add more options as needed -->
+                <select id="reason" name="purpose"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    required>
+                    <option value="Programming Related Projects">Programming Related Projects</option>
+                    <option value="Java">Java</option>
+                    <option value="Python">Python</option>
+                    <option value="C">C</option>
+                    <option value="C#">C#</option>
+                    <option value="Web Dev">Web Dev</option>
+                    <option value="School purposes">School purposes</option>
+                    <!-- Add more options as needed -->
                 </select>
+            </div>
+            <div>
+                <label for="time" class="block text-sm font-medium text-gray-700">Time</label>
+                <input type="time" id="sit-in-time" name="sit-in-time" min="09:00" max="18:00" ...>
             </div>
             <div class="mt-3" id="scheduleList"></div>
             <div class="flex justify-center gap-2">
-              <div class="mt-4">
-                <button id="reserve" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-gray-700">Reserve</button>
-              </div>
-              <div class="mt-4 ">
-                  <button id="closeModal" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700">Close</button>
-              </div>
-            </div> 
+                <div class="mt-4">
+                    <button id="reserve" type="button"
+                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-gray-700">Reserve</button>
+                </div>
+                <div class="mt-4 ">
+                    <button type="button" id="closeModal"
+                        class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700">Close</button>
+                </div>
+            </div>
         </form>
-       
+
     </div>
 </div>
 
@@ -72,14 +126,84 @@
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
 
+    // Function to fetch reservation history and populate the table
+    async function fetchReservationHistory() {
+        try {
+            const response = await fetch('/api/reservation-history');
+            const result = await response.json();
 
-    const calendarData = {
-        "2025-02-20": { status: "available", schedules: ["9am-10am", "1pm-2pm"] },
-        "2025-02-19": { status: "available", schedules: ["9am-10am", "1pm-2pm"] },
-        "2025-02-21": { status: "full", schedules: [] },
-        "2025-02-22": { status: "closed", schedules: [] }
-    };
+            if (result.success) {
+                const reservations = result.data;
+                const reservationHistoryTable = document.getElementById('reservationHistoryTable');
+                reservationHistoryTable.innerHTML = ''; // Clear existing rows
 
+                reservations.forEach(reservation => {
+                    const row = document.createElement('tr');
+
+                    // Request Date
+                    const requestDateCell = document.createElement('td');
+                    requestDateCell.className = 'py-2 px-4 border-b text-center';
+                    requestDateCell.textContent = reservation.request_date;
+                    row.appendChild(requestDateCell);
+
+                    // Reserve Date
+                    const reserveDateCell = document.createElement('td');
+                    reserveDateCell.className = 'py-2 px-4 border-b text-center';
+                    reserveDateCell.textContent = reservation.reserve_date;
+                    row.appendChild(reserveDateCell);
+
+                    // Purpose
+                    const purposeCell = document.createElement('td');
+                    purposeCell.className = 'py-2 px-4 border-b text-center';
+                    purposeCell.textContent = reservation.purpose;
+                    row.appendChild(purposeCell);
+
+                    // Status
+                    const statusCell = document.createElement('td');
+                    statusCell.className = 'py-2 px-4 border-b text-center';
+                    const statusBadge = document.createElement('span');
+                    statusBadge.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${reservation.status === 'Pending' ? 'bg-gray-200 text-gray-800' :
+                        reservation.status === 'Approved' ? 'bg-green-200 text-green-800' :
+                            'bg-red-200 text-red-800' // Denied
+                        }`;
+                    statusBadge.textContent = reservation.status;
+                    statusCell.appendChild(statusBadge);
+                    row.appendChild(statusCell);
+
+                    // Staff ID
+                    const staffIdCell = document.createElement('td');
+                    staffIdCell.className = 'py-2 px-4 border-b text-center';
+                    staffIdCell.textContent = reservation.staff_idno || '-'; // Use '-' if staff_idno is null
+                    row.appendChild(staffIdCell);
+
+                    // Append the row to the table
+                    reservationHistoryTable.appendChild(row);
+                });
+            } else {
+                // Show error message using SweetAlert2
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message || 'Failed to fetch reservation history.',
+                    confirmButtonText: 'OK',
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            // Show error message using SweetAlert2
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to fetch reservation history. Please try again.',
+                confirmButtonText: 'OK',
+            });
+        }
+    }
+
+    // Call the function to fetch and populate reservation history
+    //fetchReservationHistory();
+
+    // Function to generate the calendar
     function generateCalendar(year, month) {
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -106,17 +230,102 @@
         }
     }
 
+    // Function to open the modal and handle date selection
     function openModal(date, schedules) {
-        document.getElementById('scheduleList').innerHTML = schedules.length > 0 ? 
-            schedules.map(schedule => `<div class='mb-2'><input type='radio' name='schedule' value='${schedule}' class='mr-2'>${schedule}</div>`).join('') 
+        // Store the selected date (month and day) in the hidden input
+        const selectedDateInput = document.getElementById('selected-date');
+        selectedDateInput.value = date; // Store the full date (YYYY-MM-DD)
+
+        // Display available schedules
+        document.getElementById('scheduleList').innerHTML = schedules.length > 0 ?
+            schedules.map(schedule => `<div class='mb-2'><input type='radio' name='schedule' value='${schedule}' class='mr-2'>${schedule}</div>`).join('')
             : '<p class="text-gray-500 text-center">No available schedules</p>';
+
+        // Show the modal
         document.getElementById('reservationModal').classList.remove('hidden');
     }
 
+    document.getElementById('reserve').onclick = () => {
+        const selectedDate = document.getElementById('selected-date').value; // Get the selected date (YYYY-MM-DD)
+        const selectedTime = document.getElementById('sit-in-time').value; // Get the selected time
+        const lab = document.getElementById('lab').value; // Get the selected lab (if you have a lab dropdown)
+        const purpose = document.getElementById('reason').value; // Get the purpose from the dropdown
+
+        if (selectedDate && selectedTime && lab && purpose) {
+            // Combine the date and time
+            const fullDateTime = `${selectedDate} ${selectedTime}`;
+
+            // Log the data being sent (for debugging)
+            console.log('Sending data:', {
+                lab: lab,
+                purpose: purpose,
+                reserve_date: selectedDate,
+                time: selectedTime,
+                fullDateTime: fullDateTime,
+            });
+
+            // Send the data to the server as JSON
+            fetch('/api/reserve-lab', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',  // Ensure the content type is JSON
+                },
+                body: JSON.stringify({  // Send the data as JSON
+                    lab: lab,
+                    purpose: purpose,
+                    reserve_date: selectedDate,
+                    time: selectedTime,
+                    fullDateTime: fullDateTime,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response from server:', data);
+                    if (data.success) {
+                        // Show success message using SweetAlert2
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Reservation submitted successfully!',
+                            confirmButtonText: 'OK',
+                        });
+                    } else {
+                        // Show error message using SweetAlert2
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to submit reservation.',
+                            confirmButtonText: 'OK',
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    // Show error message using SweetAlert2
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to submit reservation. Please try again.',
+                        confirmButtonText: 'OK',
+                    });
+                });
+        } else {
+            // Show validation error using SweetAlert2
+            Swal.fire({
+                icon: 'warning',
+                title: 'Validation Error',
+                text: 'Please fill out all fields.',
+                confirmButtonText: 'OK',
+            });
+        }
+    };
+
+    // Function to close the modal
     document.getElementById('closeModal').onclick = () => {
         document.getElementById('reservationModal').classList.add('hidden');
     };
 
+    // Function to navigate to the previous month
     document.getElementById('prevMonth').onclick = () => {
         if (currentMonth === 0) {
             currentMonth = 11;
@@ -127,6 +336,7 @@
         generateCalendar(currentYear, currentMonth);
     };
 
+    // Function to navigate to the next month
     document.getElementById('nextMonth').onclick = () => {
         if (currentMonth === 11) {
             currentMonth = 0;
@@ -137,6 +347,7 @@
         generateCalendar(currentYear, currentMonth);
     };
 
+    // Initialize the calendar
     generateCalendar(currentYear, currentMonth);
 </script>
 {% endblock %}

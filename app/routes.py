@@ -557,3 +557,122 @@ def get_session_records(idno):
             'success': False,
             'message': response['error']
         })
+
+
+@main.route('/api/reserve-lab', methods=['POST'])
+def reserve_lab():
+    """API TO RESERVE LAB"""
+    global student
+    if not session.get('student'):
+        return jsonify({
+            'success': False,
+            'message': 'Unauthorized access is prohibited.'
+        }), 401
+    
+    if student is None:
+        student = Student(**session.get('student'))
+
+    # Parse JSON data from the request
+    data = request.get_json()
+    lab = data.get('lab')
+    purpose = data.get('purpose')
+    reserve_date = data.get('reserve_date')  # Expected format: "YYYY-MM-DD"
+    time = data.get('time')  # Expected format: "HH:MM"
+    fullDateTime = data.get('fullDateTime')  # Expected format: "YYYY-MM-DD HH:MM"
+
+    # Validate required fields
+    if not all([lab, purpose, reserve_date, time, fullDateTime]):
+        return jsonify({
+            'success': False,
+            'message': 'Missing required fields. Please fill out all fields.'
+        }), 400
+
+    # Combine reserve_date and time into a datetime object
+    try:
+        reserve_datetime = datetime.strptime(fullDateTime, "%Y-%m-%d %H:%M")
+    except ValueError:
+        return jsonify({
+            'success': False,
+            'message': 'Invalid date or time format. Please use "YYYY-MM-DD HH:MM".'
+        }), 400
+
+    # Check if the reservation datetime is in the past
+    current_datetime = datetime.now()
+    if reserve_datetime <= current_datetime:
+        return jsonify({
+            'success': False,
+            'message': 'Reservation date and time must be in the future.'
+        }), 400
+
+    # Prepare the reservation data
+    reservation_data = {
+        'idno': student.idno,  # Use the logged-in student's ID
+        'lab_id': lab,
+        'purpose': purpose,
+        'request_date': current_datetime,  # Use the current datetime
+        'reserve_date': fullDateTime,
+        'status': 'Pending',
+        'message': f'Hey {student.firstname.title()}! Your reservation request is sent. Please wait for confirmation.'
+    }
+
+    # Call the reservation function
+    response = reservation.request_reservation(**reservation_data)
+
+    # Return the response to the frontend
+    return jsonify(response)
+
+
+@main.route('/api/reservation-history')
+def get_reservation_history():
+    """Fetch reservation history for the logged-in student"""
+    try:
+        global student
+
+        # Check if the student is logged in
+        if not session.get('student'):
+            return jsonify({
+                'success': False,
+                'message': 'Unauthorized access is prohibited.'
+            }), 401
+
+        # Initialize the student object if not already done
+        if student is None:
+            student = Student(**session.get('student'))
+
+        # Fetch reservation history for the student
+        response = reservation.retrieve_reservation_history(idno=student.idno)
+
+        if not response.get('success'):
+            return jsonify({
+                'success': False,
+                'message': response.get('message', 'Failed to fetch reservation history.')
+            }), 500
+
+        json_formatted_data = [
+            {
+                'reservation_id' : data['reservation_id'],
+                'idno': data['idno'],
+                'request_data': data['request_date'],
+                'reserve_date': data['reserve_date'],
+                'status':data['status'],
+                'message': data['message'],
+                'staff_idno': data['staff_idno'],
+                'purpose': data['purpose'],
+                'lab_id': data['lab_id'],
+            }
+            for data in response['data']
+        ]
+
+        # Return the reservation history
+        return jsonify({
+            'success': True,
+            'data': json_formatted_data,
+        })
+
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error in get_reservation_history: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'An internal server error occurred.'
+        }), 500

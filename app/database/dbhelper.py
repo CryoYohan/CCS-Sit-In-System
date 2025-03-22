@@ -71,6 +71,11 @@ class Databasehelper:
         """Retrieve session history"""
         query = f"SELECT * FROM sitin_record WHERE idno = ?"
         return self.getprocess(query, (idno,))
+    
+    def get_student_reservation_history(self,idno)->list:
+        """Retrieve Student Reservation History"""
+        query = f"SELECT * FROM reservation WHERE idno = ?"
+        return self.getprocess(query, (idno,))
 
     def find_record(self, table: str, idno: str):
         """Finds a specific record by idno."""
