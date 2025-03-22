@@ -652,7 +652,7 @@ def get_reservation_history():
             {
                 'reservation_id' : data['reservation_id'],
                 'idno': data['idno'],
-                'request_data': data['request_date'],
+                'request_date': data['request_date'],
                 'reserve_date': data['reserve_date'],
                 'status':data['status'],
                 'message': data['message'],
@@ -675,4 +675,36 @@ def get_reservation_history():
         return jsonify({
             'success': False,
             'message': 'An internal server error occurred.'
+        }), 500
+
+@main.route('/api/calendar-data', methods=['GET'])
+def get_calendar_data():
+    """Fetch calendar data for a specific year and month"""
+    try:
+        year = request.args.get('year', type=int)
+        month = request.args.get('month', type=int)
+
+        if not year or not month:
+            return jsonify({
+                'success': False,
+                'message': 'Year and month are required.'
+            }), 400
+
+        # Fetch calendar data from the database or another source
+        calendar_data = {
+            "2025-02-20": { "status": "available", "schedules": ["9am-10am", "1pm-2pm"] },
+            "2025-02-19": { "status": "available", "schedules": ["9am-10am", "1pm-2pm"] },
+            "2025-02-21": { "status": "full", "schedules": [] },
+            "2025-02-22": { "status": "closed", "schedules": [] }
+        }
+
+        return jsonify({
+            'success': True,
+            'data': calendar_data,
+        })
+    except Exception as e:
+        print("Error fetching calendar data:", str(e))
+        return jsonify({
+            'success': False,
+            'message': 'Failed to fetch calendar data.'
         }), 500
