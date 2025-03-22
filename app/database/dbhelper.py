@@ -69,7 +69,7 @@ class Databasehelper:
 
     def getall_sessionhistory(self, idno:str)->list:
         """Retrieve session history"""
-        query = f"SELECT sr.sitin_out, l.lab_name, sr.status, sr.sitin_out FROM sitin_reservation sr JOIN lab l ON l.lab_id = sr.lab_id WHERE sr.idno = ? AND sr.status= 'Completed'"
+        query = f"SELECT * FROM sitin_record WHERE idno = ?"
         return self.getprocess(query, (idno,))
 
     def find_record(self, table: str, idno: str):

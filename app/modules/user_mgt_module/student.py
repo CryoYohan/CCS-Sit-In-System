@@ -36,4 +36,17 @@ class Student(User):
             return {'success':True, 'student':student}
         except Exception as e:
             return {'success':False, 'error':str(e)}
+
+
+    def retrieve_student_sessions_history(self,idno:str):
+        """Retrieve all student sessions"""
+        try:
+            session_history =  self.db.getall_sessionhistory(idno=idno)
+            return {
+                'success':True,
+                'data': session_history,
+            }
+        except Exception as e:
+            return {'success':False, 'error':str(e)}
+
     

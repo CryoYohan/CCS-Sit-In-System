@@ -4,7 +4,9 @@
 <div class="container mx-auto p-6">
   <!-- Page Header -->
   <div class="mb-6">
-    <h1 class="text-3xl mb-4 font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">Remaining Lab Sessions</h1>
+    <h1
+      class="text-3xl mb-4 font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
+      Remaining Lab Sessions</h1>
     <p class="text-gray-600">Manage your laboratory reservations efficiently.</p>
   </div>
 
@@ -16,8 +18,11 @@
 
   <!-- Action Buttons -->
   <div class="flex space-x-4 mb-6">
-    <a href="{{ url_for('main.reserve') }}" class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">Reserve for Sit-in</a>
-    <a href="{{ url_for('main.profilesettings') }}" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">Reservation Records</a>
+    <a href="{{ url_for('main.reserve') }}"
+      class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">Reserve
+      for Sit-in</a>
+    <a href="{{ url_for('main.profilesettings') }}"
+      class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">Reservation Records</a>
   </div>
 
   <!-- Session History Table -->
@@ -26,23 +31,88 @@
     <table class="min-w-full bg-white">
       <thead>
         <tr>
-          <th class="py-2 px-4 border-b">Date</th>
-          <th class="py-2 px-4 border-b">Time</th>
-          <th class="py-2 px-4 border-b">Lab</th>
-          <th class="py-2 px-4 border-b">Status</th>
+          <th class="py-2 px-4 border-b text-center">ID Number</th>
+          <th class="py-2 px-4 border-b text-center">Sit-in Date/Time</th>
+          <th class="py-2 px-4 border-b text-center">Log-off Date/Time</th>
+          <th class="py-2 px-4 border-b text-center">Purpose</th>
+          <th class="py-2 px-4 border-b text-center">Sit-in By</th>
+          <th class="py-2 px-4 border-b text-center">Log-off By</th>
+          <th class="py-2 px-4 border-b text-center">Status</th>
+
         </tr>
       </thead>
-      <tbody>
-        {% for record in records %}
-        <tr>
-          <td class="py-2 px-4 border-b">{{ record['sitin_out'] }}</td>
-          <td class="py-2 px-4 border-b">10:00 AM - 12:00 PM</td>
-          <td class="py-2 px-4 border-b">Chemistry Lab</td>
-          <td class="py-2 px-4 border-b text-green-500">Confirmed</td>
-        </tr>
-        {% endfor %}
+      <tbody id="sessionHistoryTable">
+        <!--Session History dynamically inserted here-->
       </tbody>
     </table>
   </div>
 </div>
+
+<script>
+  async function renderSessionHistory() {
+    try {
+      // Fetch session history data from the server
+      const student_idno = '{{ student.idno }}';
+      const response = await fetch(`/api/session-records/${student_idno}`);
+
+      // Check if the response is OK (status code 200-299)
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const sessionHistoryTable = document.getElementById('sessionHistoryTable');
+      if (!sessionHistoryTable) {
+        throw new Error('Session history table element not found!');
+      }
+
+      // Clear existing rows (if any)
+      sessionHistoryTable.innerHTML = '';
+
+      // Populate the table with session data
+      data.forEach(session => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+                <td class="py-2 px-4 border-b text-center">${session.idno}</td>
+                <td class="py-2 px-4 border-b text-center">${formatDate(session.sitin_in)}</td> 
+                <td class="py-2 px-4 border-b text-center">${formatDate(session.sitin_out)}</td> 
+                <td class="py-2 px-4 border-b text-center">${session.reason}</td>
+                <td class="py-2 px-4 border-b text-center">${session.staff_idno}</td>
+                <td class="py-2 px-4 border-b text-center">${session.logged_off_by}</td>
+               <td class="py-2 px-4 border-b text-center">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${session.status === 'Completed' ? 'bg-gray-200 text-gray-800' : 'bg-blue-200 text-blue-800'
+          }">
+                    ${session.status}
+                  </span>
+                </td>
+            `;
+        sessionHistoryTable.appendChild(row);
+      });
+    } catch (error) {
+      // Display error message using SweetAlert2
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `Failed to load session history: ${error.message}`,
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderSessionHistory);
+
+  // Function to format the date
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    // Extract components
+    const month = date.toLocaleString('default', { month: 'long' }); // Full month name (e.g., "October")
+    const day = date.getDate(); // Day of the month (e.g., 5)
+    const year = date.getFullYear(); // Year (e.g., 2023)
+    const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); // Time (e.g., "02:30 PM")
+
+    // Format as "Month Day, Year, Time"
+    return `${month} ${day}, ${year}, ${time}`;
+  }
+</script>
 {% endblock %}

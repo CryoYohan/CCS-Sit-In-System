@@ -205,38 +205,10 @@ def sessions():
                 student_data = session.get('student')
                 student = Student(**student_data)
 
-            records = reservation.retrieve_sessionhistory(idno=student.idno)
+            return render_template('sessions.html', student=student,
+                                   user_in_login_page=True,
+                                   action='Logout')
 
-            return render_template('sessions.html', student=student,user_in_login_page=True,action='Logout', records=records)
-
-        else:
-            message = "Please login first."
-            flash(message)
-            return redirect(url_for('main.login'))
-        
-    except Exception as e:
-        flash(str(e),'error')
-        flash("Please try again")
-        #session['student'] = None
-        return redirect(url_for('main.login'))
-
-
-@main.route('/rulesregulations')
-def rulesregulations():
-    global student
-    try:
-
-        if not session['student'] == None:
-            if student == None:
-                student_data = session.get('student')
-                student = Student(**student_data)
-            return render_template(
-                                    'rulesregulations.html', 
-                                    student=student,
-                                    user_in_login_page=True,
-                                    action='Logout'
-                                   )
-         
         else:
             message = "Please login first."
             flash(message)
@@ -549,3 +521,39 @@ def get_announcements():
             'message': response['message']
         })
     
+
+@main.route('/api/session-records/<idno>')
+def get_session_records(idno):
+    """FETCH ALL SESSION RECORDS"""
+    global student
+    if not session.get('student'):
+        return jsonify({
+            'success': False,
+            'message': 'Unauthorized access is prohibited.'
+        }), 401
+    
+    if student is None:
+        student = Student(**session.get('student'))
+
+    response = student.retrieve_student_sessions_history(idno=idno)
+    if response['success']:
+        print(response['data'])
+
+        json_formatted_data =[ {
+            'idno': data['idno'],
+            'sitin_in': data['sitin_in'],
+            'sitin_out': data['sitin_out'],
+            'reason':data['reason'],
+            'staff_idno': data['staff_idno'],
+            'logged_off_by': data['logged_off_by'],
+            'status': data['status'],
+        }
+        for data in response['data']
+        ]
+        return jsonify(json_formatted_data)
+    else:
+        print(response['error'])
+        return jsonify({
+            'success': False,
+            'message': response['error']
+        })
