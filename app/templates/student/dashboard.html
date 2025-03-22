@@ -74,7 +74,7 @@
                             </div>
                         </a>
                         <a class="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white"
-                            href="#">
+                            href="{{ url_for('main.sessions') }}">
                             <div class="p-5">
                                 <div class="flex justify-between">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-pink-600" fill="none"
@@ -91,9 +91,10 @@
                                 </div>
                                 <div class="ml-2 w-full flex-1">
                                     <div>
-                                        <div class="mt-3 text-3xl font-bold leading-8">49</div>
-
-                                        <div class="mt-1 text-base text-gray-600">Total Hours</div>
+                                        <div class="mt-3 text-3xl font-bold leading-8">
+                                            <p id="total-sitins">Loading...</p>
+                                        </div>
+                                        <div class="mt-1 text-base text-gray-600">Total Sit-ins</div>
                                     </div>
                                 </div>
                             </div>
@@ -208,6 +209,51 @@
 <script>
     // Fetch announcements when the page loads
     document.addEventListener('DOMContentLoaded', fetchAnnouncements1);
+
+    document.addEventListener('DOMContentLoaded', fetchTotalSitins);
+
+    async function fetchTotalSitins() {
+        try {
+            const student_idno = '{{ student.idno }}'; // Ensure this is correctly populated
+            const response = await fetch(`/api/session-records/${student_idno}`, {
+                credentials: 'include', // Include cookies in the request
+            });
+
+            // Handle unauthorized access
+            if (response.status === 401) {
+                window.location.href = '/login'; // Redirect to login page
+                return;
+            }
+
+            // Handle other HTTP errors
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            // Parse the response as JSON
+            const data = await response.json();
+
+            // Check if the response is an array (or has a `data` property)
+            if (Array.isArray(data)) {
+                const totalSitinsCount = data.length; // Get the count of sit-ins
+                document.getElementById('total-sitins').textContent = totalSitinsCount;
+            } else if (data.success && Array.isArray(data.data)) {
+                // If the response has a `data` property
+                const totalSitinsCount = data.data.length;
+                document.getElementById('total-sitins').textContent = totalSitinsCount;
+            } else {
+                // Handle invalid response format
+                throw new Error('Invalid response format from the server');
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to fetch total sit-ins. Please try again later.',
+            });
+        }
+    }
 
     async function fetchAnnouncements1() {
         try {
