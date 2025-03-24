@@ -49,12 +49,13 @@
         <!-- Right Side: Reservation History -->
         <div class="flex-1 bg-white shadow-md rounded-lg p-6">
             <h3 class="text-xl font-semibold text-gray-700 mb-4">Reservation History</h3>
-            <div class="overflow-y-auto max-h-[calc(100vh-200px)]"> <!-- Adjust height as needed -->
+            <div class="overflow-y-auto max-h-[calc(100vh-400px)]"> <!-- Adjust height as needed -->
                 <div class="flex space-x-2 mb-4">
                     <button id="filterPending" class="px-4 py-2 bg-yellow-300 rounded-md">Pending</button>
                     <button id="filterApproved" class="px-4 py-2 bg-green-200 rounded-md">Approved</button>
                     <button id="filterDenied" class="px-4 py-2 bg-red-200 rounded-md">Denied</button>
-                    <button id="clearFilter" class="px-4  py-2 bg-gray-200 rounded-md">Clear</button>
+                    <button id="filterCancelled" class="px-4 py-2 bg-gray-300 rounded-md">Cancelled</button>
+                    <button id="filterClear" class="px-4 py-2 bg-blue-200 rounded-md">Clear Filter</button>
                 </div>
                 <table class="min-w-full bg-white">
                     <thead>
@@ -135,81 +136,23 @@
     let calendarData = {}; // Initialize as an empty object
     let reservations = []; // Store the user's reservations
 
-    // Function to fetch and populate reservation history
-    async function fetchReservationHistory(filterStatus = 'Pending') {
+    let allReservations = []; // Store all reservations for filtering
+
+    async function fetchReservationHistory(filterStatus = null) {
         try {
+            // Fetch all reservations from the backend
             const response = await fetch('/api/reservation-history');
             const result = await response.json();
 
             if (result.success) {
-                const reservations = result.data;
-                const reservationHistoryTable = document.getElementById('reservationHistoryTable');
-                reservationHistoryTable.innerHTML = ''; // Clear existing rows
+                // Store all reservations for filtering
+                allReservations = result.data;
 
                 // Filter reservations based on status
-                const filteredReservations = reservations.filter(reservation => reservation.status === filterStatus);
+                const filteredReservations = filterStatus ? allReservations.filter(reservation => reservation.status === filterStatus) : allReservations;
 
-                // Sort reservations: Pending first, then Approved, then Denied
-                const sortedReservations = reservations.sort((a, b) => {
-                    const statusOrder = { 'Pending': 1, 'Approved': 2, 'Denied': 3 };
-                    return statusOrder[a.status] - statusOrder[b.status];
-                });
-
-                sortedReservations.forEach(reservation => {
-                    const row = document.createElement('tr');
-                    row.className = 'cursor-pointer hover:bg-gray-100';
-                    row.setAttribute('data-reservation', JSON.stringify(reservation)); // Store reservation data
-
-                    // Reservation ID
-                    const reservationIdCell = document.createElement('td');
-                    reservationIdCell.className = 'py-2 px-4 border-b text-center';
-                    reservationIdCell.textContent = reservation.reservation_id;
-                    row.appendChild(reservationIdCell);
-
-                    // Request Date
-                    const requestDateCell = document.createElement('td');
-                    requestDateCell.className = 'py-2 px-4 border-b text-center';
-                    requestDateCell.textContent = formatDate(reservation.request_date);
-                    row.appendChild(requestDateCell);
-
-                    // Reserve Date
-                    const reserveDateCell = document.createElement('td');
-                    reserveDateCell.className = 'py-2 px-4 border-b text-center';
-                    reserveDateCell.textContent = formatDate(reservation.reserve_date);
-                    row.appendChild(reserveDateCell);
-
-                    // Purpose
-                    const purposeCell = document.createElement('td');
-                    purposeCell.className = 'py-2 px-4 border-b text-center';
-                    purposeCell.textContent = reservation.purpose;
-                    row.appendChild(purposeCell);
-
-                    // Status
-                    const statusCell = document.createElement('td');
-                    statusCell.className = 'py-2 px-4 border-b text-center';
-                    const statusBadge = document.createElement('span');
-                    statusBadge.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                        reservation.status === 'Pending' ? 'bg-yellow-300' :
-                        reservation.status === 'Approved' ? 'bg-green-200 text-green-800' :
-                        reservation.status === 'Denied' ? 'bg-red-200 text-red-800' :
-                        'bg-gray-300 text-gray-800' // Cancelled
-                    }`;
-                    statusBadge.textContent = reservation.status;
-                    statusCell.appendChild(statusBadge);
-                    row.appendChild(statusCell);
-
-                    // Staff ID
-                    const staffIdCell = document.createElement('td');
-                    staffIdCell.className = 'py-2 px-4 border-b text-center';
-                    staffIdCell.textContent = reservation.staff_idno || '-'; // Use '-' if staff_idno is null
-                    row.appendChild(staffIdCell);
-
-                    // Append the row to the table
-                    reservationHistoryTable.appendChild(row);
-                });
-
-                // Add click event listeners to rows
-                addRowClickListeners();
+                // Populate the table with filtered reservations
+                populateReservationTable(filteredReservations);
             } else {
                 // Show error message using SweetAlert2
                 Swal.fire({
@@ -231,10 +174,83 @@
         }
     }
 
+    function populateReservationTable(reservations) {
+        const reservationHistoryTable = document.getElementById('reservationHistoryTable');
+        reservationHistoryTable.innerHTML = ''; // Clear existing rows
+
+        // Populate the table with reservations
+        reservations.forEach(reservation => {
+            const row = document.createElement('tr');
+            row.className = 'cursor-pointer hover:bg-gray-100';
+            row.setAttribute('data-reservation', JSON.stringify(reservation));
+
+            // Reservation ID
+            const reservationIdCell = document.createElement('td');
+            reservationIdCell.className = 'py-2 px-4 border-b text-center';
+            reservationIdCell.textContent = reservation.reservation_id;
+            row.appendChild(reservationIdCell);
+
+            // Request Date
+            const requestDateCell = document.createElement('td');
+            requestDateCell.className = 'py-2 px-4 border-b text-center';
+            requestDateCell.textContent = formatDate(reservation.request_date);
+            row.appendChild(requestDateCell);
+
+            // Reserve Date
+            const reserveDateCell = document.createElement('td');
+            reserveDateCell.className = 'py-2 px-4 border-b text-center';
+            reserveDateCell.textContent = formatDate(reservation.reserve_date);
+            row.appendChild(reserveDateCell);
+
+            // Purpose
+            const purposeCell = document.createElement('td');
+            purposeCell.className = 'py-2 px-4 border-b text-center';
+            purposeCell.textContent = reservation.purpose;
+            row.appendChild(purposeCell);
+
+            // Status
+            const statusCell = document.createElement('td');
+            statusCell.className = 'py-2 px-4 border-b text-center';
+            const statusBadge = document.createElement('span');
+            statusBadge.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                reservation.status === 'Pending' ? 'bg-yellow-300' :
+                reservation.status === 'Approved' ? 'bg-green-200 text-green-800' :
+                reservation.status === 'Denied' ? 'bg-red-200 text-red-800' :
+                reservation.status === 'Cancelled' ? 'bg-gray-300 text-gray-800' :
+                'bg-blue-200 text-blue-800' // Default
+            }`;
+            statusBadge.textContent = reservation.status;
+            statusCell.appendChild(statusBadge);
+            row.appendChild(statusCell);
+
+            // Staff ID
+            const staffIdCell = document.createElement('td');
+            staffIdCell.className = 'py-2 px-4 border-b text-center';
+            staffIdCell.textContent = reservation.staff_idno || '-'; // Use '-' if staff_idno is null
+            row.appendChild(staffIdCell);
+
+            // Append the row to the table
+            reservationHistoryTable.appendChild(row);
+        });
+
+        // Add click event listeners to rows
+        addRowClickListeners();
+    }
+
     // Add filter buttons
-    document.getElementById('filterPending').addEventListener('click', () => fetchReservationHistory('Pending'));
-    document.getElementById('filterApproved').addEventListener('click', () => fetchReservationHistory('Approved'));
-    document.getElementById('filterDenied').addEventListener('click', () => fetchReservationHistory('Denied'));
+    document.getElementById('filterPending').addEventListener('click', () => filterReservations('Pending'));
+    document.getElementById('filterApproved').addEventListener('click', () => filterReservations('Approved'));
+    document.getElementById('filterDenied').addEventListener('click', () => filterReservations('Denied'));
+    document.getElementById('filterCancelled').addEventListener('click', () => filterReservations('Cancelled'));
+    document.getElementById('filterClear').addEventListener('click', () => filterReservations(null));
+
+    function filterReservations(filterStatus) {
+        // Filter reservations based on status
+        const filteredReservations = filterStatus ? allReservations.filter(reservation => reservation.status === filterStatus) : allReservations;
+
+        // Populate the table with filtered reservations
+        populateReservationTable(filteredReservations);
+    }
 
     // Call the function to fetch and populate reservation history
     fetchReservationHistory();
@@ -318,6 +334,7 @@
                     confirmButtonText: 'OK',
                 }).then(() => {
                     fetchReservationHistory(); // Refresh the table
+                    generateCalendar(currentYear, currentMonth); // Refresh the calendar
                 });
             } else {
                 Swal.fire({

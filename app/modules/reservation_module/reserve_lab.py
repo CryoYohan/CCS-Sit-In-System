@@ -106,4 +106,17 @@ class Reservation():
             # Log the error for debugging
             print(f"Error in retrieve_reservation_history: {str(e)}")
             return {'success': False, 'message': 'An error occurred while fetching reservation history.'}
+        
+
+    def retrieve_reservations_by_status(self, status):
+        """Retrieve all reservations by status"""
+        try:
+            # Fetch reservations by status from the database
+            reservations = self.db.get_reservations_by_status(status=status)
+            return {'success': True, 'data': reservations}
+
+        except Exception as e:
+            # Log the error for debugging
+            print(f"Error in retrieve_reservations_by_status: {str(e)}")
+            return {'success': False, 'message': 'An error occurred while fetching reservations.'}
     
