@@ -81,6 +81,11 @@ class Databasehelper:
         """Finds a specific record by idno."""
         sql = f"SELECT * FROM {table} WHERE idno = ?"
         return self.getprocess(sql, (idno,))
+    
+    def find_reservation(self, reservation_id: str):
+        """Finds a specific record by reservation_id."""
+        sql = f"SELECT * FROM reservation WHERE reservation_id = ?"
+        return self.getprocess(sql, (reservation_id,))
 
     def add_record(self, table:str, **kwargs):
         """Adds a new record to a table."""

@@ -440,6 +440,9 @@
 
     async function clearFilter() {
         const tableBody = document.getElementById('userTableBody');
+        const searchBar = document.getElementById('search-user');
+
+        searchBar.value = '';
         tableBody.innerHTML = '';
 
         const response = await fetch("{{ url_for('admin.api_users') }}")

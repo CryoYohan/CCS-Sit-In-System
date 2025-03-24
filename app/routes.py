@@ -708,3 +708,28 @@ def get_calendar_data():
             'success': False,
             'message': 'Failed to fetch calendar data.'
         }), 500
+    
+
+@main.route('/api/cancel-reservation/<reservation_id>', methods=['GET', 'POST'])
+def cancel_reservation_student(reservation_id):
+    """Cancel Reservation"""
+    global student
+    if not session.get('student'):
+        return jsonify({
+            'success': False,
+            'message': 'Unauthorized access is prohibited.'
+        }), 401
+
+    if student is None:
+        student = Student(**session.get('student'))
+
+    if not reservation_id:
+        return jsonify({
+            'success': False,
+            'message': 'Reservation ID is required.'
+        }), 400
+
+    # Call the cancel_reservation method
+    response = reservation.cancel_reservation(reservation_id=reservation_id, idno=student.idno)
+
+    return jsonify(response)

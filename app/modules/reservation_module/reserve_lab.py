@@ -48,14 +48,49 @@ class Reservation():
     def request_reservation(self, **kwargs):
         """Request a reservation"""
         try:
-            already_reserved = self.db.find_record('reservation', kwargs.get('idno'))
-            if already_reserved:
-                return {'success':False, 'message': 'You already made a reservation. Cancel current reservation to reserve again.'}
+            # Fetch all reservations for the student
+            student_reservations = self.db.find_record('reservation', idno=kwargs.get('idno'))
+            print("All Reservations:", student_reservations)  # Debugging
+
+            # Check if the student has any Pending or Approved reservations
+            active_reservations = [
+                reservation for reservation in student_reservations
+                if reservation['status'] in ['Pending', 'Approved']  # Access 'status' directly
+            ]
+            print("Active Reservations:", active_reservations)  # Debugging
+
+            if active_reservations:
+                return {'success': False, 'message': 'You already have an active reservation. Cancel it to reserve again.'}
             else:
+                # Add the new reservation
                 self.db.add_record(table='reservation', **kwargs)
-                return {'success':True}
+                return {'success': True}
         except Exception as e:
-            return {'success':False, 'error':str(e)}
+            return {'success': False, 'error': str(e)}
+        
+
+    def cancel_reservation(self, **kwargs):
+        """Cancel a reservation"""
+        print(f"RESERVATION ID FROM KWARGS {kwargs.get('reservation_id')}")
+        try:
+            # Fetch the reservation to cancel
+            reservation = self.db.find_reservation(reservation_id=kwargs.get('reservation_id'))
+            print("Reservation to Cancel:", reservation)  # Debugging
+
+            if not reservation:
+                return {'success': False, 'message': 'Reservation not found.'}
+            else:
+                # Update the reservation status to 'Cancelled'
+                self.db.update_record(
+                    table='reservation',
+                    reservation_id=kwargs.get('reservation_id'),
+                    status='Cancelled'
+                )
+                return {'success': True}
+        except Exception as e:
+            print("Error canceling reservation:", e)  # Debugging
+            return {'success': False, 'error': str(e)}
+
 
     def retrieve_reservation_history(self, idno):
         """Retrieve all reservation history for a student"""

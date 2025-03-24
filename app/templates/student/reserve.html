@@ -50,9 +50,16 @@
         <div class="flex-1 bg-white shadow-md rounded-lg p-6">
             <h3 class="text-xl font-semibold text-gray-700 mb-4">Reservation History</h3>
             <div class="overflow-y-auto max-h-[calc(100vh-200px)]"> <!-- Adjust height as needed -->
+                <div class="flex space-x-2 mb-4">
+                    <button id="filterPending" class="px-4 py-2 bg-yellow-300 rounded-md">Pending</button>
+                    <button id="filterApproved" class="px-4 py-2 bg-green-200 rounded-md">Approved</button>
+                    <button id="filterDenied" class="px-4 py-2 bg-red-200 rounded-md">Denied</button>
+                    <button id="clearFilter" class="px-4  py-2 bg-gray-200 rounded-md">Clear</button>
+                </div>
                 <table class="min-w-full bg-white">
                     <thead>
                         <tr>
+                            <th class="py-2 px-4 border-b text-center">Reservation ID</th>
                             <th class="py-2 px-4 border-b text-center">Request Date</th>
                             <th class="py-2 px-4 border-b text-center">Reservation Date</th>
                             <th class="py-2 px-4 border-b text-center">Purpose</th>
@@ -128,8 +135,8 @@
     let calendarData = {}; // Initialize as an empty object
     let reservations = []; // Store the user's reservations
 
-    // Function to fetch reservation history and populate the table
-    async function fetchReservationHistory() {
+    // Function to fetch and populate reservation history
+    async function fetchReservationHistory(filterStatus = 'Pending') {
         try {
             const response = await fetch('/api/reservation-history');
             const result = await response.json();
@@ -139,8 +146,25 @@
                 const reservationHistoryTable = document.getElementById('reservationHistoryTable');
                 reservationHistoryTable.innerHTML = ''; // Clear existing rows
 
-                reservations.forEach(reservation => {
+                // Filter reservations based on status
+                const filteredReservations = reservations.filter(reservation => reservation.status === filterStatus);
+
+                // Sort reservations: Pending first, then Approved, then Denied
+                const sortedReservations = reservations.sort((a, b) => {
+                    const statusOrder = { 'Pending': 1, 'Approved': 2, 'Denied': 3 };
+                    return statusOrder[a.status] - statusOrder[b.status];
+                });
+
+                sortedReservations.forEach(reservation => {
                     const row = document.createElement('tr');
+                    row.className = 'cursor-pointer hover:bg-gray-100';
+                    row.setAttribute('data-reservation', JSON.stringify(reservation)); // Store reservation data
+
+                    // Reservation ID
+                    const reservationIdCell = document.createElement('td');
+                    reservationIdCell.className = 'py-2 px-4 border-b text-center';
+                    reservationIdCell.textContent = reservation.reservation_id;
+                    row.appendChild(reservationIdCell);
 
                     // Request Date
                     const requestDateCell = document.createElement('td');
@@ -164,10 +188,12 @@
                     const statusCell = document.createElement('td');
                     statusCell.className = 'py-2 px-4 border-b text-center';
                     const statusBadge = document.createElement('span');
-                    statusBadge.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${reservation.status === 'Pending' ? 'bg-yellow-300' :
+                    statusBadge.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                        reservation.status === 'Pending' ? 'bg-yellow-300' :
                         reservation.status === 'Approved' ? 'bg-green-200 text-green-800' :
-                            'bg-red-200 text-red-800' // Denied
-                        }`;
+                        reservation.status === 'Denied' ? 'bg-red-200 text-red-800' :
+                        'bg-gray-300 text-gray-800' // Cancelled
+                    }`;
                     statusBadge.textContent = reservation.status;
                     statusCell.appendChild(statusBadge);
                     row.appendChild(statusCell);
@@ -181,6 +207,9 @@
                     // Append the row to the table
                     reservationHistoryTable.appendChild(row);
                 });
+
+                // Add click event listeners to rows
+                addRowClickListeners();
             } else {
                 // Show error message using SweetAlert2
                 Swal.fire({
@@ -202,8 +231,114 @@
         }
     }
 
+    // Add filter buttons
+    document.getElementById('filterPending').addEventListener('click', () => fetchReservationHistory('Pending'));
+    document.getElementById('filterApproved').addEventListener('click', () => fetchReservationHistory('Approved'));
+    document.getElementById('filterDenied').addEventListener('click', () => fetchReservationHistory('Denied'));
+
     // Call the function to fetch and populate reservation history
     fetchReservationHistory();
+
+    // Function to add click event listeners to table rows
+    function addRowClickListeners() {
+        const rows = document.querySelectorAll('#reservationHistoryTable tr');
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                const reservation = JSON.parse(row.getAttribute('data-reservation'));
+                openReservationModal(reservation);
+            });
+        });
+    }
+
+    function openReservationModal(reservation) {
+        if (reservation.status === 'Pending') {
+            Swal.fire({
+                title: 'Cancel Reservation?',
+                text: `You have a pending reservation on ${formatDate(reservation.reserve_date)}. Do you want to cancel it?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, cancel',
+                cancelButtonText: 'No, keep it',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    cancelReservation(reservation);
+                }
+            });
+        } else if (reservation.status === 'Approved') {
+            Swal.fire({
+                title: 'Reservation Details',
+                html: `
+                    <div class="text-left">
+                        <p><strong>Reservation ID:</strong> ${reservation.reservation_id}</p>
+                        <p><strong>Request Date:</strong> ${formatDate(reservation.request_date)}</p>
+                        <p><strong>Reserve Date:</strong> ${formatDate(reservation.reserve_date)}</p>
+                        <p><strong>Purpose:</strong> ${reservation.purpose}</p>
+                        <p><strong>Status:</strong> ${reservation.status}</p>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: 'Close',
+            });
+        } else if (reservation.status === 'Denied') {
+            Swal.fire({
+                title: 'Reservation Denied',
+                html: `
+                    <div class="text-left">
+                        <p><strong>Reservation ID:</strong> ${reservation.reservation_id}</p>
+                        <p><strong>Request Date:</strong> ${formatDate(reservation.request_date)}</p>
+                        <p><strong>Reserve Date:</strong> ${formatDate(reservation.reserve_date)}</p>
+                        <p><strong>Purpose:</strong> ${reservation.purpose}</p>
+                        <p><strong>Status:</strong> ${reservation.status}</p>
+                        <p><strong>Reason for Denial:</strong> ${reservation.message || 'No reason provided.'}</p>
+                    </div>
+                `,
+                icon: 'error',
+                confirmButtonText: 'Close',
+            });
+        }
+    }
+
+    // Function to cancel a reservation
+    async function cancelReservation(reservation) {
+        try {
+            const response = await fetch(`/api/cancel-reservation/${reservation.reservation_id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: reservation.id }), // Send reservation ID
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Reservation Canceled',
+                    text: 'Your reservation has been canceled.',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    fetchReservationHistory(); // Refresh the table
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message || 'Failed to cancel the reservation.',
+                    confirmButtonText: 'OK',
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while canceling the reservation. Please try again.',
+                confirmButtonText: 'OK',
+            });
+        }
+    }
+
+
 
     // Function to fetch calendar data
     async function fetchCalendarData(year, month) {
@@ -221,31 +356,31 @@
     }
 
     async function fetchReservations() {
-        try {
-            const response = await fetch('/api/reservation-history');
-            const result = await response.json();
-            if (result.success) {
-                reservations = result.data; // Store the reservations
-                console.log('Fetched reservations:', reservations); // Log the reservations
-                markReservedDates(); // Mark reserved dates after fetching
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: result.message || 'Failed to fetch reservation history.',
-                    confirmButtonText: 'OK',
-                });
-            }
-        } catch (error) {
-            console.error('Error:', error);
+    try {
+        const response = await fetch('/api/reservation-history');
+        const result = await response.json();
+        if (result.success) {
+            reservations = result.data; // Store the reservations
+            console.log('Fetched reservations:', reservations); // Log the reservations
+            markReservedDates(); // Mark reserved dates after fetching (excluding Denied)
+        } else {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Failed to fetch reservation history. Please try again.',
+                text: result.message || 'Failed to fetch reservation history.',
                 confirmButtonText: 'OK',
             });
         }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to fetch reservation history. Please try again.',
+            confirmButtonText: 'OK',
+        });
     }
+}
 
     // Function to format the date
     function formatDate(dateString) {
@@ -262,22 +397,29 @@
     }
 
     function markReservedDate(date, status) {
-        const calendarDays = document.querySelectorAll('.calendar-day');
-        calendarDays.forEach(day => {
-            if (day.getAttribute('data-date') === date) {
-                // Add a colored circle to the day
-                const circle = document.createElement('div');
-                circle.className = `w-3 h-3 rounded-full ${status === 'Pending' ? 'bg-yellow-400' :
-                    status === 'Approved' ? 'bg-green-400' :
-                        'bg-red-400' // Denied
-                    }`;
+    const calendarDays = document.querySelectorAll('.calendar-day');
+    calendarDays.forEach(day => {
+        if (day.getAttribute('data-date') === date) {
+            // Add a colored circle to the day
+            const circle = document.createElement('div');
+            circle.className = `w-3 h-3 rounded-full ${status === 'Pending' ? 'bg-yellow-400' :
+                status === 'Approved' ? 'bg-green-400' :
+                    '' // No circle for Denied
+                }`;
+            if (circle.className) { // Only append if the circle has a class (i.e., not Denied)
                 day.appendChild(circle);
             }
-        });
-    }
+        }
+    });
+}
 
     function markReservedDates() {
         reservations.forEach(reservation => {
+            // Skip marking the date if the status is "Denied"
+            if (reservation.status === 'Denied') {
+                return; // Skip this reservation
+            }
+
             const date = reservation.reserve_date.split(' ')[0]; // Extract the date part (YYYY-MM-DD)
             markReservedDate(date, reservation.status);
         });
@@ -314,7 +456,7 @@
             calendar.appendChild(dayElement);
         }
 
-        // Mark reserved dates after the calendar is fully generated
+        // Mark reserved dates after the calendar is fully generated (excluding Denied)
         markReservedDates();
     }
 
@@ -378,6 +520,9 @@
                             text: 'Reservation submitted successfully!',
                             confirmButtonText: 'OK',
                         });
+                        
+                        // Reload the reservation history
+                        fetchReservationHistory();
 
                         // Mark the reserved date on the calendar
                         markReservedDate(selectedDate, data.status || 'Pending');
