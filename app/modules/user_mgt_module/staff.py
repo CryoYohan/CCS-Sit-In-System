@@ -1,7 +1,7 @@
 from .user import User
 
 class Staff(User):
-    def __init__(self, idno:str, firstname:str, middlename:str, lastname:str, image:str, email:str,course:str=None,year:int=None, role="Staff"):
+    def __init__(self, idno:str, firstname:str, lastname:str, image:str, email:str,course:str=None,year:int=None, role="Staff",middlename:str='N/A'):
         super().__init__(idno,firstname,middlename,lastname,email)
         self.role = role    
         self.course = course

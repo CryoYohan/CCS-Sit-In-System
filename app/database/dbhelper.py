@@ -48,8 +48,8 @@ class Databasehelper:
 
     def getall_records_rolebased(self,role:str)->list:
         """Retrieves all staff"""
-        query = f"SELECT * FROM user WHERE role = '{role}' ORDER BY lastname"
-        return self.getprocess(query)
+        query = "SELECT * FROM user WHERE role = ? ORDER BY lastname"
+        return self.getprocess(query, (role,))
 
 
     def getall_sitinrecords(self)->list:
@@ -90,7 +90,7 @@ class Databasehelper:
     def get_reservations_by_status(self, status):
         """Fetch reservations by status"""
         query = "SELECT * FROM reservation WHERE status = ?"
-        return self.execute_query(query, (status,))
+        return self.getprocess(query, (status,))
 
     def add_record(self, table:str, **kwargs):
         """Adds a new record to a table."""

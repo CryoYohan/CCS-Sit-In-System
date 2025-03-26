@@ -143,6 +143,26 @@ def adminrecords():
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
+    
+
+@admin.route('/admin_reservation_requests')
+def admin_reservation_requests():
+    """Reservation Requests"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        return render_template(
+                                'reservation_requests.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account,
+                                )
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
 
 @admin.route('/adminusermgt')
 def adminusermgt():
@@ -395,7 +415,35 @@ def sitinrecords():
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
+    
+@admin.route("/api/reservations")
+def get_pending_reservations():
+    """API to retrieve all reservations"""
+    global admin_account
 
+    if session.get('admin'):
+        if admin_account is None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        reservations = admin_account.retrieve_all_pending_reservations()
+
+        # Convert objects to dictionaries
+        reservations_list = []
+        for reservation in reservations:
+            reservations_list.append({
+                "reservation_id": reservation["reservation_id"],
+                "idno": reservation["idno"],
+                "lab_id": reservation["lab_id"],
+                "reserve_date": reservation["reserve_date"],
+                "request_date": reservation["request_date"],
+                "status": reservation["status"]
+            })
+
+        return jsonify(reservations_list)
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
  
 @admin.route('/admin_editstudent', methods=['POST'])
 def admin_editstudent():
@@ -584,7 +632,6 @@ def delete_announcement(post_id):
     # Return the response
     return jsonify(response)
 
-
 @admin.route('/sitin_student', methods=['POST'])
 def sitin_student():
     """Sit In Student"""
@@ -638,9 +685,11 @@ def addstaff():
         if password != confirmpassword:
             flash('Password do not match', 'error')
             return redirect(url_for('admin.adminusermgt'))
+        
+        
 
 
-        staff = Staff(**{k: v for k, v in staff_data.items()})
+        staff = Staff(**{k: v for k, v in staff_data.items() if v != ''})
         print(staff.__dict__)
 
         response = admin_account.add_staff(**staff.__dict__,password=password)
@@ -654,6 +703,10 @@ def addstaff():
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
+    
+
+
+
 
 
 
