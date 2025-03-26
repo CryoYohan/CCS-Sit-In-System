@@ -45,6 +45,10 @@ class Admin(User):
     def retrieve_all_current_sitins(self):
         """ Retrieve all students who currently in lab"""
         return self.db.retrieve_all_current_sitins()
+    
+    def retrieve_all_pending_reservations(self):
+        """Retrieve all reservations"""
+        return self.db.get_reservations_by_status(status='Pending')
 
     def get_announcements_for_students(self):
         """Retrieve all announcements from DB"""
