@@ -67,6 +67,14 @@ class Admin(User):
             return {'success': True} 
         except Exception as e:
             return {'success': False, 'error': str(e)}
+        
+    def get_announcement(self, post_id):
+        """Get a specific announcement"""
+        try:
+            announcement = self.db.find_announcement(post_id=post_id)
+            return {'success': True, 'data': announcement}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
 
     def delete_announcement(self,post_id):
         """Delete a announcement"""
@@ -76,6 +84,14 @@ class Admin(User):
             return {'success': True}
         except Exception as e:
             print(f'Cannot Delete the announcement\n{str(e)}')
+            return {'success': False, 'message': str(e)}
+        
+    def update_announcement(self, **kwargs):
+        """Update an announcement"""
+        try:
+            self.db.update_record(table='announcement',**kwargs)
+            return {'success': True}
+        except Exception as e:
             return {'success': False, 'message': str(e)}
 
     

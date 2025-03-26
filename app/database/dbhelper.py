@@ -41,6 +41,11 @@ class Databasehelper:
         query = f"SELECT * FROM announcement ORDER BY date_posted DESC"
         return self.getprocess(query)
     
+    def find_announcement(self, post_id: str):
+        """Finds a specific announcement by post_id."""
+        sql = f"SELECT * FROM announcement WHERE post_id = ?"
+        return self.getprocess(sql, (post_id,))
+    
     def get_all_users(self)->list:
         """Retrieves all records from a specified table."""
         query = f"SELECT * FROM user WHERE role <> 'Admin'"

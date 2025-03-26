@@ -601,11 +601,77 @@ def editAnnoucement(post_id):
         if admin_account == None:
             admin_account = Admin(**session.get('admin'))
 
-        post_title = request.form['editTitle']
-        post_description = request.form['editDescription']
+        announcement = admin_account.get_announcement(post_id=post_id)
+
+        # In your Flask route
+        if announcement['success'] and announcement['data']:
+            # Assuming you only want the first announcement if multiple exist
+            data = announcement['data'][0]
+            return jsonify({
+                'post_id': data['post_id'],
+                'post_title': data['post_title'],
+                'post_description': data['post_description'],
+                'image': data['image'],
+                'posted_by': data['posted_by'],
+                'date_posted': data['date_posted'],
+            })
+        else:
+            return jsonify({'success': False, 'message': announcement['message']}), 400
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
+    
+@admin.route('/api/<post_id>/update', methods=['POST'])
+def update_announcement_one(post_id):
+    """Update an existing announcement"""
+    global admin_account
+    if not session.get('admin'):
+        flash('Unauthorized Access', 'error')
+        return redirect(url_for('admin.adminlogin'))
+    
+    try:
+        # Initialize admin account
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
+
+        # Get form data using same pattern as working announce() route
+        update_data = {
+            "post_title": request.form['editTitle'],  # Match form field name
+            "post_description": request.form['editDescription'],
+            "posted_by": admin_account.idno,
+            "date_posted": datetime.now(),
+        }
+
+        # Handle file upload like in announce()
+        if 'editPhoto' in request.files:  # Match file input name
+            file = request.files['editPhoto']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                upload_folder = os.path.abspath(os.path.join(
+                    current_app.root_path, 
+                    "static/images/announcements"
+                ))
+                
+                # Create directory if missing
+                os.makedirs(upload_folder, exist_ok=True)
+                
+                filepath = os.path.join(upload_folder, filename)
+                file.save(filepath)
+                update_data['image'] = filename
+
+        # Update using same pattern as add_announcement
+        response = admin_account.update_announcement(
+            post_id=post_id,
+            **{k: v for k, v in update_data.items() if v is not None}
+        )
+        
+        if response['success']:
+            return jsonify({'success': True, 'message': 'Updated'})
+        else:
+            return jsonify({'success': False, 'message': response['message']}), 400
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 50
 
     
 @admin.route('/api/announcements/<post_id>', methods=['DELETE'])
