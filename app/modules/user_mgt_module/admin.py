@@ -98,6 +98,18 @@ class Admin(User):
     def retrieve_all_sitinrecords(self):
         """Retrieve all Joined Sitin Records"""
         return self.db.getall_sitinrecords()
+
+    
+    def approve_reservation(self,reservation_id,admin):
+        """Approve a reservation"""
+        try:
+            reservation = self.db.find_reservation_info(reservation_id=reservation_id)
+            today = datetime.now()
+            message = f'Hey {reservation[0]["firstname"]}! Your reservation has been approved. Please proceed to the lab at {reservation[0]["lab_id"]} on {reservation[0]["reserve_date"]}.'
+            self.db.update_record(table='reservation',reservation_id=reservation_id,status='Approved',message=message, staff_idno=admin.idno, approved_on=today)
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'message': f'Approving Reservation ERRROR: {str(e)}'}
     
     def sit_in_student(self,**kwargs):
         """Sit in a student"""

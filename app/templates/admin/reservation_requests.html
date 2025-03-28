@@ -19,25 +19,27 @@
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-600 mb-2">Search Requests</label>
-                <input type="text" placeholder="Search by ID, name, or lab..." 
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                <input type="text" placeholder="Search by ID, name, or lab..."
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
             </div>
-            
+
             <!-- Filter by Status -->
             <div>
                 <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Status</label>
-                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                <select
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                     <option>All</option>
                     <option>Pending</option>
                     <option>Approved</option>
                     <option>Declined</option>
                 </select>
             </div>
-            
+
             <!-- Filter by Date -->
             <div>
                 <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Date</label>
-                <input type="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                <input type="date"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
             </div>
         </div>
     </div>
@@ -65,13 +67,17 @@
     <div class="mt-6 flex justify-center items-center space-x-2 animate-fadeIn">
         <button class="p-2 rounded-lg bg-white shadow hover:bg-gray-100 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                <path fill-rule="evenodd"
+                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
             </svg>
         </button>
         <span class="px-4 py-2 bg-blue-500 text-white rounded-lg">1</span>
         <button class="p-2 rounded-lg bg-white shadow hover:bg-gray-100 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                <path fill-rule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd" />
             </svg>
         </button>
     </div>
@@ -80,52 +86,173 @@
 <!-- Animations -->
 <style>
     @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
-    .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
 
     @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    .animate-slideDown { animation: slideDown 0.5s ease-out forwards; }
+
+    .animate-slideDown {
+        animation: slideDown 0.5s ease-out forwards;
+    }
 
     @keyframes slideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    .animate-slideUp { animation: slideUp 0.5s ease-out forwards; }
+
+    .animate-slideUp {
+        animation: slideUp 0.5s ease-out forwards;
+    }
 </style>
 
-<!-- JavaScript for Actions -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-        const pendingReservationsTable = document.getElementById("pendingReservationsTable");
-        const response = await fetch("{{ url_for('admin.get_pending_reservations') }}");
-        const pendingReservations = await response.json();
+    async function loadReservations() {
+        try {
+            const response = await fetch("{{ url_for('admin.get_pending_reservations') }}");
+            const pendingReservations = await response.json();
+            const pendingReservationsTable = document.getElementById("pendingReservationsTable");
 
-        pendingReservations.forEach(reservation => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td class="px-4 py-3">${reservation.reservation_id}</td>
-                <td class="px-4 py-3">${reservation.idno}</td>
-                <td class="px-4 py-3">${reservation.lab_id}</td>
-                <td class="px-4 py-3">${reservation.reserve_date}</td>
-                <td class="px-4 py-3">${reservation.status}</td>
-                <td class="px-4 py-3">
-                    <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                            onclick="handleApproval(${reservation.id})">Approve</button>
-                    <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">Decline</button>
-                </td>
-            `;
-            pendingReservationsTable.appendChild(row);
+            // Clear existing table rows
+            pendingReservationsTable.innerHTML = '';
+
+            // Rebuild the table with updated data
+            pendingReservations.forEach(reservation => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td class="px-4 py-3">${reservation.reservation_id}</td>
+                    <td class="px-4 py-3">${reservation.idno}</td>
+                    <td class="px-4 py-3">${reservation.lab_id}</td>
+                    <td class="px-4 py-3">${reservation.reserve_date}</td>
+                    <td class="px-4 py-3">${reservation.status}</td>
+                    <td class="px-4 py-3">
+                        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                                onclick="handleApproval(${reservation.reservation_id})">Approve</button>
+                        <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                                onclick="handleDecline(${reservation.reservation_id})">Decline</button>
+                    </td>
+                `;
+                pendingReservationsTable.appendChild(row);
+            });
+        } catch (error) {
+            console.error("Error loading reservations:", error);
+        }
+    }
+
+    async function handleApproval(reservationId) {
+        const result = await Swal.fire({
+            title: 'Confirm Approval',
+            text: "Are you sure you want to approve this reservation?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, approve it!'
         });
-    })
-    // Sample function for handling approvals
-    function handleApproval(requestId) {
-        console.log(`Approving request ${requestId}`);
-        // Add your AJAX/fetch logic here
+
+        if (result.isConfirmed) {
+            try {
+                // Updated to match your route with reservation_id in URL
+                const response = await fetch(`/admin/api/approve_reservation/${reservationId}`, {
+                    method: 'GET',  // Changed to GET to match your route
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await Swal.fire(
+                        'Approved!',
+                        data.message || 'The reservation has been approved.',
+                        'success'
+                    );
+                    // Refresh just the table content
+                    await loadReservations();
+                } else {
+                    throw new Error(data.message || 'Approval failed');
+                }
+            } catch (error) {
+                Swal.fire(
+                    'Error!',
+                    error.message || 'There was an error approving the reservation.',
+                    'error'
+                );
+            }
+        }
+    }
+
+    // Initial load when page loads
+    document.addEventListener("DOMContentLoaded", loadReservations);
+
+    async function handleDecline(reservationId) {
+        const result = await Swal.fire({
+            title: 'Confirm Decline',
+            text: "Are you sure you want to decline this reservation?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, decline it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/admin/api/decline_reservation/${reservationId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await Swal.fire(
+                        'Declined!',
+                        data.message || 'The reservation has been declined.',
+                        'success'
+                    );
+                    await loadReservations();
+                } else {
+                    throw new Error(data.message || 'Decline failed');
+                }
+            } catch (error) {
+                Swal.fire(
+                    'Error!',
+                    error.message || 'There was an error declining the reservation.',
+                    'error'
+                );
+            }
+        }
     }
 </script>
 {% endblock %}
