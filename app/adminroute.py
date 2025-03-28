@@ -717,24 +717,42 @@ def approve_reserve(reservation_id):
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
 
-@admin.route('/api/decline_reservation/<reservation_id>)')
-def decline_reservation(reservation_id):
+@admin.route('/api/decline_reservation/<reservation_id>')
+def decline_reserve(reservation_id):
     """API to decline reservation"""
     global admin_account
 
-    if session.get('admin') is not None:
+    try:
+        if session.get('admin') is None:
+            return jsonify({
+                'success': False,
+                'message': 'Unauthorized access is prohibited'
+            }), 401
+
         if admin_account is None:
             admin_account = Admin(**session.get('admin'))
 
-        response = admin_account.decline_reservation(reservation_id=reservation_id)
+        response = admin_account.decline_reservation(
+            reservation_id=reservation_id,
+            admin=admin_account
+        )
 
         if response['success']:
-            return jsonify({'success': True, 'message': 'Reservation declined successfully!'})
+            return jsonify({
+                'success': True,
+                'message': 'Reservation declined successfully!'
+            })
         else:
-            return jsonify({'success': False, 'message': response['message']}), 400
-    else:
-        flash('Unauthorized Access is Prohibited', 'error')
-        return redirect(url_for('admin.adminlogin'))
+            return jsonify({
+                'success': False,
+                'message': response['message']
+            }), 400
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Server error: {str(e)}'
+        }), 500
 
 @admin.route('/sitin_student', methods=['POST'])
 def sitin_student():

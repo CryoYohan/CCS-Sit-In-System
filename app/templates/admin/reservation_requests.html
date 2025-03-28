@@ -226,31 +226,33 @@
 
         if (result.isConfirmed) {
             try {
-                const response = await fetch(`/admin/api/decline_reservation/${reservationId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
+                const response = await fetch(`/admin/api/decline_reservation/${reservationId}`);
+
+                // Handle non-OK responses
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `Server responded with status ${response.status}`);
+                }
 
                 const data = await response.json();
 
                 if (data.success) {
-                    await Swal.fire(
-                        'Declined!',
-                        data.message || 'The reservation has been declined.',
-                        'success'
-                    );
+                    await Swal.fire({
+                        title: 'Declined!',
+                        text: data.message || 'The reservation has been declined.',
+                        icon: 'success'
+                    });
                     await loadReservations();
                 } else {
-                    throw new Error(data.message || 'Decline failed');
+                    throw new Error(data.message || 'Decline operation failed');
                 }
             } catch (error) {
-                Swal.fire(
-                    'Error!',
-                    error.message || 'There was an error declining the reservation.',
-                    'error'
-                );
+                console.error('Decline error:', error);
+                await Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'There was an error declining the reservation.',
+                    icon: 'error'
+                });
             }
         }
     }

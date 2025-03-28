@@ -111,6 +111,17 @@ class Admin(User):
         except Exception as e:
             return {'success': False, 'message': f'Approving Reservation ERRROR: {str(e)}'}
     
+    def decline_reservation(self, reservation_id,admin):
+        """Decline a reservation"""
+        try:
+            reservation = self.db.find_reservation_info(reservation_id=reservation_id)
+            message = f'Hey {reservation[0]["firstname"]}! Your reservation has been declined. Please contact the lab staff for more information.'
+            self.db.update_record(table='reservation',reservation_id=reservation_id,status='Denied',message=message, staff_idno=admin.idno)
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'message': f'Declining Reservation ERRROR: {str(e)}'}
+
+    
     def sit_in_student(self,**kwargs):
         """Sit in a student"""
         sitin_datetime = datetime.now()
