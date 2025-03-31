@@ -77,6 +77,10 @@ class Databasehelper:
         query = f"SELECT * FROM sitin_record WHERE idno = ? ORDER BY status DESC"
         return self.getprocess(query, (idno,))
     
+    def getall_feedbacks(self, idno)->list:
+        query = f"SELECT * FROM student_feedback WHERE idno = ? ORDER BY submitted_on DESC"
+        return self.getprocess(query, (idno),)
+    
     def get_student_reservation_history(self,idno)->list:
         """Retrieve Student Reservation History"""
         query = f"SELECT * FROM reservation WHERE idno = ?"

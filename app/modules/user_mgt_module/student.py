@@ -1,4 +1,6 @@
 from .user import User
+from datetime import datetime
+
 
 class Student(User):
     def __init__(self,idno:str,firstname:str, middlename,lastname,course:str, year:int, email:str,image:str,session:int,role="Student"):
@@ -69,4 +71,12 @@ class Student(User):
             return {'success':True}
         except Exception as e:
             return {'success':False, 'error':str(e)}
+    
+    def retrieve_my_feedbacks(self, idno):
+        """Retrieve Student Feedbacks"""
+        try:
+            my_feedbacks = self.db.getall_feedbacks(idno=idno)
+            return {'success': True, 'data':my_feedbacks}
+        except Exception as e:
+            return {'success': False, 'message':str(e)}
     

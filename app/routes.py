@@ -539,16 +539,17 @@ def get_session_records(idno):
     if response['success']:
         print(response['data'])
 
-        json_formatted_data =[ {
+        json_formatted_data = [{
+            'record_id': data['record_id'],  # Add this line
             'idno': data['idno'],
             'sitin_in': data['sitin_in'],
             'sitin_out': data['sitin_out'],
-            'reason':data['reason'],
+            'reason': data['reason'],
             'staff_idno': data['staff_idno'],
             'logged_off_by': data['logged_off_by'],
             'status': data['status'],
-        }
-        for data in response['data']
+        } 
+            for data in response['data']
         ]
         return jsonify(json_formatted_data)
     else:
@@ -735,38 +736,64 @@ def cancel_reservation_student(reservation_id):
     return jsonify(response)
 
 @main.route('/api/feedback/<record_id>', methods=['POST'])
-def student_feedback(record_id):
-    """Student Feedback Endpoint"""
+def submit_feedback(record_id):
     global student
-    
-    # Check for JSON content
-    if not request.is_json:
+    try:
+        # Check authorization
+        if not session.get('student'):
+            return jsonify({
+                'success': False,
+                'message': 'Unauthorized access is prohibited.'
+            }), 401
+
+        if student is None:
+            student = Student(**session.get('student'))
+            
+        data = request.get_json()
+        feedback_text = data.get('feedback')
+        
+        
+       # Process feedback
+        student.send_feedback(record_id=record_id, feedback=feedback_text)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Feedback submitted successfully'
+        })
+    except Exception as e:
         return jsonify({
             'success': False,
-            'message': 'Request must be JSON'
+            'message': str(e)
         }), 400
 
-    # Get JSON data
-    data = request.get_json()
-    feedback = data.get('feedback')
-    
-    # Validate feedback exists
-    if not feedback:
+
+@main.route('/api/feedback-records')
+def get_feedbacks():
+    global student
+    try:
+        # Check authorization
+        if not session.get('student'):
+            return jsonify({
+                'success': False,
+                'message': 'Unauthorized access is prohibited.'
+            }), 401
+
+        if student is None:
+            student = Student(**session.get('student'))
+              
+        
+       # Process feedback
+        feedbacks = student.retrieve_my_feedbacks(idno=student.idno)
+        
+
+        return jsonify({
+            {
+                'idno': feedbacks['idno'],
+                
+            }
+        })
+    except Exception as e:
         return jsonify({
             'success': False,
-            'message': 'Feedback is required.'
+            'message': str(e)
         }), 400
-
-    # Check authorization
-    if not session.get('student'):
-        return jsonify({
-            'success': False,
-            'message': 'Unauthorized access is prohibited.'
-        }), 401
-
-    if student is None:
-        student = Student(**session.get('student'))
-
-    # Process feedback
-    response = student.send_feedback(record_id, student=student, feedback=feedback)
-    return jsonify(response)
