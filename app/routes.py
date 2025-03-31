@@ -733,3 +733,40 @@ def cancel_reservation_student(reservation_id):
     response = reservation.cancel_reservation(reservation_id=reservation_id, idno=student.idno)
 
     return jsonify(response)
+
+@main.route('/api/feedback/<record_id>', methods=['POST'])
+def student_feedback(record_id):
+    """Student Feedback Endpoint"""
+    global student
+    
+    # Check for JSON content
+    if not request.is_json:
+        return jsonify({
+            'success': False,
+            'message': 'Request must be JSON'
+        }), 400
+
+    # Get JSON data
+    data = request.get_json()
+    feedback = data.get('feedback')
+    
+    # Validate feedback exists
+    if not feedback:
+        return jsonify({
+            'success': False,
+            'message': 'Feedback is required.'
+        }), 400
+
+    # Check authorization
+    if not session.get('student'):
+        return jsonify({
+            'success': False,
+            'message': 'Unauthorized access is prohibited.'
+        }), 401
+
+    if student is None:
+        student = Student(**session.get('student'))
+
+    # Process feedback
+    response = student.send_feedback(record_id, student=student, feedback=feedback)
+    return jsonify(response)

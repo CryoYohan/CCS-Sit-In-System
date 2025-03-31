@@ -38,6 +38,7 @@
           <th class="py-2 px-4 border-b text-center">Sit-in By</th>
           <th class="py-2 px-4 border-b text-center">Log-off By</th>
           <th class="py-2 px-4 border-b text-center">Status</th>
+          <th class="py-2 px-4 border-b text-center">Action</th>
 
         </tr>
       </thead>
@@ -48,7 +49,86 @@
   </div>
 </div>
 
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md">
+    <h3 class="text-xl font-semibold mb-4">Submit Feedback</h3>
+    <form action="api/feedback/`${document.getElementById('recordId').value}`" method="POST">
+      <input type="text" id="recordId" class="hidden" />
+      <textarea id="feedbackText" class="w-full p-3 border rounded-lg mb-4" rows="4" placeholder="Enter your feedback..."></textarea>
+      <div class="flex justify-end space-x-3">
+        <button onclick="closeFeedbackModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 <script>
+
+  function openFeedbackModal(recordId) {
+    document.getElementById('recordId').value = recordId;
+    document.getElementById('feedbackModal').classList.remove('hidden');
+    console.log(recordId);
+  }
+
+  function closeFeedbackModal() {
+    document.getElementById('feedbackModal').classList.add('hidden');
+    document.getElementById('feedbackText').value = '';
+    currentRecordId = null;
+  }
+
+  async function submitFeedback() {
+      const feedbackText = document.getElementById('feedbackText').value.trim();
+      
+      if (!feedbackText) {
+          Swal.fire('Error', 'Feedback cannot be empty!', 'error');
+          return;
+      }
+
+      const { isConfirmed } = await Swal.fire({
+          title: 'Confirm Submission',
+          text: 'Are you sure you want to submit this feedback?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, submit it!'
+      });
+
+      if (!isConfirmed) return;
+
+      try {
+          const response = await fetch(`/api/feedback/${currentRecordId}`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                  feedback: feedbackText
+              })
+          });
+
+          // Check for HTTP errors
+          if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || 'Failed to submit feedback');
+          }
+
+          const result = await response.json();
+          
+          if (result.success) {
+              Swal.fire('Success!', 'Feedback submitted successfully!', 'success');
+              closeFeedbackModal();
+          } else {
+              Swal.fire('Error', result.message || 'Failed to submit feedback', 'error');
+          }
+      } catch (error) {
+          Swal.fire('Error', error.message || 'An error occurred while submitting feedback', 'error');
+      }
+  }
   async function renderSessionHistory() {
     try {
       // Fetch session history data from the server
@@ -86,6 +166,14 @@
                     ${session.status}
                   </span>
                 </td>
+                <td class="py-2 px-4 border-b text-center">
+                  <button 
+                    class="bg-green-500 px-2 py-2 rounded-lg w-24 text-white"
+                    onclick="openFeedbackModal('${session.record_id}')"
+                  >
+                    Feedback
+                  </button>
+              </td>
             `;
         sessionHistoryTable.appendChild(row);
       });

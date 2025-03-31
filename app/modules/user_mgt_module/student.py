@@ -61,4 +61,12 @@ class Student(User):
         except Exception as e:
             return {'success':False, 'error':str(e)}
 
+    def send_feedback(self,**kwargs):
+        """Send feedback"""
+        try:
+            kwargs['submitted_on'] = datetime.now()
+            self.db.add_record(table='feedback', **kwargs)
+            return {'success':True}
+        except Exception as e:
+            return {'success':False, 'error':str(e)}
     
