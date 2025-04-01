@@ -419,16 +419,14 @@ def sitinrecords():
         for user in users:
             users_list.append({
                 "record_id": user["record_id"],
-                "reservation_id": user["reservation_id"],
                 "idno": user["idno"],
-                "lab_id": user["lab_id"],
+                "lab_name": user["lab_name"],
                 "sitin_in": user["sitin_in"],
                 "sitin_out": user["sitin_out"],
                 "staff_idno": user["staff_idno"],
                 "logged_off_by": user["logged_off_by"],
                 "status": user["status"],
                 "reason": user["reason"],
-                "completed_at": user["completed_at"]
             })
 
         return jsonify(users_list)
@@ -917,7 +915,38 @@ def get_feedback(feedback_id):
         return jsonify({"error": "Unauthorized"}), 401
 
 
+@admin.route('/api/records-by-lab/<lab_name>')
+def fetch_records_by_lab(lab_name):
+    """Fetch records by lab"""
+    global admin_account
 
+    if session.get('admin') is not None:
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
+
+        records = admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
+
+
+        json_formatted_data = [
+            {
+                "record_id": record['record_id'],
+                "idno": record['idno'],
+                "lab_name": record['lab_name'],
+                "sitin_in": record['sitin_in'],
+                "sitin_out": record['sitin_out'],
+                "staff_idno": record['staff_idno'],
+                "logged_off_by": record['logged_off_by'],
+                "status": record['status'],
+                "reason": record['reason']
+            }
+            for record in records['data']
+        ]
+        print(f"JSON{json_formatted_data}")
+        return jsonify(json_formatted_data)
+
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
 
 
 

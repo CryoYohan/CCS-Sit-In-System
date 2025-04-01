@@ -59,7 +59,7 @@ class Databasehelper:
 
     def getall_sitinrecords(self)->list:
         """Retrieve all sit-in records"""
-        query = "SELECT * FROM sitin_record"
+        query = "SELECT * FROM sitin_record_details"
         return self.getprocess(query)
     
     def retrieve_all_students_to_sitin(self):
