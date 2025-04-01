@@ -855,7 +855,25 @@ def fetch_feedbacks():
     if session.get('admin') is not None:
         if admin_account is None:
             admin_account = Admin(**session.get('admin'))
-    
+
+        feedbacks = admin_account.retrieve_all_feedbacks()
+
+        json_formatted_data = [
+            {
+                "feedback_id": feedback['feedback_id'],
+                "idno": feedback['idno'],
+                "lab_name": feedback['lab_name'],
+                "feedback": feedback['feedback'],
+                "submitted_on": feedback['submitted_on'],
+                "reason": feedback['reason']
+            }
+            for feedback in feedbacks['data']
+        ]
+
+        return jsonify(
+            json_formatted_data
+        )
+
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))

@@ -50,6 +50,18 @@ class Admin(User):
         """Retrieve all reservations"""
         return self.db.get_reservations_by_status(status='Pending')
 
+    def retrieve_all_feedbacks(self):
+        """Retrieve all feedbacks"""
+        try:
+            feedbacks = self.db.getall_records(table='student_feedback')
+            return {
+                'success': True, 'data': feedbacks
+            }
+        except Exception as e:
+            return {
+                'success': False, 'message': str(e)
+            }
+
     def get_announcements_for_students(self):
         """Retrieve all announcements from DB"""
         try:

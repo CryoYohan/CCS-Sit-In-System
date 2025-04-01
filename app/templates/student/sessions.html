@@ -56,10 +56,13 @@
     <h3 class="text-xl font-semibold mb-4">Submit Feedback</h3>
     <form>
       <input type="text" id="recordId" class="hidden" />
-      <textarea id="feedbackText" class="w-full p-3 border rounded-lg mb-4" rows="4" placeholder="Enter your feedback..."></textarea>
+      <textarea id="feedbackText" class="w-full p-3 border rounded-lg mb-4" rows="4"
+        placeholder="Enter your feedback..." required></textarea>
       <div class="flex justify-end space-x-3">
-        <button type="button" onclick="closeFeedbackModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-        <button type="button" onclick="submitFeedback()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Submit</button>
+        <button type="button" onclick="closeFeedbackModal()"
+          class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+        <button type="button" onclick="submitFeedback()"
+          class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Submit</button>
       </div>
     </form>
   </div>
@@ -80,50 +83,60 @@
     currentRecordId = null;
   }
 
-  
+
   async function submitFeedback() {
-      const recordId = document.getElementById('recordId').value;
-      const feedbackText = document.getElementById('feedbackText').value; // Assuming you have a textarea for feedback
+    const recordId = document.getElementById('recordId').value;
+    const feedbackText = document.getElementById('feedbackText').value;
 
-      try {
-          const response = await fetch(`/api/feedback/${recordId}`, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                  feedback: feedbackText
-              })
-          });
+    if (!feedbackText) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Warning!',
+        text: 'Please enter your feedback before submitting.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
 
-          const data = await response.json();
+    try {
+      const response = await fetch(`/api/feedback/${recordId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          feedback: feedbackText
+        })
+      });
 
-          if (!response.ok) {
-              throw new Error(data.message || 'Failed to submit feedback');
-          }
+      const data = await response.json();
 
-          // Success case
-          Swal.fire({
-              icon: 'success',
-              title: 'Success!',
-              text: 'Feedback was successfully submitted',
-              confirmButtonText: 'OK'
-          }).then(() => {
-              // Close the modal or refresh data if needed
-              closeFeedbackModal();
-              // Optional: refresh the session history table
-              loadSessionHistory(); 
-          });
-          
-      } catch (error) {
-          console.error('Error submitting feedback:', error);
-          Swal.fire({
-              icon: 'error',
-              title: 'Error!',
-              text: error.message || 'An error occurred while submitting feedback',
-              confirmButtonText: 'OK'
-          });
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to submit feedback');
       }
+
+      // Success case
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Feedback was successfully submitted',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        // Close the modal or refresh data if needed
+        closeFeedbackModal();
+        // Optional: refresh the session history table
+        loadSessionHistory();
+      });
+
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: error.message || 'An error occurred while submitting feedback',
+        confirmButtonText: 'OK'
+      });
+    }
   }
   async function renderSessionHistory() {
     try {
