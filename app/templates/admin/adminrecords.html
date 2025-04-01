@@ -104,6 +104,58 @@
   </div>
 
   <script>
+    // Track current filtered lab
+    let currentFilter = {
+      lab: '',
+      purpose: ''
+    };
+
+    // Update handleLabFilterChange to track current filter
+    function handleLabFilterChange(event) {
+      currentFilter.lab = event.target.value;
+      fetchRecordsByLab(currentFilter.lab === 'all' ? '' : currentFilter.lab);
+    }
+
+    async function exportToPDF() {
+      try {
+        const labFilter = document.getElementById('lab-filter').value
+        console.log(`Lab FIlter : ${labFilter}`);
+        window.location.href = `/admin/api/export-records/pdf/${labFilter}`;
+      } catch (error) {
+        console.error("Export failed:", error);
+        alert("Export failed: " + error.message);
+      }
+    }
+
+    async function exportToExcel() {
+      try {
+        const labParam = currentFilter.lab && currentFilter.lab !== 'all' ? `/${currentFilter.lab}` : '';
+        window.location.href = `/admin/api/export-records/excel${labParam}`;
+      } catch (error) {
+        console.error("Export failed:", error);
+        alert("Export failed: " + error.message);
+      }
+    }
+
+    async function exportToWord() {
+      try {
+        const labParam = currentFilter.lab && currentFilter.lab !== 'all' ? `/${currentFilter.lab}` : '';
+        window.location.href = `/admin/api/export-records/word${labParam}`;
+      } catch (error) {
+        console.error("Export failed:", error);
+        alert("Export failed: " + error.message);
+      }
+    }
+
+    async function exportToCSV() {
+      try {
+        const labParam = currentFilter.lab && currentFilter.lab !== 'all' ? `/${currentFilter.lab}` : '';
+        window.location.href = `/admin/api/export-records/csv${labParam}`;
+      } catch (error) {
+        console.error("Export failed:", error);
+        alert("Export failed: " + error.message);
+      }
+    }
     // Helper functions
     function formatDate(datetime) {
       if (!datetime) return 'N/A';

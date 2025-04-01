@@ -421,7 +421,7 @@ def sitinrecords():
 
         # Convert objects to dictionaries
         users_list = []
-        for user in users:
+        for user in users['data']:
             users_list.append({
                 "record_id": user["record_id"],
                 "idno": user["idno"],
@@ -957,6 +957,7 @@ def fetch_records_by_lab(lab_name):
 @admin.route('/api/export-records/csv')
 def export_records_csv(lab_name=None):
     """Export records to CSV"""
+    global admin_account
     if session.get('admin') is None:
         return redirect(url_for('admin.adminlogin'))
 
@@ -998,6 +999,7 @@ def export_records_csv(lab_name=None):
 @admin.route('/api/export-records/excel')
 def export_records_excel(lab_name=None):
     """Export records to Excel"""
+    global admin_account
     if session.get('admin') is None:
         return redirect(url_for('admin.adminlogin'))
 
@@ -1036,15 +1038,19 @@ def export_records_excel(lab_name=None):
 @admin.route('/api/export-records/pdf/<lab_name>')
 @admin.route('/api/export-records/pdf')
 def export_records_pdf(lab_name=None):
-    """Export records to PDF"""
+    """Export records to PDF with lab filter"""
+    global admin_account
     if session.get('admin') is None:
         return redirect(url_for('admin.adminlogin'))
 
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
 
-    # Get filtered records
-    records = admin_account.retrieve_sitinrecord_by_lab(lab_id=lab_name) if lab_name else admin_account.retrieve_all_sitinrecords()
+    # Get records based on filter - single call without redundancy
+    records = admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name) if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords()
+    
+    # Determine filename based on filter
+    filename = f"sit_in_records_lab_{lab_name}.pdf" if lab_name and lab_name != 'all' else "sit_in_records_all.pdf"
 
     # Create PDF in memory
     output = io.BytesIO()
@@ -1059,13 +1065,14 @@ def export_records_pdf(lab_name=None):
     y -= 30
     
     # Add headers
-    headers = ['Record ID', 'Student ID', 'Lab', 'Check-in', 'Check-out', 'Status']
+    headers = ['Record ID', 'Student ID', 'Lab', 'Check-in', 'Check-out', 'Status', 'Reason']
     for i, header in enumerate(headers):
         p.drawString(100 + (i * 100), y, header)
     y -= 20
     
+
     # Add data
-    for record in records:
+    for record in records['data']:
         if y < 50:  # New page if we're at the bottom
             p.showPage()
             y = 800
@@ -1077,7 +1084,8 @@ def export_records_pdf(lab_name=None):
             record['lab_name'],
             record['sitin_in'],
             record['sitin_out'] or '',
-            record['status']
+            record['status'],
+            record['reason'] or ''
         ]
         for i, value in enumerate(row):
             p.drawString(100 + (i * 100), y, str(value))
@@ -1088,7 +1096,7 @@ def export_records_pdf(lab_name=None):
 
     # Prepare response
     response = make_response(output.getvalue())
-    response.headers['Content-Disposition'] = 'attachment; filename=sit_in_records.pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename={filename}'
     response.headers['Content-type'] = 'application/pdf'
     return response
 
@@ -1096,6 +1104,7 @@ def export_records_pdf(lab_name=None):
 @admin.route('/api/export-records/word')
 def export_records_word(lab_name=None):
     """Export records to Word"""
+    global admin_account
     if session.get('admin') is None:
         return redirect(url_for('admin.adminlogin'))
 
