@@ -31,6 +31,7 @@
     <table class="min-w-full bg-white">
       <thead>
         <tr>
+          <th class="py-2 px-4 border-b text-center">Session ID</th>
           <th class="py-2 px-4 border-b text-center">ID Number</th>
           <th class="py-2 px-4 border-b text-center">Sit-in Date/Time</th>
           <th class="py-2 px-4 border-b text-center">Log-off Date/Time</th>
@@ -38,6 +39,7 @@
           <th class="py-2 px-4 border-b text-center">Sit-in By</th>
           <th class="py-2 px-4 border-b text-center">Log-off By</th>
           <th class="py-2 px-4 border-b text-center">Status</th>
+          <th class="py-2 px-4 border-b text-center">Action</th>
 
         </tr>
       </thead>
@@ -48,7 +50,81 @@
   </div>
 </div>
 
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md">
+    <h3 class="text-xl font-semibold mb-4">Submit Feedback</h3>
+    <form>
+      <input type="text" id="recordId" class="hidden" />
+      <textarea id="feedbackText" class="w-full p-3 border rounded-lg mb-4" rows="4" placeholder="Enter your feedback..."></textarea>
+      <div class="flex justify-end space-x-3">
+        <button type="button" onclick="closeFeedbackModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+        <button type="button" onclick="submitFeedback()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 <script>
+
+  function openFeedbackModal(recordId) {
+    document.getElementById('recordId').value = recordId;
+    document.getElementById('feedbackModal').classList.remove('hidden');
+    console.log(`Record id: ${recordId}`);
+  }
+
+  function closeFeedbackModal() {
+    document.getElementById('feedbackModal').classList.add('hidden');
+    document.getElementById('feedbackText').value = '';
+    currentRecordId = null;
+  }
+
+  
+  async function submitFeedback() {
+      const recordId = document.getElementById('recordId').value;
+      const feedbackText = document.getElementById('feedbackText').value; // Assuming you have a textarea for feedback
+
+      try {
+          const response = await fetch(`/api/feedback/${recordId}`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  feedback: feedbackText
+              })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+              throw new Error(data.message || 'Failed to submit feedback');
+          }
+
+          // Success case
+          Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Feedback was successfully submitted',
+              confirmButtonText: 'OK'
+          }).then(() => {
+              // Close the modal or refresh data if needed
+              closeFeedbackModal();
+              // Optional: refresh the session history table
+              loadSessionHistory(); 
+          });
+          
+      } catch (error) {
+          console.error('Error submitting feedback:', error);
+          Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: error.message || 'An error occurred while submitting feedback',
+              confirmButtonText: 'OK'
+          });
+      }
+  }
   async function renderSessionHistory() {
     try {
       // Fetch session history data from the server
@@ -62,6 +138,11 @@
 
       const data = await response.json();
 
+      // First, fetch all feedback records to check which sessions already have feedback
+      const feedbackResponse = await fetch('/api/feedback-records');
+      const feedbackRecords = feedbackResponse.ok ? await feedbackResponse.json() : [];
+      const recordsWithFeedback = new Set(feedbackRecords.map(f => f.record_id));
+
       const sessionHistoryTable = document.getElementById('sessionHistoryTable');
       if (!sessionHistoryTable) {
         throw new Error('Session history table element not found!');
@@ -72,8 +153,10 @@
 
       // Populate the table with session data
       data.forEach(session => {
+        const hasFeedback = recordsWithFeedback.has(session.record_id);
         const row = document.createElement('tr');
         row.innerHTML = `
+                <td class="py-2 px-4 border-b text-center">${session.record_id}</td>
                 <td class="py-2 px-4 border-b text-center">${session.idno}</td>
                 <td class="py-2 px-4 border-b text-center">${formatDate(session.sitin_in)}</td> 
                 <td class="py-2 px-4 border-b text-center">${formatDate(session.sitin_out)}</td> 
@@ -86,6 +169,15 @@
                     ${session.status}
                   </span>
                 </td>
+                <td class="py-2 px-4 border-b text-center">
+                  <button 
+                    class="px-2 py-2 rounded-lg w-24 text-white ${hasFeedback ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500'}"
+                    onclick="${hasFeedback ? '' : `openFeedbackModal('${session.record_id}')`}"
+                    ${hasFeedback ? 'disabled' : ''}
+                  >
+                    ${hasFeedback ? 'Submitted' : 'Feedback'}
+                  </button>
+              </td>
             `;
         sessionHistoryTable.appendChild(row);
       });

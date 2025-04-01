@@ -77,6 +77,10 @@ class Databasehelper:
         query = f"SELECT * FROM sitin_record WHERE idno = ? ORDER BY status DESC"
         return self.getprocess(query, (idno,))
     
+    def getall_feedbacks(self, idno)->list:
+        query = f"SELECT * FROM student_feedback WHERE idno = ? ORDER BY submitted_on DESC"
+        return self.getprocess(query, (idno),)
+    
     def get_student_reservation_history(self,idno)->list:
         """Retrieve Student Reservation History"""
         query = f"SELECT * FROM reservation WHERE idno = ?"
@@ -85,6 +89,11 @@ class Databasehelper:
     def find_record(self, table: str, idno: str):
         """Finds a specific record by idno."""
         sql = f"SELECT * FROM {table} WHERE idno = ?"
+        return self.getprocess(sql, (idno,))
+    
+    def find_reservation_record(self,idno:str):
+        """Finds a specific reservation record by idno."""
+        sql = f"SELECT * FROM reservation WHERE idno = ? AND status = 'Pending'"
         return self.getprocess(sql, (idno,))
     
     def find_reservation_info(self, reservation_id: str):

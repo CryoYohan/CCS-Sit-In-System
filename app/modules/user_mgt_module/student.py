@@ -1,4 +1,6 @@
 from .user import User
+from datetime import datetime
+
 
 class Student(User):
     def __init__(self,idno:str,firstname:str, middlename,lastname,course:str, year:int, email:str,image:str,session:int,role="Student"):
@@ -52,7 +54,7 @@ class Student(User):
     def request_reservation(self, **kwargs):
         """Request a reservation"""
         try:
-            already_reserved = self.db.find_record('reservation', kwargs.get('idno'))
+            already_reserved = self.db.find_reservation_record(idno=kwargs.get('idno'))
             if already_reserved:
                 return {'success':False, 'error': 'You already made a reservation. Cancel current reservation to reserve again.'}
             else:
@@ -61,4 +63,20 @@ class Student(User):
         except Exception as e:
             return {'success':False, 'error':str(e)}
 
+    def send_feedback(self,**kwargs):
+        """Send feedback"""
+        try:
+            kwargs['submitted_on'] = datetime.now()
+            self.db.add_record(table='feedback', **kwargs)
+            return {'success':True}
+        except Exception as e:
+            return {'success':False, 'error':str(e)}
+    
+    def retrieve_my_feedbacks(self, idno):
+        """Retrieve Student Feedbacks"""
+        try:
+            my_feedbacks = self.db.getall_feedbacks(idno=idno)
+            return {'success': True, 'data':my_feedbacks}
+        except Exception as e:
+            return {'success': False, 'message':str(e)}
     
