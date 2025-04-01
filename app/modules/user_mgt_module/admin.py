@@ -121,7 +121,11 @@ class Admin(User):
     
     def retrieve_all_sitinrecords(self):
         """Retrieve all Joined Sitin Records"""
-        return self.db.getall_sitinrecords()
+        try:
+            records = self.db.fetchAll(table='sitin_record_details')
+            return {'success':True, 'data':records}
+        except Exception as e:
+            return {'success':False, 'error':str(e)}
 
     
     def retrieve_sitinrecord_by_lab(self, lab_name):
