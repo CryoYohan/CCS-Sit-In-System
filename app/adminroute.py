@@ -1,4 +1,4 @@
-from flask import session, url_for, Blueprint, render_template, request, flash, redirect, current_app, jsonify
+from flask import make_response, session, url_for, Blueprint, render_template, request, flash, redirect, current_app, jsonify
 from .modules.user_mgt_module.staff import Staff
 from .modules.user_mgt_module.admin import Admin
 from .modules.login_register_module import Authorization
@@ -6,6 +6,11 @@ from .database.dbhelper import Databasehelper
 from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
+import csv
+import io
+from reportlab.pdfgen import canvas
+from docx import Document
+import pandas as pd
 
 admin = Blueprint('admin', __name__, template_folder='templates/admin',url_prefix='/admin')
 
@@ -941,13 +946,202 @@ def fetch_records_by_lab(lab_name):
             }
             for record in records['data']
         ]
-        print(f"JSON{json_formatted_data}")
         return jsonify(json_formatted_data)
 
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
 
+
+@admin.route('/api/export-records/csv/<lab_name>')
+@admin.route('/api/export-records/csv')
+def export_records_csv(lab_name=None):
+    """Export records to CSV"""
+    if session.get('admin') is None:
+        return redirect(url_for('admin.adminlogin'))
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    # Get filtered records
+    records = admin_account.retrieve_sitinrecord_by_lab(lab_id=lab_name) if lab_name else admin_account.retrieve_all_sitinrecords()
+
+    # Create CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Write header
+    writer.writerow(['Record ID', 'Student ID', 'Lab', 'Check-in', 'Check-out', 
+                    'Staff ID', 'Logged Off By', 'Status', 'Reason'])
+    
+    # Write data
+    for record in records:
+        writer.writerow([
+            record['record_id'],
+            record['idno'],
+            record['lab_name'],
+            record['sitin_in'],
+            record['sitin_out'] or '',
+            record['staff_idno'] or '',
+            record['logged_off_by'] or '',
+            record['status'],
+            record['reason'] or ''
+        ])
+    
+    # Prepare response
+    response = make_response(output.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=sit_in_records.csv'
+    response.headers['Content-type'] = 'text/csv'
+    return response
+
+@admin.route('/api/export-records/excel/<lab_name>')
+@admin.route('/api/export-records/excel')
+def export_records_excel(lab_name=None):
+    """Export records to Excel"""
+    if session.get('admin') is None:
+        return redirect(url_for('admin.adminlogin'))
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    # Get filtered records
+    records = admin_account.retrieve_sitinrecord_by_lab(lab_id=lab_name) if lab_name else admin_account.retrieve_all_sitinrecords()
+
+    # Create DataFrame
+    df = pd.DataFrame([{
+        'Record ID': r['record_id'],
+        'Student ID': r['idno'],
+        'Lab': r['lab_name'],
+        'Check-in': r['sitin_in'],
+        'Check-out': r['sitin_out'] or '',
+        'Staff ID': r['staff_idno'] or '',
+        'Logged Off By': r['logged_off_by'] or '',
+        'Status': r['status'],
+        'Reason': r['reason'] or ''
+    } for r in records])
+
+    # Create Excel in memory
+    output = io.BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    df.to_excel(writer, index=False, sheet_name='Sit-In Records')
+    writer.save()
+    output.seek(0)
+
+    # Prepare response
+    response = make_response(output.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=sit_in_records.xlsx'
+    response.headers['Content-type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    return response
+
+@admin.route('/api/export-records/pdf/<lab_name>')
+@admin.route('/api/export-records/pdf')
+def export_records_pdf(lab_name=None):
+    """Export records to PDF"""
+    if session.get('admin') is None:
+        return redirect(url_for('admin.adminlogin'))
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    # Get filtered records
+    records = admin_account.retrieve_sitinrecord_by_lab(lab_id=lab_name) if lab_name else admin_account.retrieve_all_sitinrecords()
+
+    # Create PDF in memory
+    output = io.BytesIO()
+    p = canvas.Canvas(output)
+    
+    # Set up PDF
+    p.setFont("Helvetica", 12)
+    y = 800  # Starting y position
+    
+    # Add title
+    p.drawString(100, y, "Sit-In Records")
+    y -= 30
+    
+    # Add headers
+    headers = ['Record ID', 'Student ID', 'Lab', 'Check-in', 'Check-out', 'Status']
+    for i, header in enumerate(headers):
+        p.drawString(100 + (i * 100), y, header)
+    y -= 20
+    
+    # Add data
+    for record in records:
+        if y < 50:  # New page if we're at the bottom
+            p.showPage()
+            y = 800
+            p.setFont("Helvetica", 12)
+            
+        row = [
+            str(record['record_id']),
+            str(record['idno']),
+            record['lab_name'],
+            record['sitin_in'],
+            record['sitin_out'] or '',
+            record['status']
+        ]
+        for i, value in enumerate(row):
+            p.drawString(100 + (i * 100), y, str(value))
+        y -= 15
+    
+    p.save()
+    output.seek(0)
+
+    # Prepare response
+    response = make_response(output.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=sit_in_records.pdf'
+    response.headers['Content-type'] = 'application/pdf'
+    return response
+
+@admin.route('/api/export-records/word/<lab_name>')
+@admin.route('/api/export-records/word')
+def export_records_word(lab_name=None):
+    """Export records to Word"""
+    if session.get('admin') is None:
+        return redirect(url_for('admin.adminlogin'))
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    # Get filtered records
+    records = admin_account.retrieve_sitinrecord_by_lab(lab_id=lab_name) if lab_name else admin_account.retrieve_all_sitinrecords()
+
+    # Create Word document
+    document = Document()
+    document.add_heading('Sit-In Records', 0)
+    
+    # Create table
+    table = document.add_table(rows=1, cols=6)
+    table.style = 'Table Grid'
+    
+    # Add headers
+    headers = table.rows[0].cells
+    headers[0].text = 'Record ID'
+    headers[1].text = 'Student ID'
+    headers[2].text = 'Lab'
+    headers[3].text = 'Check-in'
+    headers[4].text = 'Check-out'
+    headers[5].text = 'Status'
+    
+    # Add data
+    for record in records:
+        row = table.add_row().cells
+        row[0].text = str(record['record_id'])
+        row[1].text = str(record['idno'])
+        row[2].text = record['lab_name']
+        row[3].text = record['sitin_in']
+        row[4].text = record['sitin_out'] or ''
+        row[5].text = record['status']
+    
+    # Save to memory
+    output = io.BytesIO()
+    document.save(output)
+    output.seek(0)
+
+    # Prepare response
+    response = make_response(output.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=sit_in_records.docx'
+    response.headers['Content-type'] = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    return response
 
 
 
