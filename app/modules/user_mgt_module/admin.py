@@ -61,6 +61,18 @@ class Admin(User):
             return {
                 'success': False, 'message': str(e)
             }
+    
+    def retrieve_one_feedback(self, feedback_id):
+        """Retrieve one feedback"""
+        try:
+            feedback = self.db.getone_feedback(feedback_id=feedback_id)
+            return {
+                'success': True, 'data': feedback
+            }
+        except Exception as e:
+            return {
+                'success': False, 'message': str(e)
+            }
 
     def get_announcements_for_students(self):
         """Retrieve all announcements from DB"""

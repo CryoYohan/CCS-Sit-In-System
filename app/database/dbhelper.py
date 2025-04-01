@@ -80,6 +80,11 @@ class Databasehelper:
     def getall_feedbacks(self, idno)->list:
         query = f"SELECT * FROM student_feedback WHERE idno = ? ORDER BY submitted_on DESC"
         return self.getprocess(query, (idno),)
+
+    def getone_feedback(self, feedback_id):
+        """Retrieve one feedback"""
+        query = f"SELECT * FROM student_feedback WHERE feedback_id = ?"
+        return self.getprocess(query, (feedback_id,))
     
     def get_student_reservation_history(self,idno)->list:
         """Retrieve Student Reservation History"""

@@ -878,6 +878,44 @@ def fetch_feedbacks():
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
 
+@admin.route('/api/feedback/<feedback_id>')
+def get_feedback(feedback_id):
+    """ API for fetching single feedback by ID """
+    global admin_account
+
+    if session.get('admin') is not None:
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
+
+        feedbacks = admin_account.retrieve_one_feedback(feedback_id=feedback_id)
+
+        # Debug print to check the structure
+        print(f"Raw feedback data: {feedbacks}")
+        
+        if not feedbacks.get('data') or not feedbacks['data']:
+            return jsonify({"error": "Feedback not found"}), 404
+
+        # Get the first feedback directly
+        feedback = feedbacks['data'][0]
+        print(f"Lab name: {feedback['lab_name']}")  # Debug print
+
+        # Create response object directly
+        response_data = {
+            "feedback_id": feedback['feedback_id'],
+            "idno": feedback['idno'],
+            "lastname": feedback['lastname'],
+            "firstname": feedback['firstname'],
+            "lab_name": feedback['lab_name'],
+            "feedback": feedback['feedback'],
+            "submitted_on": feedback['submitted_on'],
+            "reason": feedback['reason']
+        }
+
+        return jsonify(response_data)
+
+    else:
+        return jsonify({"error": "Unauthorized"}), 401
+
 
 
 
