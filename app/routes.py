@@ -114,7 +114,7 @@ def announcements():
 def sitin():
     """Render Sit-in page."""
     global student
-    labs = reservation.retrieve_labs()
+
     datenow = datetime.now()
 
     if not session.get('student') == None:
@@ -127,7 +127,6 @@ def sitin():
                                 student=student,
                                 user_in_login_page=True,
                                 action='Logout',
-                                labs=labs,
                                 datenow=datenow
                                )
     else:
@@ -521,6 +520,67 @@ def get_announcements():
             'message': response['message']
         })
     
+@main.route('/api/labs')
+def fetch_labs():
+    """FETCH ALL LABS"""
+    global student
+    if not session.get('student'):
+        return jsonify({
+            'success': False,
+            'message': 'Unauthorized access is prohibited.'
+        }), 401
+    if student is None:
+        student = Student(**session.get('student'))
+    
+    labs = reservation.retrieve_labs()
+
+    json_formatted_data = [
+        {
+            'lab_id': lab['lab_id'],
+            'lab_name': lab['lab_name'],
+            'lab_description': lab['lab_description'],
+            'vacant_time': lab['vacant_time'],
+            'slots': lab['slots'],
+            'image':lab['image']
+        }
+        for lab in labs['data']
+    ]
+
+    return jsonify(
+        json_formatted_data
+    )
+@main.route('/api/labs/<lab_id>')
+def fetch_lab(lab_id):
+    """FETCH ONE LAB"""
+    global student
+    if not session.get('student'):
+        return jsonify({
+            'success': False,
+            'message': 'Unauthorized access is prohibited.'
+        }), 401
+    if student is None:
+        student = Student(**session.get('student'))
+    
+    labs = reservation.retrieve_one_lab(lab_id=lab_id)
+
+
+    if labs['success']:
+        lab = labs['data'][0]  # Directly use the single lab object
+        
+        return jsonify({
+            'lab_id': lab['lab_id'],
+            'lab_name': lab['lab_name'],
+            'lab_description': lab['lab_description'],
+            'vacant_time': lab['vacant_time'],
+            'slots': lab['slots'],
+            'image': lab['image'],
+            'success': True
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': labs['error']
+        })
 
 @main.route('/api/session-records/<idno>')
 def get_session_records(idno):

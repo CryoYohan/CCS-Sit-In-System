@@ -1,20 +1,20 @@
 {% extends 'dashboard_template.html' %}
 {% block content %}
 <div class="container mx-auto p-6">
+  <!-- Page Header -->
+  <div class="mb-6">
+    <h1
+      class="text-3xl mb-2 font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
+      CCS Laboratories Information</h1>
+    <p class="text-gray-600">Manage your laboratory reservations efficiently.</p>
+  </div>
   <!-- Laboratory Selection -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    {% for lab in labs %}
-    <div
-      class="bg-white shadow-md rounded-lg overflow-hidden transform transition-transform hover:scale-105 cursor-pointer"
-      onclick="openModal('Lab {{ lab['lab_name'] }}', {{ lab['slots'] }})">
-      <img src="{{ url_for('static', filename='images/laboratories/'+lab['image']) }}" alt="{{ lab.name }}"
-        class="w-full h-32 object-cover">
-      <div class="p-4">
-        <h3 class="text-lg font-semibold text-gray-800">Lab {{ lab['lab_name'] }}</h3>
-        <p class="text-sm text-gray-600">{{ lab['lab_description'] }}</p>
-      </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="labs-container">
+    <!-- Loading state -->
+    <div class="col-span-full text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+      <p class="mt-2 text-gray-600">Loading laboratories...</p>
     </div>
-    {% endfor %}
   </div>
 
   <!-- Reservation Form -->
@@ -31,9 +31,8 @@
         <select id="lab" name="lab"
           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           required>
-          {% for lab in labs %}
-          <option value="{{ lab['lab_name'] }}">Lab {{ lab['lab_name'] }}</option>
-          {% endfor %}
+          <option value="" disabled selected>Select a lab...</option>
+          <!-- Options will be populated by JavaScript -->
         </select>
       </div>
       <div>
@@ -63,51 +62,235 @@
 </div>
 
 <!-- Modal -->
-<div id="labModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-  <div class="bg-white rounded-lg overflow-hidden w-1/3">
-    <div class="p-4 border-b">
-      <h3 class="text-lg font-semibold text-gray-800" id="modalLabName">Lab Name</h3>
+<div id="labModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-modalIn">
+    <!-- Modal Header with Gradient Background -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="text-2xl font-bold text-white" id="modalLabName">Lab Name</h3>
+          <p class="text-blue-100 mt-1" id="modalLabDescription">Laboratory description</p>
+        </div>
+        <button onclick="closeModal()" class="text-white hover:text-blue-100 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
     </div>
-    <div class="p-4">
-      <p class="text-sm text-gray-600">Available Seats: <span id="modalAvailableSeats"></span>/50</p>
-      <!-- Add more details as needed -->
+
+    <!-- Modal Body -->
+    <div class="p-6 space-y-4">
+      <!-- Lab Image -->
+      <div class="rounded-lg overflow-hidden shadow-sm">
+        <img id="modalLabImage" src="" alt="Lab Image" class="w-full h-48 object-cover">
+      </div>
+
+      <!-- Information Grid -->
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Available Seats -->
+        <div class="bg-blue-50 p-3 rounded-lg">
+          <p class="text-xs font-semibold text-blue-500 uppercase tracking-wider">Available Seats</p>
+          <p class="text-lg font-bold text-gray-800"><span id="modalAvailableSeats">0</span>/<span
+              id="modalTotalSeats">0</span></p>
+        </div>
+
+        <!-- Status -->
+        <div class="bg-purple-50 p-3 rounded-lg">
+          <p class="text-xs font-semibold text-purple-500 uppercase tracking-wider">Status</p>
+          <p class="text-lg font-bold text-gray-800" id="modalLabStatus">Available</p>
+        </div>
+      </div>
+
+      <!-- Schedule -->
+      <div>
+        <p class="text-sm font-medium text-gray-500 mb-1">Available Schedule</p>
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-gray-800" id="modalLabSchedule">
+            Monday, Wednesday, Friday | 9:00 AM - 5:00 PM
+          </p>
+        </div>
+      </div>
+
+      <!-- Equipment -->
+      <div>
+        <p class="text-sm font-medium text-gray-500 mb-1">Equipment Available</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">50 Computers</span>
+          <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Projector</span>
+          <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Whiteboard</span>
+        </div>
+      </div>
     </div>
-    <div class="p-4 border-t flex justify-end">
+
+    <!-- Modal Footer -->
+    <div class="bg-gray-50 px-6 py-4 border-t flex justify-end space-x-3">
       <button onclick="closeModal()"
-        class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300">Close</button>
+        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">
+        Close
+      </button>
+      <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        Reserve Now
+      </button>
     </div>
   </div>
 </div>
 
 <script>
-  // Function to format the date
-  function formatDate(dateString) {
-    const date = new Date(dateString);
+  // Function to format the current date and time
+  function formatCurrentDateTime() {
+    const now = new Date();
 
-    // Extract components
-    const month = date.toLocaleString('default', { month: 'long' }); // Full month name (e.g., "October")
-    const day = date.getDate(); // Day of the month (e.g., 5)
-    const year = date.getFullYear(); // Year (e.g., 2023)
-    const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); // Time (e.g., "02:30 PM")
+    // Format date (e.g., "March 15, 2023")
+    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = now.toLocaleDateString('en-US', dateOptions);
 
-    // Format as "Month Day, Year, Time"
-    return `${month} ${day}, ${year}, ${time}`;
+    // Format time (e.g., "2:30 PM")
+    const timeOptions = { hour: '2-digit', minute: '2-digit' };
+    const formattedTime = now.toLocaleTimeString('en-US', timeOptions);
+
+    return `${formattedDate} ${formattedTime}`;
   }
 
-  // Set the current date and time in the input field
+  // Set the current date and time when page loads
   document.addEventListener('DOMContentLoaded', () => {
-    const currentDate = new Date(); // Get the current date and time
-    const formattedDate = formatDate(currentDate); // Format the date
-    document.getElementById('date').value = formattedDate; // Set the value of the input field
+    document.getElementById('date').value = formatCurrentDateTime();
   });
-  function openModal(labName, availableSeats) {
-    document.getElementById('modalLabName').innerText = labName;
-    document.getElementById('modalAvailableSeats').innerText = availableSeats;
-    document.getElementById('labModal').classList.remove('hidden');
+
+  // Function to populate lab dropdown
+  function populateLabDropdown(labs) {
+    const select = document.getElementById('lab');
+
+    // Clear existing options except the first one
+    while (select.options.length > 1) {
+      select.remove(1);
+    }
+
+    // Add labs from API response
+    labs.forEach(lab => {
+      const option = document.createElement('option');
+      option.value = lab.lab_name;
+      option.textContent = `Lab ${lab.lab_name}`;
+      select.appendChild(option);
+    });
+  }
+
+  // Fetch labs when page loads
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const response = await fetch('/api/labs');
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch labs');
+      }
+
+      const labs = await response.json();
+      renderLabs(labs);
+      populateLabDropdown(labs);
+    } catch (error) {
+      console.error('Error fetching labs:', error);
+      document.getElementById('labs-container').innerHTML = `
+        <div class="col-span-full text-center py-8 text-red-500">
+          Failed to load laboratories. Please try again later.
+        </div>
+      `;
+    }
+  });
+
+  // Render labs in the grid
+  function renderLabs(labs) {
+    const container = document.getElementById('labs-container');
+
+    if (!labs || labs.length === 0) {
+      container.innerHTML = `
+        <div class="col-span-full text-center py-8 text-gray-500">
+          No laboratories available.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = labs.map(lab => `
+      <div class="bg-white shadow-md rounded-lg overflow-hidden transform transition-transform hover:scale-105 cursor-pointer"
+           onclick="openModal('${lab.lab_id}')">
+        <img src="{{ url_for('static', filename='images/laboratories/') }}${lab.image || 'default-lab.jpg'}" 
+             alt="Lab ${lab.lab_name}"
+             class="w-full h-32 object-cover">
+        <div class="p-4">
+          <h3 class="text-lg font-semibold text-gray-800">Lab ${lab.lab_name}</h3>
+          <p class="text-sm text-gray-600">${lab.lab_description}</p>
+          <div class="mt-2 flex items-center text-sm text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            ${lab.slots} seats available
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+  // Animation for modal
+  const modalInAnimation = [
+    { opacity: 0, transform: 'translateY(20px) scale(0.95)' },
+    { opacity: 1, transform: 'translateY(0) scale(1)' }
+  ];
+
+  const modalTiming = {
+    duration: 200,
+    easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    fill: 'forwards'
+  };
+
+  async function openModal(labId) {
+    try {
+      const response = await fetch(`/api/labs/${labId}`);
+      if (!response.ok) throw new Error('Failed to fetch lab details');
+      const lab = await response.json();
+
+      // Determine if today is weekend (Saturday or Sunday)
+      const today = new Date();
+      const isWeekend = (today.getDay() === 6) || (today.getDay() === 0); // 6 = Saturday, 0 = Sunday
+
+      // Set status based on day of week
+      const labStatus = isWeekend ? 'Closed (Weekend)' : lab.status || 'Open';
+
+      // Populate modal with lab data
+      document.getElementById('modalLabName').textContent = `Lab ${lab.lab_name}`;
+      document.getElementById('modalLabDescription').textContent = lab.lab_description || 'No description available';
+
+      // Set the image source with url_for
+      const labImage = document.getElementById('modalLabImage');
+      labImage.src = "{{ url_for('static', filename='images/laboratories/') }}" + (lab.image || 'default-lab.jpg');
+      labImage.onerror = function () {
+        this.src = "{{ url_for('static', filename='images/laboratories/default-lab.jpg') }}";
+      };
+
+      document.getElementById('modalAvailableSeats').textContent = lab.slots;
+      document.getElementById('modalTotalSeats').textContent = 50;
+      document.getElementById('modalLabStatus').textContent = labStatus;
+      document.getElementById('modalLabSchedule').textContent = lab.vacant_time;
+
+      // Show modal with animation
+      const modal = document.getElementById('labModal');
+      modal.classList.remove('hidden');
+      modal.querySelector('.animate-modalIn').animate(modalInAnimation, modalTiming);
+
+    } catch (error) {
+      console.error('Error opening lab modal:', error);
+      alert('Failed to load lab details');
+    }
   }
 
   function closeModal() {
-    document.getElementById('labModal').classList.add('hidden');
+    const modal = document.getElementById('labModal');
+    modal.classList.add('hidden');
   }
 </script>
+
+<style>
+  .animate-modalIn {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+</style>
 {% endblock %}

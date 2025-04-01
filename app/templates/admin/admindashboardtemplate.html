@@ -159,7 +159,7 @@
                         <span class="flex-1 ms-3 whitespace-nowrap">Feedbacks</span>
                         <span
                            class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                           <p id="totalPendingRequests1">0</p>
+                           <p id="totalFeedbacks">0</p>
                         </span>
                      </a>
                   </li>
@@ -204,20 +204,26 @@
       document.addEventListener("DOMContentLoaded", async () => {
 
          const totalPendingRequests_p = document.getElementById("totalPendingRequests1");
+         const totaFeedbacks_p = document.getElementById("totalFeedbacks")
 
 
          try {
 
             const response = await fetch("{{ url_for('admin.get_pending_reservations') }}");
+            const response2 = await fetch("{{ url_for('admin.fetch_feedbacks') }}")
 
-            if (!response.ok) {
+            if (!response.ok || !response2.ok) {
                throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
             const totalPendingRequests = await response.json();
+            const totalFeedbacks = await response2.json();
 
             const totalPendingRequests_count = totalPendingRequests.length;
             totalPendingRequests_p.textContent = totalPendingRequests_count;
+
+            const totalFeedbacks_count = totalFeedbacks.length;
+            totaFeedbacks_p.textContent = totalFeedbacks_count;
 
 
          } catch (error) {

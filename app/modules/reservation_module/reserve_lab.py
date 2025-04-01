@@ -26,7 +26,19 @@ class Reservation():
     
     def retrieve_labs(self)->list:
         """Retrieve all labs"""
-        return self.db.getall_records(table=self.table_lab)
+        try:
+            labs = self.db.getall_records(table=self.table_lab)
+            return {'success': True, 'data': labs}
+        except Exception as e:
+            return {'success': False, 'error':str(e)}
+    
+    def retrieve_one_lab(self, lab_id:int):
+        """Retrieve one lab using lab id"""
+        try:
+            lab = self.db.fetchOne(table='lab', lab_id=lab_id)
+            return {'success': True, 'data': lab}
+        except Exception as e:
+            return {'success': False, 'error':str(e)}
 
     def retrieve_lab_id(self, lab_name):
         """Retrieve lab id using UNIQUE lab name shet"""

@@ -96,6 +96,22 @@ class Databasehelper:
         sql = f"SELECT * FROM {table} WHERE idno = ?"
         return self.getprocess(sql, (idno,))
     
+    def fetchOne(self, table, **kwargs):
+        """Fetches a single record based on the specified column and value."""
+        if not kwargs:
+            raise ValueError("At least one filter condition must be provided")
+        
+        # Get the first key-value pair from kwargs
+        column, value = next(iter(kwargs.items()))
+        
+        sql = f"SELECT * FROM {table} WHERE {column} = ?"
+        return self.getprocess(sql, (value,))
+
+    def fetchAll(self, table):
+        """Fetches all records from the specified table."""
+        sql = f"SELECT * FROM {table}"
+        return self.getprocess(sql)
+    
     def find_reservation_record(self,idno:str):
         """Finds a specific reservation record by idno."""
         sql = f"SELECT * FROM reservation WHERE idno = ? AND status = 'Pending'"
