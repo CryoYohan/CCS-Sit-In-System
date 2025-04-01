@@ -50,7 +50,7 @@
                             </div>
                         </a>
                         <a class="transform  hover:scale-105 transition duration-300 shadow-xl rounded-lg col-span-12 sm:col-span-6 xl:col-span-3 intro-y bg-white"
-                            href="{{ url_for('main.reserve') }}">
+                            href="{{ url_for('main.sitin') }}">
                             <div class="p-5">
                                 <div class="flex justify-between">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -66,7 +66,9 @@
                                 </div>
                                 <div class="ml-2 w-full flex-1">
                                     <div>
-                                        <div class="mt-3 text-3xl font-bold leading-8">7</div>
+                                        <div class="mt-3 text-3xl font-bold leading-8">
+                                            <p id="totalLabs">Loading...</p>
+                                        </div>
 
                                         <div class="mt-1 text-base text-gray-600">Labs Open</div>
                                     </div>
@@ -211,6 +213,43 @@
     document.addEventListener('DOMContentLoaded', fetchAnnouncements1);
 
     document.addEventListener('DOMContentLoaded', fetchTotalSitins);
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const totalLabsElement = document.getElementById('totalLabs');
+
+            if (!totalLabsElement) {
+                console.error('Element with id "totalLabs" not found');
+                return;
+            }
+
+            // Show loading state
+            totalLabsElement.textContent = 'Loading...';
+
+            const response = await fetch('/api/labs');
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const labs = await response.json();
+
+            // Verify labs is an array
+            if (!Array.isArray(labs)) {
+                throw new Error('Invalid data format - expected array');
+            }
+
+            totalLabsElement.textContent = labs.length;
+
+        } catch (error) {
+            console.error('Error fetching labs:', error);
+            const totalLabsElement = document.getElementById('totalLabs');
+            if (totalLabsElement) {
+                totalLabsElement.textContent = 'Error';
+                totalLabsElement.title = error.message; // Show error on hover
+            }
+        }
+    });
 
     async function fetchTotalSitins() {
         try {
