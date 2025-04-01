@@ -124,6 +124,14 @@ class Admin(User):
         return self.db.getall_sitinrecords()
 
     
+    def retrieve_sitinrecord_by_lab(self, lab_name):
+        """Retrieve all Joined Sitin Records by lab_id"""
+        try:
+            records = self.db.fetchOne(table='sitin_record_details', lab_name=lab_name)
+            return {'success': True, 'data': records}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
+    
     def approve_reservation(self,reservation_id,admin):
         """Approve a reservation"""
         try:

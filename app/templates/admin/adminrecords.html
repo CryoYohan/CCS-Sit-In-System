@@ -13,275 +13,254 @@
     </div>
   </div>
 
-  <!-- Search and Filter -->
+  <!-- Export and Filter Buttons -->
   <div class="mb-8 bg-white p-6 rounded-xl shadow-md animate-slideUp">
-    <div class="flex justify-between mb-7">
-      <!-- Search Bar -->
-      <form action="/admin/users" method="GET" class="flex items-center gap-2">
-        <input type="text" name="query" placeholder="Search by name, ID, or email"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-          value="{{ request.args.get('query', '') }}" />
-        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-          Search
+    <div class="flex flex-wrap justify-between gap-4">
+      <!-- Export Buttons -->
+      <div class="flex gap-3">
+        <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Generate PDF
         </button>
-        <!-- Clear Filter Button -->
-        <a href="/admin/users"
-          class="w-64 p-2 text-center bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
-          Clear Filter
-        </a>
-      </form>
+        <button
+          class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Generate Excel
+        </button>
+        <button
+          class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Generate Word
+        </button>
+      </div>
+
+      <!-- Filter Dropdowns -->
+      <div class="flex gap-3">
+        <!-- Lab Filter Dropdown -->
+        <div class="flex items-center gap-2">
+          <label class="block text-sm font-medium text-gray-600 whitespace-nowrap">Filter by Lab</label>
+          <select id="lab-filter"
+            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition border-none focus:ring-2 focus:ring-blue-500">
+            <option value="all">All Labs</option>
+            <option value="530">Lab 530</option>
+            <option value="544">Lab 544</option>
+            <option value="528">Lab 528</option>
+            <option value="526">Lab 526</option>
+          </select>
+        </div>
+
+        <!-- Purpose Filter Dropdown -->
+        <div class="flex items-center gap-2">
+          <label class="block text-sm font-medium text-gray-600 whitespace-nowrap">Filter by Purpose</label>
+          <select
+            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition border-none focus:ring-2 focus:ring-blue-500">
+            <option value="all">All Purposes</option>
+            <option value="class">ASP NET CORE</option>
+            <option value="research">Python</option>
+            <option value="thesis">Java</option>
+            <option value="personal">C#</option>
+            <option value="personal">Web Dev</option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 
 
-  <!-- Sit-In Records Table -->
+  <!-- Scrollable Sit-In Records Table with Fixed Height -->
   <div class="bg-white rounded-2xl shadow-xl overflow-hidden animate-slideUp">
-    <table class="w-full table-auto">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Record ID</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Reservation ID</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Student ID</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Lab ID</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Check-in</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Check-out</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Staff ID</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Logged Off By</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Reason</th>
-          <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Completed At</th>
-        </tr>
-      </thead>
+    <div class="overflow-auto" style="max-height: 500px;">
+      <table class="w-full table-auto">
+        <thead class="bg-gray-100 sticky top-0 z-10">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Record ID</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Student ID</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Lab</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Check-in</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Check-out</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Staff ID</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Logged Off By</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Status</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 whitespace-nowrap">Reason</th>
+          </tr>
+        </thead>
 
-      <tbody id="sitinRecordTbody" class="divide-y divide-gray-200">
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Edit Modal (Reused from Previous Code) -->
-<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-4xl mx-auto animate-slideUp relative">
-    <!-- Close Button -->
-    <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-
-    <h2 class="text-3xl font-bold text-center text-blue-700 mb-6">
-      Edit Sit-In Record
-    </h2>
-    <!-- Profile Section -->
-    <div class="flex items-center mb-8">
-      <!-- Profile Icon (Circle) -->
-      <div
-        class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl font-bold mr-4">
-        <img src="{{ url_for('static',filename='images/profileicons/default.png') }}" alt="Profile Picture"
-          title="Profile Picture" />
-      </div>
-      <!-- User's Full Name and Email -->
-      <div>
-        <h1 class="text-2xl font-bold text-gray-800">John Doe</h1>
-        <p class="text-gray-600">john.doe@example.com</p>
-      </div>
+        <tbody id="sitinRecordTbody" class="divide-y divide-gray-200">
+          <!-- Table rows will be inserted here -->
+        </tbody>
+      </table>
     </div>
-    <form action="/editsitrecord" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Student ID -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Student ID</label>
-        <input type="text" name="editstudentid" placeholder="001"
-          class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
-      </div>
-
-      <!-- Name -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Name</label>
-        <input type="text" name="editname" placeholder="John Doe"
-          class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
-      </div>
-
-      <!-- Email -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" name="editemail" placeholder="john.doe@example.com"
-          class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
-      </div>
-
-      <!-- Lab -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Lab</label>
-        <input type="text" name="editlab" placeholder="Lab A"
-          class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
-      </div>
-
-      <!-- Date -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Date</label>
-        <input type="date" name="editdate"
-          class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
-      </div>
-
-      <!-- Time -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Time</label>
-        <input type="time" name="edittime"
-          class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50" />
-      </div>
-
-      <!-- Status -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Status</label>
-        <select name="editstatus"
-          class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring focus:ring-blue-400 bg-blue-50">
-          <option>Pending</option>
-          <option>Approved</option>
-          <option>In-Lab</option>
-          <option>Completed</option>
-        </select>
-      </div>
-
-      <!-- Save Changes Button -->
-      <div class="md:col-span-2 flex justify-center">
-        <button type="submit"
-          class="w-full md:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg text-lg hover:opacity-90 transition duration-300 shadow-md">
-          Save Changes
-        </button>
-      </div>
-    </form>
   </div>
-</div>
 
-<!-- JavaScript -->
-<script>
+  <script>
+    // Helper functions
+    function formatDate(datetime) {
+      if (!datetime) return 'N/A';
+      return new Date(datetime).toLocaleString();
+    }
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    const tbody = document.getElementById("sitinRecordTbody");
+    function getStatusColor(status) {
+      const statusColors = {
+        "Pending": "bg-yellow-100 text-yellow-800",
+        "Approved": "bg-green-100 text-green-400",
+        "In-lab": "bg-blue-100 text-blue-800",
+        "Completed": "bg-gray-100 text-gray-800",
+        "Denied": "bg-red-100 text-red-800"
+      };
+      return statusColors[status] || "bg-gray-100 text-gray-800";
+    }
 
-    try {
-      const response = await fetch("{{ url_for('admin.sitinrecords') }}");
+    // Main table update function
+    function updateTable(records) {
+      const tbody = document.getElementById('sitinRecordTbody');
+      tbody.innerHTML = ''; // Clear existing rows
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+      if (records.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="text-center py-4 text-gray-500">
+              No records found
+            </td>
+          </tr>
+        `;
+        return;
       }
 
-      const records = await response.json();
-      tbody.innerHTML = ""; // Clear previous records
-
       records.forEach(record => {
-        const row = document.createElement("tr");
-        row.className = "hover:bg-gray-50 transition";
-
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50 transition';
         row.innerHTML = `
-                  <td class="px-4 py-3 text-sm text-gray-700">${record.record_id}</td>
-                  <td class="px-4 py-3 text-sm text-gray-700">${record.reservation_id}</td>
-                  <td class="px-4 py-3 text-sm text-gray-700">${record.idno}</td>
-                  <td class="px-4 py-3 text-sm text-gray-700">${record.lab_id}</td>
-                  <td class="px-4 py-3 text-sm text-gray-700">${formatDate(record.sitin_in)}</td>
-                  <td class="px-4 py-3 text-sm text-gray-700">${formatDate(record.sitin_out)}</td>
-                  <td class="px-4 py-3 text-sm text-gray-700">${record.staff_idno || 'N/A'}</td>
-                  <td class="px-4 py-3 text-sm text-gray-700">${record.logged_off_by || 'N/A'}</td>
-                  <td class="px-4 py-3">
-                      <span class="px-2 py-1 text-xs font-semibold 
-                          ${getStatusColor(record.status)} rounded-full">
-                          ${record.status}
-                      </span>
-                  </td>
-                  <td class="px-4 py-3 text-sm text-gray-700">${record.reason || 'N/A'}</td>
-                  <td class="px-4 py-3 text-sm text-gray-700">${formatDate(record.completed_at)}</td>
-              `;
-
+          <td class="px-4 py-3 text-sm text-gray-700">${record.record_id}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${record.idno}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${record.lab_name}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${formatDate(record.sitin_in)}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${formatDate(record.sitin_out) || 'N/A'}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${record.staff_idno || 'N/A'}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">${record.logged_off_by || 'N/A'}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 text-xs font-semibold ${getStatusColor(record.status)} rounded-full">
+              ${record.status}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-sm text-gray-700">${record.reason || 'N/A'}</td>
+        `;
         tbody.appendChild(row);
       });
-
-    } catch (error) {
-      console.error("Error fetching sit-in records:", error);
-      tbody.innerHTML = `<tr><td colspan="12" class="text-center text-red-500">${error.message}</td></tr>`;
-    }
-  });
-
-  // Helper function to format dates
-  function formatDate(datetime) {
-    if (!datetime) return 'N/A';
-    return new Date(datetime).toLocaleString();
-  }
-
-  // Helper function to set colors based on status
-  function getStatusColor(status) {
-    switch (status) {
-      case "Pending": return "bg-yellow-100 text-yellow-800";
-      case "Approved": return "bg-green-100 text-green-400";
-      case "In-lab": return "bg-blue-100 text-blue-800";
-      case "Completed": return "bg-gray-100 text-gray-800";
-      case "Denied": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  }
-
-
-
-  function togglePassword(id) {
-    const field = document.getElementById(id);
-    field.type = field.type === "password" ? "text" : "password";
-  }
-
-  function openEditModal() {
-    const modal = document.getElementById("editModal");
-    modal.classList.remove("hidden");
-  }
-
-  function closeEditModal() {
-    const modal = document.getElementById("editModal");
-    modal.classList.add("hidden");
-  }
-</script>
-
-<!-- Animations -->
-<style>
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
     }
 
-    to {
-      opacity: 1;
-    }
-  }
+    // Data fetching functions
+    async function fetchRecordsByLab(labName) {
+      try {
+        const endpoint = labName ? `/admin/api/records-by-lab/${labName}` : '/admin/api/sitinrecords';
+        const response = await fetch(endpoint);
 
-  .animate-fadeIn {
-    animation: fadeIn 0.8s ease-out forwards;
-  }
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .animate-slideDown {
-    animation: slideDown 0.8s ease-out forwards;
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
+        const records = await response.json();
+        updateTable(records);
+      } catch (error) {
+        console.error("Error fetching records:", error);
+        const tbody = document.getElementById('sitinRecordTbody');
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="text-center py-4 text-red-500">
+              Error loading records: ${error.message}
+            </td>
+          </tr>
+        `;
+      }
     }
 
-    to {
-      opacity: 1;
-      transform: translateY(0);
+    // Event handlers
+    function handleLabFilterChange(event) {
+      const labName = event.target.value;
+      fetchRecordsByLab(labName === 'all' ? '' : labName);
     }
-  }
 
-  .animate-slideUp {
-    animation: slideUp 0.8s ease-out forwards;
-  }
-</style>
-{% endblock %}
+    // Modal functions
+    function togglePassword(id) {
+      const field = document.getElementById(id);
+      field.type = field.type === "password" ? "text" : "password";
+    }
+
+    function openEditModal() {
+      document.getElementById("editModal").classList.remove("hidden");
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").classList.add("hidden");
+    }
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", () => {
+      // Set up event listeners
+      const labFilter = document.getElementById('lab-filter');
+      if (labFilter) {
+        labFilter.addEventListener('change', handleLabFilterChange);
+      }
+
+      // Initial data load
+      fetchRecordsByLab('');
+    });
+  </script>
+
+  <!-- Animations -->
+  <style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .animate-fadeIn {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-slideDown {
+      animation: slideDown 0.8s ease-out forwards;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-slideUp {
+      animation: slideUp 0.8s ease-out forwards;
+    }
+  </style>
+  {% endblock %}
