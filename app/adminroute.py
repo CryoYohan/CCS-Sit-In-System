@@ -187,6 +187,28 @@ def adminusermgt():
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
 
+
+@admin.route('/feedbacks')
+def admin_feedbacks():
+    """ Admin Feedbacks Management"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        return render_template(
+                                'admin_feedbacks.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account,
+                                )
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+
+
+
 @admin.route('/adminlogout')
 def adminlogout():
     session['admin'] = None
@@ -203,8 +225,6 @@ def api_users():
         if admin_account is None:
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
-
-    
 
         users = admin_account.retrieve_all_students()
 
@@ -827,8 +847,18 @@ def addstaff():
         return redirect(url_for('admin.adminlogin'))
     
 
+@admin.route('/api/feedbacks')
+def fetch_feedbacks():
+    """ API for fetching feedbacks"""
+    global admin_account
 
-
+    if session.get('admin') is not None:
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
+    
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
 
 
 
