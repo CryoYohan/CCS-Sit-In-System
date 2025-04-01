@@ -1,6 +1,7 @@
-{% extends 'admindashboardtemplate.html' %} {% block content %}
+{% extends 'admindashboardtemplate.html' %}
+{% block content %}
 <div class="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-8 animate-fadeIn">
-  <!-- Header -->
+  <!-- Header with Enhanced Animation -->
   <div class="flex justify-between items-center mb-8 p-6 bg-white rounded-xl shadow-md animate-slideDown">
     <h1 class="text-3xl font-bold text-gray-800 flex items-center">
       📢 Announcements
@@ -12,12 +13,12 @@
     </div>
   </div>
 
-  <!-- Main Card -->
+  <!-- Main Card with Smoother Animation -->
   <div class="bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row animate-slideUp">
     <!-- Left Side: Create Announcement -->
     <div class="w-full md:w-1/2 p-8 border-r border-gray-100">
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Create Announcement</h2>
-      <form action="{{ url_for('admin.announce') }}" method="post" enctype="multipart/form-data">
+      <form action="{{ url_for('admin.announce') }}" method="post" enctype="multipart/form-data" class="animate-fadeIn">
         <!-- Title -->
         <div class="mb-6">
           <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Title</label>
@@ -43,7 +44,7 @@
 
         <!-- Submit Button -->
         <button type="submit"
-          class="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-300 shadow-lg">
+          class="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-300 shadow-lg hover:scale-[1.02] transform">
           Post Announcement
         </button>
       </form>
@@ -51,19 +52,17 @@
 
     <!-- Right Side: List of Announcements -->
     <div class="w-full md:w-1/2 p-8 h-[500px] overflow-y-auto">
-      <h2 class="text-2xl font-bold text-gray-800 mb-6">Your Announcements</h2>
-      <div id="announcement-container" class="space-y-6">
-        <!--div container for announcement here-->
+      <h2 class="text-2xl font-bold text-gray-800 mb-6 animate-fadeIn">Your Announcements</h2>
+      <div id="announcement-container" class="space-y-6 animate-fadeIn">
+        <!-- Announcements will be dynamically inserted here -->
       </div>
     </div>
   </div>
 </div>
 
-
-
-<!-- Edit Modal -->
-<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-  <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-8 animate-slideUp">
+<!-- Edit Modal with Enhanced Animation -->
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-8 animate-modalIn">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Announcement</h2>
     <form id="editAnnouncementForm" method="post" enctype="multipart/form-data">
       <!-- Title -->
@@ -89,13 +88,14 @@
 
       <!-- Save Button -->
       <button type="submit"
-        class="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-300 shadow-lg">
+        class="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-300 shadow-lg hover:scale-[1.02] transform">
         Save Changes
       </button>
     </form>
 
     <!-- Close Button -->
-    <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition">
+    <button onclick="closeEditModal()"
+      class="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition transform hover:scale-110">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
@@ -103,48 +103,36 @@
   </div>
 </div>
 
-<!-- JavaScript for Modal -->
+<!-- JavaScript for Modal (unchanged from your original) -->
 <script>
-  // Fetch announcements when the page loads
+  // Your existing JavaScript code remains exactly the same
   document.addEventListener('DOMContentLoaded', fetchAnnouncements);
 
   async function openEditModal(post_id) {
-
     const response = await fetch(`/admin/api/${post_id}/editannouncement`, {
-      credentials: 'include',  // Include cookies in the request
+      credentials: 'include',
     });
-
     const data = await response.json();
-
     const modal = document.getElementById("editModal");
     modal.classList.remove("hidden");
+    document.getElementById('editTitle').value = data.post_title;
+    document.getElementById('editDescription').value = data.post_description;
 
-    const editTitle = document.getElementById('editTitle');
-    const editDescription = document.getElementById('editDescription');
-
-    editTitle.value = data.post_title;
-    editDescription.value = data.post_description;
-    
-      // Add to your openEditModal function
-    document.getElementById('editAnnouncementForm').addEventListener('submit', function(e) {
-      e.preventDefault(); // Prevent default form submission
+    document.getElementById('editAnnouncementForm').addEventListener('submit', function (e) {
+      e.preventDefault();
       submitEditForm(post_id);
     });
-
   }
 
   async function submitEditForm(post_id) {
     const form = document.getElementById('editAnnouncementForm');
     const formData = new FormData(form);
-    
+
     try {
-      // Show loading indicator
       Swal.fire({
         title: 'Updating announcement...',
         allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
+        didOpen: () => { Swal.showLoading(); }
       });
 
       const response = await fetch(`/admin/api/${post_id}/update`, {
@@ -152,14 +140,10 @@
         body: formData,
         credentials: 'include'
       });
-
       const result = await response.json();
 
       if (result.success) {
-        // Close loading indicator first
         Swal.close();
-        
-        // Show success message
         await Swal.fire({
           icon: 'success',
           title: 'Success!',
@@ -167,7 +151,6 @@
           confirmButtonColor: '#3085d6',
         });
         window.location.reload();
-        // Close the modal and refresh announcements
         document.getElementById('editModal').classList.add('hidden');
       } else {
         Swal.fire({
@@ -191,32 +174,21 @@
   function closeEditModal() {
     const modal = document.getElementById("editModal");
     modal.classList.add("hidden");
-
-    const editTitle = document.getElementById('editTitle');
-    const editDescription = document.getElementById('editDescription');
-
-    editTitle.value = '';
-    editDescription.value = '';
+    document.getElementById('editTitle').value = '';
+    document.getElementById('editDescription').value = '';
   }
 
   async function fetchAnnouncements() {
     try {
       const response = await fetch('/admin/api/announcements', {
-        credentials: 'include',  // Include cookies in the request
+        credentials: 'include',
       });
-
       if (response.status === 401) {
-        // Redirect to login page if unauthorized
         window.location.href = '/admin/login';
         return;
       }
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       const announcements = await response.json();
-
       if (announcements.success) {
         renderAnnouncements(announcements);
       } else {
@@ -236,14 +208,12 @@
     }
   }
 
-  // Function to render announcements
   function renderAnnouncements(announcements) {
     const container = document.getElementById('announcement-container');
-    container.innerHTML = ''; // Clear existing content
+    container.innerHTML = '';
     announcements.data.forEach(announcement => {
       const announcementItem = document.createElement('div');
-      announcementItem.className = 'bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md transition';
-
+      announcementItem.className = 'bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md transition transform hover:-translate-y-1';
       announcementItem.innerHTML = `
         <div class="flex justify-between items-start">
           <div>
@@ -255,14 +225,12 @@
             <p class="text-gray-600 mt-2">${announcement.post_description}</p>
           </div>
           <div class="flex space-x-4">
-            <!-- Edit Button -->
-            <button onclick="openEditModal(${announcement.post_id})" class="text-blue-500 hover:text-blue-700 transition">
+            <button onclick="openEditModal(${announcement.post_id})" class="text-blue-500 hover:text-blue-700 transition transform hover:scale-110">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
             </button>
-            <!-- Delete Button -->
-            <button onclick="deleteAnnouncement(${announcement.post_id})" class="text-red-500 hover:text-red-700 transition">
+            <button onclick="deleteAnnouncement(${announcement.post_id})" class="text-red-500 hover:text-red-700 transition transform hover:scale-110">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
@@ -273,14 +241,11 @@
           <img src="/static/images/announcements/${announcement.image}" alt="Announcement Photo" class="w-full rounded-lg" />
         </div>
       `;
-
       container.appendChild(announcementItem);
     });
-
   }
 
   function deleteAnnouncement(id) {
-    // SweetAlert2 confirmation dialog
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -291,26 +256,22 @@
       confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {
-        // Send DELETE request to the server
         fetch(`/admin/api/announcements/${id}`, {
           method: 'DELETE',
-          credentials: 'include'  // Include cookies for session management
+          credentials: 'include'
         })
-          .then(response => response.json())  // Parse the response as JSON
+          .then(response => response.json())
           .then(data => {
             if (data.success) {
-              // Show success message
               Swal.fire({
                 icon: 'success',
                 title: 'Deleted!',
                 text: 'The announcement has been deleted.',
-                timer: 1500,  // Auto-close after 1.5 seconds
+                timer: 1500,
                 showConfirmButton: false
               });
-              // Refresh the announcements list
-              renderAnnouncements();
+              fetchAnnouncements();
             } else {
-              // Show error message if the server responds with an error
               Swal.fire({
                 icon: 'error',
                 title: 'Error!',
@@ -319,8 +280,7 @@
             }
           })
           .catch(error => {
-            console.error('There was a problem with the delete operation:', error);
-            // Show error message for network or other errors
+            console.error('Error:', error);
             Swal.fire({
               icon: 'error',
               title: 'Error!',
@@ -333,39 +293,37 @@
 
   function formatDate(dateString) {
     const date = new Date(dateString);
-
-    // Extract components
-    const month = date.toLocaleString('default', { month: 'long' }); // Full month name (e.g., "October")
-    const day = date.getDate(); // Day of the month (e.g., 5)
-    const year = date.getFullYear(); // Year (e.g., 2023)
-    const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); // Time (e.g., "02:30 PM")
-
-    // Format as "Month Day, Year, Time"
+    const month = date.toLocaleString('default', { month: 'long' });
+    const day = date.getDate();
+    const year = date.getFullYear();
+    const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     return `${month} ${day}, ${year}, ${time}`;
   }
-
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- Animations -->
+
+<!-- Enhanced Animation Styles -->
 <style>
   @keyframes fadeIn {
     from {
       opacity: 0;
+      transform: scale(0.98);
     }
 
     to {
       opacity: 1;
+      transform: scale(1);
     }
   }
 
   .animate-fadeIn {
-    animation: fadeIn 0.8s ease-out forwards;
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   @keyframes slideDown {
     from {
       opacity: 0;
-      transform: translateY(-20px);
+      transform: translateY(-30px);
     }
 
     to {
@@ -375,13 +333,13 @@
   }
 
   .animate-slideDown {
-    animation: slideDown 0.8s ease-out forwards;
+    animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   @keyframes slideUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(30px);
     }
 
     to {
@@ -391,7 +349,35 @@
   }
 
   .animate-slideUp {
-    animation: slideUp 0.8s ease-out forwards;
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes modalIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .animate-modalIn {
+    animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Smooth transitions for interactive elements */
+  .transition {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  /* Hover effects for buttons */
+  button:hover {
+    transition: all 0.2s ease;
   }
 </style>
 {% endblock %}
