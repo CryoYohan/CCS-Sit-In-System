@@ -1146,8 +1146,9 @@ def export_records_word(lab_name=None):
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
 
-    # Get filtered records
-    records = admin_account.retrieve_sitinrecord_by_lab(lab_id=lab_name) if lab_name else admin_account.retrieve_all_sitinrecords()
+    # Fetch records
+    records = (admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
+               if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
 
     # Create Word document
     document = Document()
