@@ -1019,16 +1019,17 @@ def export_records_excel(lab_name=None):
 
     # Create DataFrame
     df = pd.DataFrame([{
-        'Record ID': r.get('record_id', 'N/A'),
-        'Student ID': r.get('idno', 'N/A'),
-        'Lab': r.get('lab_name', 'N/A'),
-        'Check-in': r.get('sitin_in', 'N/A'),
-        'Check-out': r.get('sitin_out', '') or 'N/A',
-        'Staff ID': r.get('staff_idno', '') or 'N/A',
-        'Logged Off By': r.get('logged_off_by', '') or 'N/A',
-        'Status': r.get('status', 'N/A'),
-        'Reason': r.get('reason', '') or 'N/A'
-    } for r in records['data']])  # Safe dictionary access
+        'Record ID': r['record_id'],
+        'Student ID': r['idno'],
+        'Lab': r['lab_name'],
+        'Check-in': r['sitin_in'],
+        'Check-out': r['sitin_out'] or '',
+        'Staff ID': r['staff_idno'] or '',
+        'Logged Off By': r['logged_off_by'] or '',
+        'Status': r['status'],
+        'Reason': r['reason'] or ''
+    } for r in records['data']])  # Assuming all keys exist
+
 
     # Create Excel in memory
     output = io.BytesIO()
