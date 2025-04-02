@@ -133,8 +133,10 @@
     async function exportToExcel() {
       try {
         const labFilter = document.getElementById('lab-filter').value
+        const purposeFilter = document.getElementById('purpose-filter').value
         console.log(`Lab FIlter : ${labFilter}`);
-        window.location.href = `/admin/api/export-records/excel/${labFilter}`;
+        console.log(`Purpose Filter : ${purposeFilter}`);
+        window.location.href = `/admin/api/export-records/excel/${labFilter}/${purposeFilter}`;
       } catch (error) {
         console.error("Export failed:", error);
         alert("Export failed: " + error.message);
@@ -144,8 +146,10 @@
     async function exportToWord() {
       try {
         const labFilter = document.getElementById('lab-filter').value
+        const purposeFilter = document.getElementById('purpose-filter').value
         console.log(`Lab FIlter : ${labFilter}`);
-        window.location.href = `/admin/api/export-records/word/${labFilter}`;
+        console.log(`Purpose Filter : ${purposeFilter}`);
+        window.location.href = `/admin/api/export-records/word/${labFilter}/${purposeFilter}`;
       } catch (error) {
         console.error("Export failed:", error);
         alert("Export failed: " + error.message);

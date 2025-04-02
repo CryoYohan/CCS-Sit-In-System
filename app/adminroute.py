@@ -1002,9 +1002,8 @@ def export_records_csv(lab_name=None):
     response.headers['Content-type'] = 'text/csv'
     return response
 
-@admin.route('/api/export-records/excel/<lab_name>')
-@admin.route('/api/export-records/excel')
-def export_records_excel(lab_name=None):
+@admin.route('/api/export-records/excel/<lab_name>/<purpose>')
+def export_records_excel(lab_name=None,purpose=None):
     """Export records to Excel"""
     global admin_account
     if session.get('admin') is None:
@@ -1013,9 +1012,26 @@ def export_records_excel(lab_name=None):
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
 
-   # Fetch records
-    records = (admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
-               if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
+    if lab_name and lab_name != 'all' and purpose and purpose != 'all':
+    # Filter by both lab_name and purpose
+        print("IF CONDITION")
+        records = admin_account.retrieve_sitinrecord_by_lab_and_purpose(lab_name=lab_name, reason=purpose)
+    elif lab_name and lab_name != 'all':
+        print("1st elif CONDITION")
+        # Filter by lab_name only
+        records = admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
+    elif purpose and purpose != 'all':
+        print("2ND elif CONDITION")
+        # Filter by purpose only
+        records = admin_account.retrieve_sitinrecord_by_purpose(reason=purpose)
+        print(records)
+    else:
+        # No filters applied, retrieve all records
+        print("ELSE CONDITION")
+        records = admin_account.retrieve_all_sitinrecords()
+#    # Fetch records
+#     records = (admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
+#                if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
 
     # Create DataFrame
     df = pd.DataFrame([{
@@ -1041,7 +1057,7 @@ def export_records_excel(lab_name=None):
 
     # Prepare response
     response = make_response(output.getvalue())
-    response.headers['Content-Disposition'] = 'attachment; filename=sit_in_records.xlsx'
+    response.headers['Content-Disposition'] = f'attachment; filename=sit_in_records_lab-{lab_name}_purpose-{purpose}.xlsx'
     response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     return response
 
@@ -1142,9 +1158,8 @@ def format_date(datetime_str):
         print(f"Error formatting date: {datetime_str} - {str(e)}")
         return datetime_str  # Return original string if formatting fails
 
-@admin.route('/api/export-records/word/<lab_name>')
-@admin.route('/api/export-records/word')
-def export_records_word(lab_name=None):
+@admin.route('/api/export-records/word/<lab_name>/<purpose>')
+def export_records_word(lab_name=None, purpose=None):
     """Export records to Word"""
     global admin_account
     if session.get('admin') is None:
@@ -1152,17 +1167,35 @@ def export_records_word(lab_name=None):
 
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
+    
+    if lab_name and lab_name != 'all' and purpose and purpose != 'all':
+    # Filter by both lab_name and purpose
+        print("IF CONDITION")
+        records = admin_account.retrieve_sitinrecord_by_lab_and_purpose(lab_name=lab_name, reason=purpose)
+    elif lab_name and lab_name != 'all':
+        print("1st elif CONDITION")
+        # Filter by lab_name only
+        records = admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
+    elif purpose and purpose != 'all':
+        print("2ND elif CONDITION")
+        # Filter by purpose only
+        records = admin_account.retrieve_sitinrecord_by_purpose(reason=purpose)
+        print(records)
+    else:
+        # No filters applied, retrieve all records
+        print("ELSE CONDITION")
+        records = admin_account.retrieve_all_sitinrecords()
 
-    # Fetch records
-    records = (admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
-               if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
+    # # Fetch records
+    # records = (admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
+    #            if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
 
     # Create Word document
     document = Document()
     document.add_heading('Sit-In Records', 0)
     
     # Create table
-    table = document.add_table(rows=1, cols=6)
+    table = document.add_table(rows=1, cols=7)
     table.style = 'Table Grid'
     
     # Add headers
@@ -1173,6 +1206,7 @@ def export_records_word(lab_name=None):
     headers[3].text = 'Check-in'
     headers[4].text = 'Check-out'
     headers[5].text = 'Status'
+    headers[6].text = 'Reason'
     
     # Add data
     for record in records['data']:
@@ -1183,6 +1217,7 @@ def export_records_word(lab_name=None):
         row[3].text = record['sitin_in']
         row[4].text = record['sitin_out'] or ''
         row[5].text = record['status']
+        row[6].text = record['reason'] or ''
     
     # Save to memory
     output = io.BytesIO()
@@ -1191,7 +1226,7 @@ def export_records_word(lab_name=None):
 
     # Prepare response
     response = make_response(output.getvalue())
-    response.headers['Content-Disposition'] = 'attachment; filename=sit_in_records.docx'
+    response.headers['Content-Disposition'] = f'attachment; filename=sit_in_records_lab-{lab_name}_purpose-{purpose}.docx'
     response.headers['Content-type'] = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     return response
 
