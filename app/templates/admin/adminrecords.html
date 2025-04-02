@@ -129,8 +129,9 @@
 
     async function exportToExcel() {
       try {
-        const labParam = currentFilter.lab && currentFilter.lab !== 'all' ? `/${currentFilter.lab}` : '';
-        window.location.href = `/admin/api/export-records/excel${labParam}`;
+        const labFilter = document.getElementById('lab-filter').value
+        console.log(`Lab FIlter : ${labFilter}`);
+        window.location.href = `/admin/api/export-records/excel/${labFilter}`;
       } catch (error) {
         console.error("Export failed:", error);
         alert("Export failed: " + error.message);
