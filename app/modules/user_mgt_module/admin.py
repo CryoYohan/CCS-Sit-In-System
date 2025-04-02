@@ -135,6 +135,24 @@ class Admin(User):
             return {'success': True, 'data': records}
         except Exception as e:
             return {'success': False, 'message': str(e)}
+        
+    def retrieve_sitinrecord_by_purpose(self, reason):
+        """Retrieve all Joined Sitin Records by purpose"""
+        try:
+            records = self.db.fetchOne(table='sitin_record_details', reason=reason)
+            return {'success': True, 'data': records}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
+        
+    def retrieve_sitinrecord_by_lab_and_purpose(self, lab_name, reason):
+        """Retrieve all Joined Sitin Records by lab_id and purpose"""
+        try:
+            records = self.db.fetchLabPurpose(table='sitin_record_details', lab_name=lab_name, reason=reason)
+            print('LAB AND REASON retrieval')
+            return {'success': True, 'data': records}
+        except Exception as e:
+            print('Caught error in retrieve by lab and reason')
+            return {'success': False, 'message': str(e)}
     
     def approve_reservation(self,reservation_id,admin):
         """Approve a reservation"""

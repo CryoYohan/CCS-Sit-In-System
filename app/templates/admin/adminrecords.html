@@ -64,13 +64,14 @@
         <div class="flex items-center gap-2">
           <label class="block text-sm font-medium text-gray-600 whitespace-nowrap">Filter by Purpose</label>
           <select
+          id="purpose-filter"
             class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition border-none focus:ring-2 focus:ring-blue-500">
             <option value="all">All Purposes</option>
-            <option value="class">ASP NET CORE</option>
-            <option value="research">Python</option>
-            <option value="thesis">Java</option>
-            <option value="personal">C#</option>
-            <option value="personal">Web Dev</option>
+            <option value="ASP NET CORE">ASP NET CORE</option>
+            <option value="Python">Python</option>
+            <option value="Java">Java</option>
+            <option value="C#">C#</option>
+            <option value="Web Dev">Web Dev</option>
           </select>
         </div>
       </div>
@@ -119,8 +120,10 @@
     async function exportToPDF() {
       try {
         const labFilter = document.getElementById('lab-filter').value
+        const purposeFilter = document.getElementById('purpose-filter').value
         console.log(`Lab FIlter : ${labFilter}`);
-        window.location.href = `/admin/api/export-records/pdf/${labFilter}`;
+        console.log(`Purpose Filter : ${purposeFilter}`);
+        window.location.href = `/admin/api/export-records/pdf/${labFilter}/${purposeFilter}`;
       } catch (error) {
         console.error("Export failed:", error);
         alert("Export failed: " + error.message);

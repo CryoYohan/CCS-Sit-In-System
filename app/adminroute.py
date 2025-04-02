@@ -1045,9 +1045,8 @@ def export_records_excel(lab_name=None):
     response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     return response
 
-@admin.route('/api/export-records/pdf/<lab_name>')
-@admin.route('/api/export-records/pdf')
-def export_records_pdf(lab_name=None):
+@admin.route('/api/export-records/pdf/<lab_name>/<purpose>')
+def export_records_pdf(lab_name=None, purpose=None):
     """Generate a well-formatted PDF for Sit-In Records."""
     global admin_account
     if session.get('admin') is None:
@@ -1056,9 +1055,29 @@ def export_records_pdf(lab_name=None):
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
     
-    # Fetch records
-    records = (admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
-               if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
+    if lab_name and lab_name != 'all' and purpose and purpose != 'all':
+    # Filter by both lab_name and purpose
+        print("IF CONDITION")
+        records = admin_account.retrieve_sitinrecord_by_lab_and_purpose(lab_name=lab_name, reason=purpose)
+    elif lab_name and lab_name != 'all':
+        print("1st elif CONDITION")
+        # Filter by lab_name only
+        records = admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
+    elif purpose and purpose != 'all':
+        print("2ND elif CONDITION")
+        # Filter by purpose only
+        records = admin_account.retrieve_sitinrecord_by_purpose(reason=purpose)
+        print(records)
+    else:
+        # No filters applied, retrieve all records
+        print("ELSE CONDITION")
+        records = admin_account.retrieve_all_sitinrecords()
+
+    
+    # # Fetch records
+    # records = (
+    #     admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
+    #            if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
     
     filename = f"sit_in_records_lab_{lab_name}.pdf" if lab_name else "sit_in_records_all.pdf"
     output = io.BytesIO()
