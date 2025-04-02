@@ -959,6 +959,68 @@ def fetch_records_by_lab(lab_name):
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
 
+@admin.route('/api/records-by-purpose/<purpose>')
+def fetch_records_by_purpose(purpose):
+    """Fetch records by purpose"""
+    global admin_account
+
+    if session.get('admin') is not None:
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
+
+        records = admin_account.retrieve_sitinrecord_by_purpose(reason=purpose)
+
+        json_formatted_data = [
+            {
+                "record_id": record['record_id'],
+                "idno": record['idno'],
+                "lab_name": record['lab_name'],
+                "sitin_in": record['sitin_in'],
+                "sitin_out": record['sitin_out'],
+                "staff_idno": record['staff_idno'],
+                "logged_off_by": record['logged_off_by'],
+                "status": record['status'],
+                "reason": record['reason']
+            }
+            for record in records['data']
+        ]
+        return jsonify(json_formatted_data)
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+    
+@admin.route('/api/records-by-lab/<lab_name>/<purpose>')
+def fetch_records_by_labpurpose(lab_name, purpose):
+    """Fetch records by lab"""
+    global admin_account
+
+    if session.get('admin') is not None:
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
+
+        records = admin_account.retrieve_sitinrecord_by_lab_and_purpose(lab_name=lab_name,reason=purpose)
+
+
+        json_formatted_data = [
+            {
+                "record_id": record['record_id'],
+                "idno": record['idno'],
+                "lab_name": record['lab_name'],
+                "sitin_in": record['sitin_in'],
+                "sitin_out": record['sitin_out'],
+                "staff_idno": record['staff_idno'],
+                "logged_off_by": record['logged_off_by'],
+                "status": record['status'],
+                "reason": record['reason']
+            }
+            for record in records['data']
+        ]
+        return jsonify(json_formatted_data)
+
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+
 
 @admin.route('/api/export-records/csv/<lab_name>')
 @admin.route('/api/export-records/csv')

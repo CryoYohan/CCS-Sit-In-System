@@ -105,25 +105,66 @@
   </div>
 
   <script>
-    // Track current filtered lab
+    // Track current filtered lab and purpose
     let currentFilter = {
       lab: '',
       purpose: ''
     };
 
-    // Update handleLabFilterChange to track current filter
+    // Update filter handlers to track both filters
     function handleLabFilterChange(event) {
       currentFilter.lab = event.target.value;
-      fetchRecordsByLab(currentFilter.lab === 'all' ? '' : currentFilter.lab);
+      fetchFilteredRecords();
     }
 
+    function handlePurposeFilterChange(event) {
+      currentFilter.purpose = event.target.value;
+      fetchFilteredRecords();
+    }
+
+    async function fetchFilteredRecords() {
+    try {
+      const labParam = currentFilter.lab === 'all' ? '' : currentFilter.lab;
+      const purposeParam = currentFilter.purpose === 'all' ? '' : currentFilter.purpose;
+      
+      let endpoint;
+      if (labParam && purposeParam) {
+        endpoint = `/admin/api/records-by-lab/${labParam}/${purposeParam}`;
+      } else if (labParam) {
+        endpoint = `/admin/api/records-by-lab/${labParam}`;
+      } else if (purposeParam) {
+        endpoint = `/admin/api/records-by-purpose/${purposeParam}`;
+      } else {
+        endpoint = '/admin/api/sitinrecords';
+      }
+
+      const response = await fetch(endpoint);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const records = await response.json();
+      updateTable(records);
+    } catch (error) {
+      console.error("Error fetching records:", error);
+      const tbody = document.getElementById('sitinRecordTbody');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" class="text-center py-4 text-red-500">
+            Error loading records: ${error.message}
+          </td>
+        </tr>
+      `;
+    }
+  }
+
+    // Export functions (updated to use currentFilter)
     async function exportToPDF() {
       try {
-        const labFilter = document.getElementById('lab-filter').value
-        const purposeFilter = document.getElementById('purpose-filter').value
-        console.log(`Lab FIlter : ${labFilter}`);
-        console.log(`Purpose Filter : ${purposeFilter}`);
-        window.location.href = `/admin/api/export-records/pdf/${labFilter}/${purposeFilter}`;
+        const labParam = currentFilter.lab === 'all' ? '' : currentFilter.lab;
+        const purposeParam = currentFilter.purpose === 'all' ? '' : currentFilter.purpose;
+        window.location.href = `/admin/api/export-records/pdf/${labParam || 'all'}/${purposeParam || 'all'}`;
       } catch (error) {
         console.error("Export failed:", error);
         alert("Export failed: " + error.message);
@@ -132,11 +173,9 @@
 
     async function exportToExcel() {
       try {
-        const labFilter = document.getElementById('lab-filter').value
-        const purposeFilter = document.getElementById('purpose-filter').value
-        console.log(`Lab FIlter : ${labFilter}`);
-        console.log(`Purpose Filter : ${purposeFilter}`);
-        window.location.href = `/admin/api/export-records/excel/${labFilter}/${purposeFilter}`;
+        const labParam = currentFilter.lab === 'all' ? '' : currentFilter.lab;
+        const purposeParam = currentFilter.purpose === 'all' ? '' : currentFilter.purpose;
+        window.location.href = `/admin/api/export-records/excel/${labParam || 'all'}/${purposeParam || 'all'}`;
       } catch (error) {
         console.error("Export failed:", error);
         alert("Export failed: " + error.message);
@@ -145,11 +184,9 @@
 
     async function exportToWord() {
       try {
-        const labFilter = document.getElementById('lab-filter').value
-        const purposeFilter = document.getElementById('purpose-filter').value
-        console.log(`Lab FIlter : ${labFilter}`);
-        console.log(`Purpose Filter : ${purposeFilter}`);
-        window.location.href = `/admin/api/export-records/word/${labFilter}/${purposeFilter}`;
+        const labParam = currentFilter.lab === 'all' ? '' : currentFilter.lab;
+        const purposeParam = currentFilter.purpose === 'all' ? '' : currentFilter.purpose;
+        window.location.href = `/admin/api/export-records/word/${labParam || 'all'}/${purposeParam || 'all'}`;
       } catch (error) {
         console.error("Export failed:", error);
         alert("Export failed: " + error.message);
@@ -158,14 +195,16 @@
 
     async function exportToCSV() {
       try {
-        const labParam = currentFilter.lab && currentFilter.lab !== 'all' ? `/${currentFilter.lab}` : '';
-        window.location.href = `/admin/api/export-records/csv${labParam}`;
+        const labParam = currentFilter.lab === 'all' ? '' : currentFilter.lab;
+        const purposeParam = currentFilter.purpose === 'all' ? '' : currentFilter.purpose;
+        window.location.href = `/admin/api/export-records/csv/${labParam || 'all'}/${purposeParam || 'all'}`;
       } catch (error) {
         console.error("Export failed:", error);
         alert("Export failed: " + error.message);
       }
     }
-    // Helper functions
+
+    // Helper functions (unchanged)
     function formatDate(datetime) {
       if (!datetime) return 'N/A';
       return new Date(datetime).toLocaleString();
@@ -182,10 +221,10 @@
       return statusColors[status] || "bg-gray-100 text-gray-800";
     }
 
-    // Main table update function
+    // Main table update function (unchanged)
     function updateTable(records) {
       const tbody = document.getElementById('sitinRecordTbody');
-      tbody.innerHTML = ''; // Clear existing rows
+      tbody.innerHTML = '';
 
       if (records.length === 0) {
         tbody.innerHTML = `
@@ -220,63 +259,26 @@
       });
     }
 
-    // Data fetching functions
-    async function fetchRecordsByLab(labName) {
-      try {
-        const endpoint = labName ? `/admin/api/records-by-lab/${labName}` : '/admin/api/sitinrecords';
-        const response = await fetch(endpoint);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const records = await response.json();
-        updateTable(records);
-      } catch (error) {
-        console.error("Error fetching records:", error);
-        const tbody = document.getElementById('sitinRecordTbody');
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="9" class="text-center py-4 text-red-500">
-              Error loading records: ${error.message}
-            </td>
-          </tr>
-        `;
-      }
-    }
-
-    // Event handlers
-    function handleLabFilterChange(event) {
-      const labName = event.target.value;
-      fetchRecordsByLab(labName === 'all' ? '' : labName);
-    }
-
-    // Modal functions
-    function togglePassword(id) {
-      const field = document.getElementById(id);
-      field.type = field.type === "password" ? "text" : "password";
-    }
-
-    function openEditModal() {
-      document.getElementById("editModal").classList.remove("hidden");
-    }
-
-    function closeEditModal() {
-      document.getElementById("editModal").classList.add("hidden");
-    }
-
-    // Initialize
+    // Initialize with both filters
     document.addEventListener("DOMContentLoaded", () => {
-      // Set up event listeners
+      // Set up event listeners for both filters
       const labFilter = document.getElementById('lab-filter');
+      const purposeFilter = document.getElementById('purpose-filter');
+      
       if (labFilter) {
+        currentFilter.lab = labFilter.value;
         labFilter.addEventListener('change', handleLabFilterChange);
+      }
+      
+      if (purposeFilter) {
+        currentFilter.purpose = purposeFilter.value;
+        purposeFilter.addEventListener('change', handlePurposeFilterChange);
       }
 
       // Initial data load
-      fetchRecordsByLab('');
+      fetchFilteredRecords();
     });
-  </script>
+</script>
 
   <!-- Animations -->
   <style>
