@@ -1013,35 +1013,35 @@ def export_records_excel(lab_name=None):
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
 
-    # Get filtered records
-    records = admin_account.retrieve_sitinrecord_by_lab(lab_id=lab_name) if lab_name else admin_account.retrieve_all_sitinrecords()
+   # Fetch records
+    records = (admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
+               if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
 
     # Create DataFrame
     df = pd.DataFrame([{
-        'Record ID': r['record_id'],
-        'Student ID': r['idno'],
-        'Lab': r['lab_name'],
-        'Check-in': r['sitin_in'],
-        'Check-out': r['sitin_out'] or '',
-        'Staff ID': r['staff_idno'] or '',
-        'Logged Off By': r['logged_off_by'] or '',
-        'Status': r['status'],
-        'Reason': r['reason'] or ''
-    } 
-    for r in records['data']
-    ])
+        'Record ID': r.get('record_id', 'N/A'),
+        'Student ID': r.get('idno', 'N/A'),
+        'Lab': r.get('lab_name', 'N/A'),
+        'Check-in': r.get('sitin_in', 'N/A'),
+        'Check-out': r.get('sitin_out', '') or 'N/A',
+        'Staff ID': r.get('staff_idno', '') or 'N/A',
+        'Logged Off By': r.get('logged_off_by', '') or 'N/A',
+        'Status': r.get('status', 'N/A'),
+        'Reason': r.get('reason', '') or 'N/A'
+    } for r in records['data']])  # Safe dictionary access
 
     # Create Excel in memory
     output = io.BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df.to_excel(writer, index=False, sheet_name='Sit-In Records')
-    writer.save()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Sit-In Records')
+        writer.close()  # Correct method
+
     output.seek(0)
 
     # Prepare response
     response = make_response(output.getvalue())
     response.headers['Content-Disposition'] = 'attachment; filename=sit_in_records.xlsx'
-    response.headers['Content-type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     return response
 
 @admin.route('/api/export-records/pdf/<lab_name>')
@@ -1070,19 +1070,6 @@ def export_records_pdf(lab_name=None):
     
     # Table Headers
     data = [['Record ID', 'Student ID', 'Lab', 'Check-in', 'Check-out', 'Status', 'Reason']]
-    
-    # Formatting Date
-    def format_date(datetime_str):
-        if not datetime_str:
-            return ''
-        try:
-            dt = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S.%f')
-        except ValueError:
-            try:
-                dt = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
-            except ValueError:
-                return datetime_str  # Fallback
-        return dt.strftime('%m/%d/%Y %I:%M %p')
     
     # Add Data Rows
     for record in records['data']:
