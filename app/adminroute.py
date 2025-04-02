@@ -11,6 +11,12 @@ import io
 from reportlab.pdfgen import canvas
 from docx import Document
 import pandas as pd
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.units import inch
+
 
 admin = Blueprint('admin', __name__, template_folder='templates/admin',url_prefix='/admin')
 
@@ -25,6 +31,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 # Function to check if the file extension is valid
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @admin.after_request
 def after_request(response):
@@ -1038,67 +1045,93 @@ def export_records_excel(lab_name=None):
 @admin.route('/api/export-records/pdf/<lab_name>')
 @admin.route('/api/export-records/pdf')
 def export_records_pdf(lab_name=None):
-    """Export records to PDF with lab filter"""
+    """Generate a well-formatted PDF for Sit-In Records."""
     global admin_account
     if session.get('admin') is None:
         return redirect(url_for('admin.adminlogin'))
 
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
-
-    # Get records based on filter - single call without redundancy
-    records = admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name) if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords()
     
-    # Determine filename based on filter
-    filename = f"sit_in_records_lab_{lab_name}.pdf" if lab_name and lab_name != 'all' else "sit_in_records_all.pdf"
-
-    # Create PDF in memory
+    # Fetch records
+    records = (admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
+               if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
+    
+    filename = f"sit_in_records_lab_{lab_name}.pdf" if lab_name else "sit_in_records_all.pdf"
     output = io.BytesIO()
-    p = canvas.Canvas(output)
+    doc = SimpleDocTemplate(output, pagesize=landscape(letter), leftMargin=30, rightMargin=30, topMargin=50, bottomMargin=30)
+    elements = []
     
-    # Set up PDF
-    p.setFont("Helvetica", 12)
-    y = 800  # Starting y position
+    styles = getSampleStyleSheet()
+    title = Paragraph(f"Sit-In Records - {lab_name if lab_name else 'All Labs'}", styles['Title'])
+    elements.append(title)
     
-    # Add title
-    p.drawString(100, y, "Sit-In Records")
-    y -= 30
+    # Table Headers
+    data = [['Record ID', 'Student ID', 'Lab', 'Check-in', 'Check-out', 'Status', 'Reason']]
     
-    # Add headers
-    headers = ['Record ID', 'Student ID', 'Lab', 'Check-in', 'Check-out', 'Status', 'Reason']
-    for i, header in enumerate(headers):
-        p.drawString(100 + (i * 100), y, header)
-    y -= 20
+    # Formatting Date
+    def format_date(datetime_str):
+        if not datetime_str:
+            return ''
+        try:
+            dt = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S.%f')
+        except ValueError:
+            try:
+                dt = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                return datetime_str  # Fallback
+        return dt.strftime('%m/%d/%Y %I:%M %p')
     
-
-    # Add data
+    # Add Data Rows
     for record in records['data']:
-        if y < 50:  # New page if we're at the bottom
-            p.showPage()
-            y = 800
-            p.setFont("Helvetica", 12)
-            
-        row = [
+        data.append([
             str(record['record_id']),
             str(record['idno']),
             record['lab_name'],
-            record['sitin_in'],
-            record['sitin_out'] or '',
+            format_date(record['sitin_in']),
+            format_date(record['sitin_out']),
             record['status'],
             record['reason'] or ''
-        ]
-        for i, value in enumerate(row):
-            p.drawString(100 + (i * 100), y, str(value))
-        y -= 15
+        ])
     
-    p.save()
+    # Create Table
+    table = Table(data, colWidths=[70, 80, 60, 120, 120, 70, 140])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 10)
+    ]))
+    
+    elements.append(table)
+    doc.build(elements)
     output.seek(0)
 
-    # Prepare response
     response = make_response(output.getvalue())
     response.headers['Content-Disposition'] = f'attachment; filename={filename}'
     response.headers['Content-type'] = 'application/pdf'
     return response
+
+def format_date(datetime_str):
+    """Format datetime string for display, handling milliseconds"""
+    if not datetime_str:
+        return ''
+    
+    try:
+        # Try parsing with milliseconds first
+        try:
+            dt = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S.%f')
+        except ValueError:
+            # Fall back to parsing without milliseconds
+            dt = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+        return dt.strftime('%m/%d/%Y %I:%M %p')
+    except ValueError as e:
+        print(f"Error formatting date: {datetime_str} - {str(e)}")
+        return datetime_str  # Return original string if formatting fails
 
 @admin.route('/api/export-records/word/<lab_name>')
 @admin.route('/api/export-records/word')
