@@ -105,7 +105,13 @@ class Databasehelper:
         column, value = next(iter(kwargs.items()))
         
         sql = f"SELECT * FROM {table} WHERE {column} = ?"
+        print(sql)
         return self.getprocess(sql, (value,))
+    
+    def fetchLabPurpose(self, table, lab_name, reason):
+        """Fetches a single record based on the specified column and value."""
+        sql = f"SELECT * FROM {table} WHERE lab_name = ? AND reason = ?"
+        return self.getprocess(sql, (lab_name,reason,))
 
     def fetchAll(self, table):
         """Fetches all records from the specified table."""
