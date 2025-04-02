@@ -1027,7 +1027,9 @@ def export_records_excel(lab_name=None):
         'Logged Off By': r['logged_off_by'] or '',
         'Status': r['status'],
         'Reason': r['reason'] or ''
-    } for r in records])
+    } 
+    for r in records['data']
+    ])
 
     # Create Excel in memory
     output = io.BytesIO()
@@ -1097,7 +1099,7 @@ def export_records_pdf(lab_name=None):
     # Create Table
     table = Table(data, colWidths=[70, 80, 60, 120, 120, 70, 140])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightskyblue),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
@@ -1165,7 +1167,7 @@ def export_records_word(lab_name=None):
     headers[5].text = 'Status'
     
     # Add data
-    for record in records:
+    for record in records['data']:
         row = table.add_row().cells
         row[0].text = str(record['record_id'])
         row[1].text = str(record['idno'])
