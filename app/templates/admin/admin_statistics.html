@@ -1,0 +1,276 @@
+{% extends 'admindashboardtemplate.html' %}
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-8 animate-fadeIn">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8 p-6 bg-white rounded-xl shadow-md animate-slideDown">
+        <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+            📊 Lab Statistics Dashboard
+            <span class="ml-2 text-2xl">✨</span>
+        </h1>
+        <div class="flex space-x-4">
+            <span class="text-2xl">📈</span>
+            <span class="text-2xl">🔍</span>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 animate-slideUp">
+        <!-- Total Sit-ins Card -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
+            <div class="flex items-center">
+                <div class="p-3 bg-blue-100 rounded-full mr-4">
+                    <span class="text-blue-600 text-2xl">👥</span>
+                </div>
+                <div>
+                    <p class="text-gray-600">Total Sit-ins</p>
+                    <h3 class="text-2xl font-bold">1,245</h3>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <p class="text-sm text-gray-500">Last 30 days</p>
+            </div>
+        </div>
+
+        <!-- Labs Utilization Card -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
+            <div class="flex items-center">
+                <div class="p-3 bg-purple-100 rounded-full mr-4">
+                    <span class="text-purple-600 text-2xl">💻</span>
+                </div>
+                <div>
+                    <p class="text-gray-600">Most Active Lab</p>
+                    <h3 class="text-2xl font-bold">Lab 544</h3>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <p class="text-sm text-gray-500">530 sit-ins this month</p>
+            </div>
+        </div>
+
+        <!-- Peak Hours Card -->
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
+            <div class="flex items-center">
+                <div class="p-3 bg-green-100 rounded-full mr-4">
+                    <span class="text-green-600 text-2xl">⏰</span>
+                </div>
+                <div>
+                    <p class="text-gray-600">Peak Hours</p>
+                    <h3 class="text-2xl font-bold">1PM - 3PM</h3>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <p class="text-sm text-gray-500">Average 45 students/hour</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fadeIn">
+        <!-- Lab Utilization Chart -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Lab Utilization</h2>
+            <div class="h-64">
+                <canvas id="labChart"></canvas>
+            </div>
+            <div class="mt-4 text-sm text-gray-500">
+                <p>Shows distribution of sit-ins across different labs</p>
+            </div>
+        </div>
+
+        <!-- Students by Course -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Students by Course</h2>
+            <div class="h-64">
+                <canvas id="courseChart"></canvas>
+            </div>
+            <div class="mt-4 text-sm text-gray-500">
+                <p>Breakdown of students by academic program</p>
+            </div>
+        </div>
+
+        <!-- Sit-in Purposes -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Sit-in Purposes</h2>
+            <div class="h-64">
+                <canvas id="purposeChart"></canvas>
+            </div>
+            <div class="mt-4 text-sm text-gray-500">
+                <p>Most common reasons for lab visits</p>
+            </div>
+        </div>
+
+        <!-- Daily Sit-ins Trend -->
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Daily Sit-ins Trend</h2>
+            <div class="h-64">
+                <canvas id="dailyChart"></canvas>
+            </div>
+            <div class="mt-4 text-sm text-gray-500">
+                <p>Last 14 days of lab utilization</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Statistics Section -->
+    <div class="mt-8 bg-white p-6 rounded-xl shadow-md animate-slideUp">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Additional Insights</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Busiest Days -->
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-2">Busiest Days</h3>
+                <ul class="space-y-2">
+                    <li class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span>Wednesday</span>
+                        <span class="font-medium">28% of weekly traffic</span>
+                    </li>
+                    <li class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span>Thursday</span>
+                        <span class="font-medium">25% of weekly traffic</span>
+                    </li>
+                    <li class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span>Tuesday</span>
+                        <span class="font-medium">22% of weekly traffic</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Average Duration -->
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-2">Average Visit Duration</h3>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span>Lab 530</span>
+                            <span class="font-medium">1h 45m</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span>Lab 544</span>
+                            <span class="font-medium">2h 10m</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-600 h-2 rounded-full" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span>Lab 526</span>
+                            <span class="font-medium">1h 20m</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Lab Utilization Chart
+        const labCtx = document.getElementById('labChart').getContext('2d');
+        new Chart(labCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Lab 530', 'Lab 544', 'Lab 526'],
+                datasets: [{
+                    data: [530, 544, 526],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(168, 85, 247, 0.8)',
+                        'rgba(16, 185, 129, 0.8)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // Students by Course Chart
+        const courseCtx = document.getElementById('courseChart').getContext('2d');
+        new Chart(courseCtx, {
+            type: 'bar',
+            data: {
+                labels: ['BSIT', 'BSCS', 'BSIS', 'BSCE', 'Other'],
+                datasets: [{
+                    label: 'Students',
+                    data: [320, 280, 150, 90, 60],
+                    backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Sit-in Purposes Chart
+        const purposeCtx = document.getElementById('purposeChart').getContext('2d');
+        new Chart(purposeCtx, {
+            type: 'polarArea',
+            data: {
+                labels: ['Python', 'ASP.NET', 'Java', 'Web Dev', 'Database', 'Research'],
+                datasets: [{
+                    data: [35, 25, 20, 15, 10, 5],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(168, 85, 247, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(239, 68, 68, 0.7)',
+                        'rgba(156, 163, 175, 0.7)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // Daily Sit-ins Trend Chart
+        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+        new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan 1', 'Jan 2', 'Jan 3', 'Jan 4', 'Jan 5', 'Jan 6', 'Jan 7',
+                    'Jan 8', 'Jan 9', 'Jan 10', 'Jan 11', 'Jan 12', 'Jan 13', 'Jan 14'],
+                datasets: [{
+                    label: 'Daily Sit-ins',
+                    data: [34, 20, 45, 32, 28, 40, 38, 42, 36, 29, 31, 48, 39, 44],
+                    fill: false,
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
