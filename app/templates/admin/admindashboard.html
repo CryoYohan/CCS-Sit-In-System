@@ -120,7 +120,9 @@
                                 </div>
                                 <div class="ml-2 w-full flex-1">
                                     <div>
-                                        <div class="mt-3 text-3xl font-bold leading-8">7</div>
+                                        <div class="mt-3 text-3xl font-bold leading-8">
+                                            <p id="totalLabs">Loading...</p>
+                                        </div>
 
                                         <div class="mt-1 text-base text-gray-600">Total Laboratories</div>
                                     </div>
@@ -148,6 +150,7 @@
         const currentsitin_p = document.getElementById("current-sitin");
         const totalStudents_p = document.getElementById("totalStudents");
         const totalPendingRequests_p = document.getElementById("totalPendingRequests");
+        const totalLabs_p = document.getElementById("totalLabs");
 
         currentsitin_p.textContent = "";
 
@@ -155,14 +158,16 @@
             const response = await fetch("{{ url_for('admin.current_sitin') }}");
             const response2 = await fetch("{{ url_for('admin.api_users') }}");
             const response3 = await fetch("{{ url_for('admin.get_pending_reservations') }}");
+            const response4 = await fetch("{{ url_for('admin.get_laboratories') }}");
 
-            if (!response.ok || !response2.ok || !response3.ok) {
+            if (!response.ok || !response2.ok || !response3.ok || !response4.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
             const users = await response.json();
             const totalStudents = await response2.json();
             const totalPendingRequests = await response3.json();
+            const totalLabs = await response4.json();
 
             console.log("Fetched Data:", users);  // Debugging
             console.log("Fetched Data:", totalStudents);  // Debugging
@@ -175,6 +180,9 @@
 
             const totalPendingRequests_count = totalPendingRequests.length;
             totalPendingRequests_p.textContent = totalPendingRequests_count;
+
+            const totalLabs_count = totalLabs.length;
+            totalLabs_p.textContent = totalLabs_count;
 
 
         } catch (error) {
