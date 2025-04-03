@@ -165,19 +165,35 @@ def managelab():
             admin_account = session.get('admin')
             admin_account = Admin(**admin_account)
 
-        labs = admin_account.retrieve_all_labs()
-
         return render_template(
                                 'managelab.html',
                                 user_in_login_page=True, 
                                 action='Logout',
                                 admin=admin_account,
-                                labs=labs,
                                 )
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
     
+@admin.route('/resources')
+def resources():
+    """Manage Laboratories"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        return render_template(
+                                'lab_resources_materials.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account,
+                                )
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+
 @admin.route('/adminrecords')
 def adminrecords():
     """Records"""
