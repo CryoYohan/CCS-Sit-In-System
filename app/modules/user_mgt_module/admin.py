@@ -76,6 +76,18 @@ class Admin(User):
             }
         except Exception as e:
             return {'success':False, 'error': str(e)}
+
+    def get_lab_details(self, lab_id):
+        """Get lab by ID"""
+        try:
+            lab = self.db.fetchOne(table='lab',lab_id=lab_id)
+            return {
+                'success':True,
+                'data': lab
+            }
+        except Exception as e:
+            return {'success':False, 'error': str(e)}
+        
     def retrieve_all_current_sitins(self):
         """ Retrieve all students who currently in lab"""
         return self.db.retrieve_all_current_sitins()
