@@ -1311,6 +1311,7 @@ def add_laboratory():
             vacant_time = request.form.get("vacant_time")
             day_sched = request.form.get("day_sched")
             image = request.files.get("image")  # Get file
+            slots = request.form.get("slots")
 
             # ✅ Check if all fields are provided
             if not all([lab_name, lab_description, vacant_time, day_sched, image]):
@@ -1343,7 +1344,9 @@ def add_laboratory():
                 "lab_description": lab_description,
                 "vacant_time": vacant_time,
                 "day_sched": day_sched,
-                "image": filename
+                "image": filename,
+                "slots":slots,
+                "admin_idno": admin_account.idno
             }
 
             response = admin_account.add_lab(**data)

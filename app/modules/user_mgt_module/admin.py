@@ -45,7 +45,7 @@ class Admin(User):
     def add_lab(self, **kwargs):
         """Add a lab"""
         try:
-            kwargs['added_date'] = datetime.now()
+            kwargs['add_date'] = datetime.now()
             self.db.add_record(table='lab',**kwargs) 
             return {'success': True} 
         except Exception as e:
