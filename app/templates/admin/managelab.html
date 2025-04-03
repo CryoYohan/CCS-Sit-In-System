@@ -441,6 +441,55 @@
             });
     }
 
+    async function deleteLab(lab_id) {
+        // Show confirmation dialog
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/admin/api/delete-laboratory/${lab_id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire(
+                        'Deleted!',
+                        'The laboratory has been deleted.',
+                        'success'
+                    );
+                    // Refresh the laboratory list
+                    fetchLaboratories();
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        data.message || 'Failed to delete laboratory.',
+                        'error'
+                    );
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire(
+                    'Error!',
+                    'Something went wrong while deleting the laboratory.',
+                    'error'
+                );
+            }
+        }
+    }
+
 </script>
 
 <!-- Animations -->

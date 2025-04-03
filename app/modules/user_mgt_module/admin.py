@@ -67,6 +67,15 @@ class Admin(User):
                 'error': str(e)
             }
 
+    def delete_lab(self,lab_id):
+        """Delete Lab"""
+        try:
+            self.db.deleteOne(table='lab', column='lab_id', value=lab_id)
+            return {
+                'success':True
+            }
+        except Exception as e:
+            return {'success':False, 'error': str(e)}
     def retrieve_all_current_sitins(self):
         """ Retrieve all students who currently in lab"""
         return self.db.retrieve_all_current_sitins()
