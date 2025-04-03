@@ -32,6 +32,29 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def save_image(image):
+     # ✅ Attempt to save image
+    file = image
+    filename = ''
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename) # Secure file name
+        upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/laboratories"))
+        filepath = os.path.join(upload_folder, filename)
+
+        if not os.path.isdir(upload_folder):
+            print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
+            flash("Upload folder missing. Contact admin.", "danger")
+            return redirect(url_for('admin.admin_announcement'))
+        
+        print(f"Saving file to: {filepath}")  # Debugging line
+        file.save(filepath.replace("\\", "/"))  # Fix Windows backslash issue
+
+        if os.path.exists(filepath):  # Verify if the file was actually saved
+            print("✅ File successfully saved!")
+        
+    return filename
+
 
 @admin.after_request
 def after_request(response):
@@ -545,25 +568,8 @@ def announce():
             admin_account = Admin(**session.get('admin'))
 
         file = request.files['image']
-        filename = ''
-
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename) # Secure file name
-            upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/announcements"))
-            filepath = os.path.join(upload_folder, filename)
-
-            if not os.path.isdir(upload_folder):
-                print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
-                flash("Upload folder missing. Contact admin.", "danger")
-                return redirect(url_for('admin.admin_announcement'))
-            
-            print(f"Saving file to: {filepath}")  # Debugging line
-            file.save(filepath.replace("\\", "/"))  # Fix Windows backslash issue
-
-            if os.path.exists(filepath):  # Verify if the file was actually saved
-                print("✅ File successfully saved!")
-
-
+        
+        filename = save_image(image=file)
 
         announcement_data = {
             "post_title": request.form['title'],
@@ -1389,3 +1395,45 @@ def get_laboratories():
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
+
+@admin.route('/api/edit-laboratory/<lab_id>', methods=['POST'])
+def edit_laboratory(lab_id):
+    """API to edit laboratory details"""
+    global admin_account
+
+    if session.get('admin'):
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
+
+        try:
+            # Get Form Data
+            lab_name = request.form.get("lab_name")
+            lab_description = request.form.get("lab_description")
+            vacant_time = request.form.get("vacant_time")
+            day_sched = request.form.get("day_sched")
+            slots = request.form.get("slots")
+            image = request.files.get("image")  # Get file
+
+            filename = save_image(image)
+
+            data = {
+                'lab_id': lab_id,
+                'lab_name':lab_name,
+                'lab_description': lab_description,
+                'vacant_time': vacant_time,
+                'slots': slots,
+                'day_sched': day_sched,
+                'image':filename,
+                'admin_idno': admin_account.idno,
+            }
+            response = admin_account.edit_lab(**{k:v for k,v in data.items() if not v == ''})
+            if response['success']:
+                return jsonify({'success': True, 'message': 'Laboratory edited successfully!'}), 200
+            else:
+                return jsonify({'success': False, 'message': response['error']}), 500
+
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }),500

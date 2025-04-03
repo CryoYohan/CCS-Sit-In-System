@@ -51,6 +51,22 @@ class Admin(User):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
+    def edit_lab(self,**kwargs):
+        """Edit lab"""
+        try:
+            print('HEY')
+            kwargs['add_date'] = datetime.now()
+            self.db.update_record(table='lab', **kwargs)
+            return {
+                'success':True
+            }
+        except Exception as e:
+            print('HOY')
+            return {
+                'success':False,
+                'error': str(e)
+            }
+
     def retrieve_all_current_sitins(self):
         """ Retrieve all students who currently in lab"""
         return self.db.retrieve_all_current_sitins()
