@@ -724,6 +724,20 @@ def delete_announcement(post_id):
             'message': 'Unauthorized access is prohibited.'
         }), 401  # Unauthorized status code
 
+    image_filename = admin_account.get_announcement(post_id=post_id)
+
+    if image_filename['success'] and image_filename['data']:
+        # Delete the associated image
+        image_path = os.path.join(
+            current_app.static_folder,
+            'images',
+            'announcements',
+            image_filename['data'][0]['image']
+        )
+        if os.path.exists(image_path):
+            os.remove(image_path)
+            current_app.logger.info(f"Deleted announcement image: {image_path}")
+
     # Initialize admin_account if not already initialized
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
