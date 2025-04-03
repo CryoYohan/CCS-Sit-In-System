@@ -83,6 +83,26 @@ def dashboard():
     else:
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
+
+@admin.route('/statistics')
+def statistics():
+    """Admin Dashboard"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        return render_template(
+                                'admin_statistics.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account
+                               )
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+       
     
 
 @admin.route('/admin_announcements')
