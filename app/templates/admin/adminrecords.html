@@ -63,8 +63,7 @@
         <!-- Purpose Filter Dropdown -->
         <div class="flex items-center gap-2">
           <label class="block text-sm font-medium text-gray-600 whitespace-nowrap">Filter by Purpose</label>
-          <select
-          id="purpose-filter"
+          <select id="purpose-filter"
             class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition border-none focus:ring-2 focus:ring-blue-500">
             <option value="all">All Purposes</option>
             <option value="ASP NET CORE">ASP NET CORE</option>
@@ -123,41 +122,41 @@
     }
 
     async function fetchFilteredRecords() {
-    try {
-      const labParam = currentFilter.lab === 'all' ? '' : currentFilter.lab;
-      const purposeParam = currentFilter.purpose === 'all' ? '' : currentFilter.purpose;
-      
-      let endpoint;
-      if (labParam && purposeParam) {
-        endpoint = `/admin/api/records-by-lab/${labParam}/${purposeParam}`;
-      } else if (labParam) {
-        endpoint = `/admin/api/records-by-lab/${labParam}`;
-      } else if (purposeParam) {
-        endpoint = `/admin/api/records-by-purpose/${purposeParam}`;
-      } else {
-        endpoint = '/admin/api/sitinrecords';
-      }
+      try {
+        const labParam = currentFilter.lab === 'all' ? '' : currentFilter.lab;
+        const purposeParam = currentFilter.purpose === 'all' ? '' : currentFilter.purpose;
 
-      const response = await fetch(endpoint);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+        let endpoint;
+        if (labParam && purposeParam) {
+          endpoint = `/admin/api/records-by-lab/${labParam}/${purposeParam}`;
+        } else if (labParam) {
+          endpoint = `/admin/api/records-by-lab/${labParam}`;
+        } else if (purposeParam) {
+          endpoint = `/admin/api/records-by-purpose/${purposeParam}`;
+        } else {
+          endpoint = '/admin/api/sitinrecords';
+        }
 
-      const records = await response.json();
-      updateTable(records);
-    } catch (error) {
-      console.error("Error fetching records:", error);
-      const tbody = document.getElementById('sitinRecordTbody');
-      tbody.innerHTML = `
+        const response = await fetch(endpoint);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const records = await response.json();
+        updateTable(records);
+      } catch (error) {
+        console.error("Error fetching records:", error);
+        const tbody = document.getElementById('sitinRecordTbody');
+        tbody.innerHTML = `
         <tr>
           <td colspan="9" class="text-center py-4 text-red-500">
             Error loading records: ${error.message}
           </td>
         </tr>
       `;
+      }
     }
-  }
 
     // Export functions (updated to use currentFilter)
     async function exportToPDF() {
@@ -264,12 +263,12 @@
       // Set up event listeners for both filters
       const labFilter = document.getElementById('lab-filter');
       const purposeFilter = document.getElementById('purpose-filter');
-      
+
       if (labFilter) {
         currentFilter.lab = labFilter.value;
         labFilter.addEventListener('change', handleLabFilterChange);
       }
-      
+
       if (purposeFilter) {
         currentFilter.purpose = purposeFilter.value;
         purposeFilter.addEventListener('change', handlePurposeFilterChange);
@@ -278,7 +277,7 @@
       // Initial data load
       fetchFilteredRecords();
     });
-</script>
+  </script>
 
   <!-- Animations -->
   <style>

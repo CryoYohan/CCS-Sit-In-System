@@ -1294,3 +1294,95 @@ def export_records_word(lab_name=None, purpose=None):
 
 
 
+
+@admin.route('/api/add-laboratory', methods=['POST'])
+def add_laboratory():
+    """API to add a new laboratory"""
+    global admin_account
+
+    if session.get('admin'):
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
+
+        try:
+            # ✅ Get form data
+            lab_name = request.form.get("lab_name")
+            lab_description = request.form.get("lab_description")
+            vacant_time = request.form.get("vacant_time")
+            day_sched = request.form.get("day_sched")
+            image = request.files.get("image")  # Get file
+
+            # ✅ Check if all fields are provided
+            if not all([lab_name, lab_description, vacant_time, day_sched, image]):
+                return jsonify({'success': False, 'message': 'All fields are required'}), 400
+
+            # ✅ Attempt to save image
+            file = image
+            filename = ''
+
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename) # Secure file name
+                upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/laboratories"))
+                filepath = os.path.join(upload_folder, filename)
+
+                if not os.path.isdir(upload_folder):
+                    print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
+                    flash("Upload folder missing. Contact admin.", "danger")
+                    return redirect(url_for('admin.admin_announcement'))
+                
+                print(f"Saving file to: {filepath}")  # Debugging line
+                file.save(filepath.replace("\\", "/"))  # Fix Windows backslash issue
+
+                if os.path.exists(filepath):  # Verify if the file was actually saved
+                    print("✅ File successfully saved!")
+
+
+            # ✅ Prepare data to send to `admin_account.add_lab`
+            data = {
+                "lab_name": lab_name,
+                "lab_description": lab_description,
+                "vacant_time": vacant_time,
+                "day_sched": day_sched,
+                "image": filename
+            }
+
+            response = admin_account.add_lab(**data)
+            if response['success']:
+                return jsonify({'success': True, 'message': 'Laboratory added successfully!'}), 200
+            else:
+                return jsonify({'success': False, 'message': response['error']}), 500
+
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
+
+
+@admin.route('/api/get-laboratories')
+def get_laboratories():
+    """API to retrieve all laboratories"""
+    global admin_account
+
+    if session.get('admin'):
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
+
+        laboratories = admin_account.retrieve_all_labs()
+
+        # Convert objects to dictionaries
+        labs_list = []
+        for lab in laboratories:
+            labs_list.append({
+                "lab_id": lab["lab_id"],
+                "lab_name": lab["lab_name"],
+                "lab_description": lab["lab_description"],
+                "vacant_time": lab["vacant_time"],
+                "slots": lab["slots"],
+            })
+
+        return jsonify(labs_list)
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))
