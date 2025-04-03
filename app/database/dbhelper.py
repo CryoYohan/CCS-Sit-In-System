@@ -108,6 +108,11 @@ class Databasehelper:
         print(sql)
         return self.getprocess(sql, (value,))
     
+    def deleteOne(self, table, column, value):
+        """Delete one record dynamic"""
+        sql = f"DELETE FROM {table} WHERE {column} = ?"
+        return self.postprocess(sql, (value,))
+    
     def fetchLabPurpose(self, table, lab_name, reason):
         """Fetches a single record based on the specified column and value."""
         sql = f"SELECT * FROM {table} WHERE lab_name = ? AND reason = ?"

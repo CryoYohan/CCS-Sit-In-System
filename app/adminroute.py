@@ -1437,3 +1437,35 @@ def edit_laboratory(lab_id):
                 'success': False,
                 'message': str(e)
             }),500
+
+@admin.route('/api/delete-laboratory/<lab_id>', methods=['DELETE'])
+def delete_laboratory(lab_id):
+    """API to delete a laboratory"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        # Call the delete method from your Admin class
+        response = admin_account.delete_lab(lab_id=lab_id)
+        
+        if response['success']:
+            return jsonify({
+                'success': True,
+                'message': 'Laboratory deleted successfully!'
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'message': response.get('error', 'Failed to delete laboratory')
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
