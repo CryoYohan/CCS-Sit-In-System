@@ -1464,6 +1464,19 @@ def delete_laboratory(lab_id):
         admin_account = Admin(**session.get('admin'))
 
     try:
+        image_filename = admin_account.get_lab_details(lab_id=lab_id)
+
+        if image_filename['success'] and image_filename['data']:
+            # Delete the associated image
+            image_path = os.path.join(
+                current_app.static_folder,
+                'images',
+                'laboratories',
+                image_filename['data'][0]['image']
+            )
+            if os.path.exists(image_path):
+                os.remove(image_path)
+                current_app.logger.info(f"Deleted laboratory image: {image_path}")
         # Call the delete method from your Admin class
         response = admin_account.delete_lab(lab_id=lab_id)
         
