@@ -42,6 +42,15 @@ class Admin(User):
          """Retrieve all labs"""
          return self.db.getall_records(table='lab')
 
+    def add_lab(self, **kwargs):
+        """Add a lab"""
+        try:
+            kwargs['added_date'] = datetime.now()
+            self.db.add_record(table='lab',**kwargs) 
+            return {'success': True} 
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
     def retrieve_all_current_sitins(self):
         """ Retrieve all students who currently in lab"""
         return self.db.retrieve_all_current_sitins()
