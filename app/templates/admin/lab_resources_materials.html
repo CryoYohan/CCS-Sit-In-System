@@ -47,7 +47,7 @@
                     </select>
                 </div>
 
-                <!-- Lab Selection -->
+                <!-- Lab Selection 
                 <div>
                     <label for="lab" class="block text-sm font-medium text-gray-700 mb-1">Associated Lab</label>
                     <select id="lab" name="lab" required
@@ -58,7 +58,7 @@
                         <option value="526">Lab 526</option>
                         <option value="all">All Labs</option>
                     </select>
-                </div>
+                </div>-->
 
                 <!-- File Upload -->
                 <div>
@@ -77,7 +77,8 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit"
+                <button type="button"
+                    onclick="add_resource()"
                     class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-300 shadow-lg hover:scale-[1.02] transform">
                     Upload Resource
                 </button>
@@ -114,7 +115,7 @@
                                 Type</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Lab</th>
+                                File</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status</th>
@@ -124,62 +125,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <!-- Sample Resource 1 -->
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">Python Lab Manual</div>
-                                <div class="text-sm text-gray-500">Updated 3 days ago</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Lab Manual</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">544</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span
-                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Published</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                                <a href="#" class="text-yellow-600 hover:text-yellow-900 mr-3">Unpublish</a>
-                                <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
-                            </td>
-                        </tr>
-
-                        <!-- Sample Resource 2 -->
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">ASP.NET Tutorial</div>
-                                <div class="text-sm text-gray-500">Uploaded 1 week ago</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Tutorial</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">530</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span
-                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Draft</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                                <a href="#" class="text-green-600 hover:text-green-900 mr-3">Publish</a>
-                                <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
-                            </td>
-                        </tr>
-
-                        <!-- Sample Resource 3 -->
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">Database Reference</div>
-                                <div class="text-sm text-gray-500">Created 2 weeks ago</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Reference</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">All Labs</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span
-                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Archived</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                                <a href="#" class="text-green-600 hover:text-green-900 mr-3">Restore</a>
-                                <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
-                            </td>
-                        </tr>
+                        <!--Dynamic ROws-->
                     </tbody>
                 </table>
             </div>
@@ -226,7 +172,183 @@
     </div>
 </div>
 
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', fetchLabResources);
+
+    function fetchLabResources() {
+        fetch('/admin/api/get-lab-resources')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderLabResources(data.resources);
+                } else {
+                    console.error('Error fetching resources:', data.error);
+                }
+            });
+    }
+
+    function renderLabResources(resources) {
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = ''; // Clear existing rows
+
+        resources.forEach(resource => {
+            const tr = document.createElement('tr');
+
+            const uploadDate = new Date(resource.upload_date);
+            const timeAgo = getTimeAgo(uploadDate);
+
+            tr.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">${resource.resources_name}</div>
+                    <div class="text-sm text-gray-500">${timeAgo}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${resource.resource_type}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${resource.resources_path}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(resource.status)}">
+                        ${resource.status}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
+                    <a href="#" class="${getToggleClass(resource.status)} mr-3">${getToggleText(resource.status)}</a>
+                    <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    function getTimeAgo(date) {
+        const now = new Date();
+        const diffMs = now - date;
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+            return 'Uploaded today';
+        } else if (diffDays === 1) {
+            return 'Uploaded 1 day ago';
+        } else {
+            return `Uploaded ${diffDays} days ago`;
+        }
+    }
+
+    function getStatusClasses(status) {
+        switch (status.toLowerCase()) {
+            case 'published':
+                return 'bg-green-100 text-green-800';
+            case 'draft':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'archived':
+                return 'bg-gray-100 text-gray-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    }
+
+    function getToggleText(status) {
+        switch (status.toLowerCase()) {
+            case 'published': return 'Unpublish';
+            case 'draft': return 'Publish';
+            case 'archived': return 'Restore';
+            default: return 'Toggle';
+        }
+    }
+
+    function getToggleClass(status) {
+        switch (status.toLowerCase()) {
+            case 'published': return 'text-yellow-600 hover:text-yellow-900';
+            case 'draft': return 'text-green-600 hover:text-green-900';
+            case 'archived': return 'text-green-600 hover:text-green-900';
+            default: return 'text-gray-600 hover:text-gray-900';
+        }
+    }
+
+    function add_resource() {
+        // Add Lab Resource
+        const resourceTitle = document.getElementById('title').value.trim();
+        const resourceDescription = document.getElementById('description').value.trim();
+        const resourceType = document.getElementById('type').value.trim();
+        const resourceFile = document.getElementById('file').files[0];
+        const resourcePublish = document.getElementById('publish').checked;
+        
+        const formData = new FormData();
+
+        if (resourcePublish){
+            formData.append('resource_name', resourceTitle);
+            formData.append('description', resourceDescription);
+            formData.append('resource_type', resourceType);
+            formData.append('resource_file', resourceFile);
+            formData.append('status', 'Published');
+
+            fetch ('/admin/api/add-lab-resource',{
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Resource Added',
+                        text: 'Resource added successfully!',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error adding resource: ' + data.message,
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+        }
+        else {
+           formData.append('resource_name', resourceTitle);
+            formData.append('description', resourceDescription);
+            formData.append('resource_type', resourceType);
+            formData.append('resource_file', resourceFile);
+            formData.append('status', 'Draft');
+
+            fetch ('/admin/api/add-lab-resource',{
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Resource Added',
+                        text: 'Resource added successfully!',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error adding resource: ' + data.message,
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+        }    
+    }
+
     // Modal functions
     function openModal() {
         document.getElementById('edit-modal').classList.remove('hidden');

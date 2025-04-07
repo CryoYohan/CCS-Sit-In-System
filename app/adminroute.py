@@ -27,10 +27,13 @@ db = Databasehelper()
 
 # Allowed extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+ALLOWED_FILE_EXTENSIONS = {'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'}
 
 # Function to check if the file extension is valid
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def allowed_file_extension(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_FILE_EXTENSIONS
 
 def save_image(image):
      # ✅ Attempt to save image
@@ -1532,3 +1535,83 @@ def delete_laboratory(lab_id):
             'success': False,
             'message': str(e)
         }), 500
+
+
+@admin.route('/api/get-lab-resources', methods=['GET'])
+def get_lab_resources():
+    """API to retrieve all lab resources"""
+    global admin_account
+    if not session.get('admin'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        resources = admin_account.get_lab_resources()  
+
+        # Convert objects to dictionaries
+        resources_list = [{
+            "resources_id": resource["resources_id"],
+            "resources_name": resource["resources_name"],
+            "description": resource["description"],
+            "resource_type": resource["resource_type"],
+            "resources_path": resource["resources_path"],
+            "status": resource["status"],
+            "upload_date": resource["upload_date"],
+        } 
+        for resource in resources['data']
+        ]
+
+        return jsonify({'success': True, 'resources': resources_list}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+    
+@admin.route('/api/add-lab-resource', methods=['POST'])
+def add_lab_resources():
+    """API to add a new lab resource"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        file = request.files.get("resource_file")
+
+        if file and allowed_file_extension(file.filename):
+            filename = secure_filename(file.filename)
+
+            # Create upload folder if it doesn't exist
+            upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/lab-resources"))
+            os.makedirs(upload_folder, exist_ok=True)
+
+            # Save file
+            file_path = os.path.join(upload_folder, filename)
+            file.save(file_path)
+
+            # Store relative path to DB (e.g., static/uploads/filename.pdf)
+            resource_path = os.path.join('static', 'uploads', filename)
+
+            data = {
+                'resources_name': request.form.get("resource_name"),
+                'description': request.form.get("description"),
+                'resource_type': request.form.get("resource_type"),
+                'resources_path': resource_path,  # pass the path instead of file object
+                'status': request.form.get("status"),
+                'upload_date': datetime.now(),
+            }
+
+            response = admin_account.add_lab_resource(**data)
+
+            if response['success']:
+                return jsonify({'success': True, 'message': 'Laboratory resource added successfully!'}), 200
+            else:
+                return jsonify({'success': False, 'message': response['error']}), 500
+        else:
+            return jsonify({'success': False, 'message': 'Invalid or missing file type.'}), 400
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
