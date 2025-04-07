@@ -283,12 +283,28 @@ class Admin(User):
             return {'success': True}
         except Exception as e:
             return {'success': False, 'error': str(e)}
+    
+    def delete_lab_resource(self, resources_id):
+        """Delete lab resource"""
+        try:
+            self.db.delete_record(table='lab_resources', resources_id=resources_id)
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
 
     def get_lab_resources(self):
         """Get lab resources"""
         try:
             resources = self.db.getall_records(table='lab_resources')
             return {'success': True, 'data': resources}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+    
+    def get_lab_resource_by_id(self, resources_id):
+        """Get lab resource by ID"""
+        try:
+            resource = self.db.fetchOne(table='lab_resources',resources_id=resources_id)
+            return {'success': True, 'data': resource}
         except Exception as e:
             return {'success': False, 'error': str(e)}
 

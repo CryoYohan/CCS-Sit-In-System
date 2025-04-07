@@ -1599,7 +1599,7 @@ def add_lab_resources():
                 'resources_name': request.form.get("resource_name"),
                 'description': request.form.get("description"),
                 'resource_type': request.form.get("resource_type"),
-                'resources_path': resource_path,  # pass the path instead of file object
+                'resources_path': filename,  # pass the path instead of file object
                 'status': request.form.get("status"),
                 'upload_date': datetime.now(),
             }
@@ -1613,5 +1613,43 @@ def add_lab_resources():
         else:
             return jsonify({'success': False, 'message': 'Invalid or missing file type.'}), 400
 
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+    
+
+@admin.route('/api/delete-lab-resource/<resources_id>', methods=['DELETE'])
+def delete_lab_resource(resources_id):
+    """API to delete a lab resource"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        # Get the resource details first
+        resource_details = admin_account.get_lab_resource_by_id(resources_id=resources_id)
+
+        if resource_details['success'] and resource_details['data']:
+            # Delete the associated file
+            file_path = os.path.join(
+                current_app.static_folder,
+                'lab-resources',
+                resource_details['data'][0]['resources_path']
+            )
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                current_app.logger.info(f"Deleted lab resource file: {file_path}")
+
+        # Call the delete method from your Admin class
+        response = admin_account.delete_lab_resource(resources_id=resources_id)
+        
+        if response['success']:
+            return jsonify({'success': True, 'message': 'Laboratory resource deleted successfully!'}), 200
+        else:
+            return jsonify({'success': False, 'message': response['error']}), 500
+            
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
