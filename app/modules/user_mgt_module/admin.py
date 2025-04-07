@@ -274,7 +274,23 @@ class Admin(User):
             return {'success': True}
         except Exception as e:
             return {'success': False, 'message': str(e)}
+        
 
+    def add_lab_resource(self, **kwargs):
+        """Add lab resource"""
+        try:
+            self.db.add_record(table='lab_resources',**kwargs)
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    def get_lab_resources(self):
+        """Get lab resources"""
+        try:
+            resources = self.db.getall_records(table='lab_resources')
+            return {'success': True, 'data': resources}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
 
 
     def update(self, **kwargs):
