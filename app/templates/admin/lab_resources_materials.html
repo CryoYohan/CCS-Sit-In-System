@@ -47,19 +47,6 @@
                     </select>
                 </div>
 
-                <!-- Lab Selection 
-                <div>
-                    <label for="lab" class="block text-sm font-medium text-gray-700 mb-1">Associated Lab</label>
-                    <select id="lab" name="lab" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <option value="">Select lab</option>
-                        <option value="530">Lab 530</option>
-                        <option value="544">Lab 544</option>
-                        <option value="526">Lab 526</option>
-                        <option value="all">All Labs</option>
-                    </select>
-                </div>-->
-
                 <!-- File Upload -->
                 <div>
                     <label for="file" class="block text-sm font-medium text-gray-700 mb-1">File Upload</label>
@@ -130,20 +117,16 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="mt-4 flex items-center justify-between">
+           <!-- Pagination -->
+            <div class="mt-4 flex items-center justify-between pagination">
                 <div class="text-sm text-gray-500">
-                    Showing <span class="font-medium">1</span> to <span class="font-medium">3</span> of <span
-                        class="font-medium">24</span> resources
+                    Showing <span class="font-medium">1</span> to <span class="font-medium">3</span> of <span class="font-medium">24</span> resources
                 </div>
                 <div class="flex space-x-2">
-                    <button class="px-3 py-1 border rounded-lg text-sm bg-gray-100 text-gray-500">Previous</button>
-                    <button class="px-3 py-1 border rounded-lg text-sm bg-blue-500 text-white">1</button>
-                    <button class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-100">2</button>
-                    <button class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-100">3</button>
-                    <button class="px-3 py-1 border rounded-lg text-sm hover:bg-gray-100">Next</button>
+                    <!-- Pagination buttons will be inserted here -->
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -175,6 +158,10 @@
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    let currentPage = 1;
+    const rowsPerPage = 5;
+    let resources = []; // Declare a global variable to hold the resources
+
     document.addEventListener('DOMContentLoaded', fetchLabResources);
 
     function fetchLabResources() {
@@ -182,18 +169,24 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    renderLabResources(data.resources);
+                    resources = data.resources; // Store fetched resources globally
+                    renderLabResources();
+                    renderPagination();
                 } else {
                     console.error('Error fetching resources:', data.error);
                 }
             });
     }
 
-    function renderLabResources(resources) {
+    function renderLabResources() {
         const tbody = document.querySelector('tbody');
         tbody.innerHTML = ''; // Clear existing rows
 
-        if (resources.length === 0) {
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const currentPageResources = resources.slice(startIndex, endIndex); // Slice the data for the current page
+
+        if (currentPageResources.length === 0) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td colspan="5" class="px-6 py-4 text-center text-gray-500">
@@ -204,9 +197,8 @@
             return;
         }
 
-        resources.forEach(resource => {
+        currentPageResources.forEach(resource => {
             const tr = document.createElement('tr');
-
             const uploadDate = new Date(resource.upload_date);
             const timeAgo = getTimeAgo(uploadDate);
 
@@ -228,9 +220,59 @@
                     <a href="#" onclick="deleteLabResource(${resource.resources_id})" class="text-red-600 hover:text-red-900">Delete</a>
                 </td>
             `;
-
             tbody.appendChild(tr);
         });
+    }
+
+    function renderPagination() {
+        const totalPages = Math.ceil(resources.length / rowsPerPage);
+        const paginationContainer = document.querySelector('.pagination');
+        
+        // Clear existing pagination
+        paginationContainer.innerHTML = '';
+
+        // Previous Button
+        const prevButton = document.createElement('button');
+        prevButton.textContent = 'Prev';
+        prevButton.disabled = currentPage === 1;
+        prevButton.classList.add('px-4', 'py-2', 'mx-2', 'bg-blue-500', 'text-white', 'rounded-lg', 'hover:bg-blue-600', 'transition');
+        prevButton.disabled && prevButton.classList.add('opacity-50');
+        prevButton.addEventListener('click', () => changePage(currentPage - 1));
+        paginationContainer.appendChild(prevButton);
+
+        // Page Numbers
+        for (let page = 1; page <= totalPages; page++) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = page;
+            pageButton.classList.add('px-4', 'py-2', 'mx-2', 'rounded-lg', 'text-sm', 'font-medium', 'transition', 'duration-150');
+            
+            // Add active class for the current page
+            pageButton.classList.add(currentPage === page ? 'bg-blue-500' : 'bg-gray-200');
+            
+            // Hover effect for page buttons
+            pageButton.classList.add('hover:bg-blue-400', 'hover:text-white');
+            
+            pageButton.addEventListener('click', () => changePage(page));
+            paginationContainer.appendChild(pageButton);
+        }
+
+        // Next Button
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Next';
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.classList.add('px-4', 'py-2', 'mx-2', 'bg-blue-500', 'text-white', 'rounded-lg', 'hover:bg-blue-600', 'transition');
+        nextButton.disabled && nextButton.classList.add('opacity-50');
+        nextButton.addEventListener('click', () => changePage(currentPage + 1));
+        paginationContainer.appendChild(nextButton);
+    }
+
+    function changePage(page) {
+        const totalPages = Math.ceil(resources.length / rowsPerPage);
+        if (page < 1 || page > totalPages) return; // Prevent going beyond valid pages
+
+        currentPage = page;
+        renderLabResources(); // Re-render resources for the new page
+        renderPagination(); // Re-render pagination buttons
     }
 
     function getTimeAgo(date) {
@@ -277,6 +319,8 @@
             default: return 'text-gray-600 hover:text-gray-900';
         }
     }
+
+
 
     function add_resource() {
         // Add Lab Resource
