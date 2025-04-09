@@ -337,6 +337,27 @@ class Admin(User):
                 return {'success': True, 'message': 'Update Successful'}
         except Exception as e:
             return {'success': False, 'error': str(e)}
+
+    
+    def reset_one_session(self, idno):
+        """Reset one session"""
+        try:
+            user = self.db.find_record(table='user', idno=idno)
+            if user:
+                self.db.update_record(table='user', idno=idno, session=30)
+                return {'success': True}
+            else:
+                return {'success': False, 'message': 'User not found'}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
+        
+    def reset_all_sessions(self):
+        """Reset all sessions"""
+        try:
+            self.db.reset_all_session()
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
         
 
     def delete(self):
