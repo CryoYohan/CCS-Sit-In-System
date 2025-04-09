@@ -315,6 +315,14 @@ class Admin(User):
             return {'success': True, 'data': resource}
         except Exception as e:
             return {'success': False, 'error': str(e)}
+    
+    def publish_unpublish(self, **kwargs):
+        """Publish/Unpublish lab resources"""
+        try:
+            self.db.update_record(table='lab_resources', **kwargs)
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
 
 
     def update(self, **kwargs):

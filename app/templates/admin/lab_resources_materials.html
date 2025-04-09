@@ -659,19 +659,17 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const formData = new FormData();
+                formData.append('resources_id', resources_id);
                 formData.append('edit-status', newStatus);
 
-                fetch(`/admin/api/edit-lab-resource/${resources_id}`, {
+                fetch(`/admin/api/publish-unpublish`, {
                     method: 'POST',
                     body: formData,
                     headers: {
                         'Accept': 'application/json',
                     },
                 })
-                    .then(response => {
-                        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             Swal.fire(

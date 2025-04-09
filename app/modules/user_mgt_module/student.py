@@ -80,3 +80,12 @@ class Student(User):
         except Exception as e:
             return {'success': False, 'message':str(e)}
     
+    def get_lab_resources(self):
+        """Retrieve all lab resources"""
+        try:
+            lab_resources = self.db.fetchOne(table='lab_resources', status='Published')
+            return {'success': True, 'data': lab_resources}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    

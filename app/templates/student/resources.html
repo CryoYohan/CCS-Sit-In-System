@@ -1,0 +1,347 @@
+{% extends 'dashboard_template.html' %}
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-8 animate-fadeIn">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8 p-6 bg-white rounded-xl shadow-md animate-slideDown">
+        <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+            🖥️ Lab Resources
+            <span class="ml-2 text-2xl">📚</span>
+        </h1>
+        <div class="flex space-x-4">
+            <span class="text-2xl">🔧</span>
+            <span class="text-2xl">💾</span>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="">
+        <!-- Resource Management -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md animate-slideUp">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Available Lab Resources</h2>
+                <div class="flex space-x-2">
+                    <button id="filter-btn" class="px-3 py-1 bg-gray-100 rounded-lg text-sm flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        Filter
+                    </button>
+                    <input type="text" placeholder="Search resources..." class="px-3 py-1 border rounded-lg text-sm">
+                </div>
+            </div>
+
+            <!-- Resource Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Resource ID</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Title</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Type</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                File</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <!--Dynamic ROws-->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-4 flex items-center justify-between pagination">
+                <div class="text-sm text-gray-500">
+                    Showing <span class="font-medium">1</span> to <span class="font-medium">3</span> of <span
+                        class="font-medium">24</span> resources
+                </div>
+                <div class="flex space-x-2">
+                    <!-- Pagination buttons will be inserted here -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Edit Resource -->
+<div id="edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-1/2 shadow-lg rounded-md bg-white animate-fadeIn">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">Edit Resource</h3>
+            <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <!-- Upload Resources Card -->
+        <div class="bg-white p-6 rounded-xl shadow-md animate-slideUp">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Edit Lab Resource</h2>
+            <form action="#" method="post" enctype="multipart/form-data" class="space-y-4">
+                <input type="text" id="edit-resources-id" name="resources_id" hidden>
+                <!-- Resource Title -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Resource Title</label>
+                    <input type="text" id="edit-resources-name" name="title" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+
+                <!-- Resource Description -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="edit-description" name="description" rows="3" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"></textarea>
+                </div>
+
+                <!-- Resource Type -->
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Resource Type</label>
+                    <select id="edit-resource_type" name="type" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option value="">Select type</option>
+                        <option value="Lecture Note">Lecture Note</option>
+                        <option value="Lab Manual">Lab Manual</option>
+                        <option value="Software">Software</option>
+                        <option value="Tutorial">Tutorial</option>
+                        <option value="Reference">Reference Material</option>
+                    </select>
+                </div>
+
+                <!-- File Upload -->
+                <div>
+                    <label for="file" class="block text-sm font-medium text-gray-700 mb-1">File Upload</label>
+                    <div class="mt-1 flex items-center">
+                        <input type="file" id="edit-file" name="file" required
+                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+                </div>
+
+                <!-- Publish Option -->
+                <div class="flex items-center">
+                    <input id="edit-publish" name="edit-publish" type="checkbox"
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="edit-publish" class="ml-2 block text-sm text-gray-700">Publish immediately</label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" onclick="editResource()"
+                    class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-300 shadow-lg hover:scale-[1.02] transform">
+                    Update Resource
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    let currentPage = 1;
+    const rowsPerPage = 5;
+    let resources = []; // Declare a global variable to hold the resources
+
+    document.addEventListener('DOMContentLoaded', fetchLabResources);
+
+    function fetchLabResources() {
+        fetch('/api/get-lab-resources')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    resources = data.resources; // Store fetched resources globally
+                    renderLabResources();
+                    renderPagination();
+                } else {
+                    console.error('Error fetching resources:', data.error);
+                }
+            });
+    }
+
+    function renderLabResources() {
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = ''; // Clear existing rows
+
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const currentPageResources = resources.slice(startIndex, endIndex); // Slice the data for the current page
+
+        if (currentPageResources.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                    No lab resources uploaded yet.
+                </td>
+            `;
+            tbody.appendChild(tr);
+            return;
+        }
+
+        currentPageResources.forEach(resource => {
+            const tr = document.createElement('tr');
+            const uploadDate = new Date(resource.upload_date);
+            const timeAgo = getTimeAgo(uploadDate);
+
+            tr.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${resource.resources_id}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">${resource.resources_name}</div>
+                    <div class="text-sm text-gray-500">${timeAgo}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${resource.resource_type}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${resource.resources_path}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(resource.status)}">
+                        ${resource.status}
+                    </span>
+                </td>
+            `;
+
+            // Action buttons container
+            const tdActions = document.createElement('td');
+            tdActions.className = "px-6 py-4 whitespace-nowrap text-sm font-medium";
+
+            // Edit link
+            const downloadLink = document.createElement('a');
+            downloadLink.href = "#";
+            downloadLink.className = "text-blue-600 hover:text-blue-900 mr-3";
+            downloadLink.textContent = "Download";
+            downloadLink.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default anchor behavior
+                //openEditModal(resource);
+            });
+
+            // Append all action links
+            tdActions.appendChild(downloadLink);
+
+            // Append actions to the row
+            tr.appendChild(tdActions);
+
+            // Append the row to the table
+            tbody.appendChild(tr);
+        });
+    }
+
+
+    function renderPagination() {
+        const totalPages = Math.ceil(resources.length / rowsPerPage);
+        const paginationContainer = document.querySelector('.pagination');
+
+        // Clear existing pagination
+        paginationContainer.innerHTML = '';
+
+        // Previous Button
+        const prevButton = document.createElement('button');
+        prevButton.textContent = 'Prev';
+        prevButton.disabled = currentPage === 1;
+        prevButton.classList.add('px-4', 'py-2', 'mx-2', 'bg-blue-500', 'text-white', 'rounded-lg', 'hover:bg-blue-600', 'transition');
+        prevButton.disabled && prevButton.classList.add('opacity-50');
+        prevButton.addEventListener('click', () => changePage(currentPage - 1));
+        paginationContainer.appendChild(prevButton);
+
+        // Page Numbers
+        for (let page = 1; page <= totalPages; page++) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = page;
+            pageButton.classList.add('px-4', 'py-2', 'mx-2', 'rounded-lg', 'text-sm', 'font-medium', 'transition', 'duration-150');
+
+            // Add active class for the current page
+            pageButton.classList.add(currentPage === page ? 'bg-blue-500' : 'bg-gray-200');
+
+            // Hover effect for page buttons
+            pageButton.classList.add('hover:bg-blue-400', 'hover:text-white');
+
+            pageButton.addEventListener('click', () => changePage(page));
+            paginationContainer.appendChild(pageButton);
+        }
+
+        // Next Button
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Next';
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.classList.add('px-4', 'py-2', 'mx-2', 'bg-blue-500', 'text-white', 'rounded-lg', 'hover:bg-blue-600', 'transition');
+        nextButton.disabled && nextButton.classList.add('opacity-50');
+        nextButton.addEventListener('click', () => changePage(currentPage + 1));
+        paginationContainer.appendChild(nextButton);
+    }
+
+    function changePage(page) {
+        const totalPages = Math.ceil(resources.length / rowsPerPage);
+        if (page < 1 || page > totalPages) return; // Prevent going beyond valid pages
+
+        currentPage = page;
+        renderLabResources(); // Re-render resources for the new page
+        renderPagination(); // Re-render pagination buttons
+    }
+
+    function getTimeAgo(date) {
+        const now = new Date();
+        const diffMs = now - date;
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+            return 'Uploaded today';
+        } else if (diffDays === 1) {
+            return 'Uploaded 1 day ago';
+        } else {
+            return `Uploaded ${diffDays} days ago`;
+        }
+    }
+
+    function getStatusClasses(status) {
+        switch (status.toLowerCase()) {
+            case 'published':
+                return 'bg-green-100 text-green-800';
+            case 'draft':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'archived':
+                return 'bg-gray-100 text-gray-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    }
+
+    function getToggleText(status) {
+        switch (status.toLowerCase()) {
+            case 'published': return 'Unpublish';
+            case 'draft': return 'Publish';
+            case 'archived': return 'Restore';
+            default: return 'Toggle';
+        }
+    }
+
+    function getToggleClass(status) {
+        switch (status.toLowerCase()) {
+            case 'published': return 'text-yellow-600 hover:text-yellow-900';
+            case 'draft': return 'text-green-600 hover:text-green-900';
+            case 'archived': return 'text-green-600 hover:text-green-900';
+            default: return 'text-gray-600 hover:text-gray-900';
+        }
+    }
+
+
+    // Modal functions
+    function openModal() {
+        document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+    }
+
+</script>
+{% endblock %}

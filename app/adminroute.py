@@ -1695,6 +1695,31 @@ def edit_lab_resource(resources_id):
 
     except Exception as  e:
          return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin.route('/api/publish-unpublish', methods=['POST'])
+def publish_unpublish():
+    """API to publish/unpublish lab resources"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        resources_id = request.form.get('resources_id')
+        status = request.form.get('edit-status')
+
+        response = admin_account.publish_unpublish(resources_id=resources_id, status=status)
+
+        if response['success']:
+            return jsonify({'success': True, 'message': 'Status updated successfully!'}), 200
+        else:
+            return jsonify({'success': False, 'message': response['error']}), 500
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
     
 
 def deleteResourceFile(resources_id):
