@@ -661,6 +661,7 @@ def reserve_lab():
             'message': 'Invalid date or time format. Please use "YYYY-MM-DD HH:MM".'
         }), 400
 
+
     # Check if the reservation datetime is in the past
     current_datetime = datetime.now()
     if reserve_datetime <= current_datetime:

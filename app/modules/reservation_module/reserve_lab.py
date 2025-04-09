@@ -67,7 +67,7 @@ class Reservation():
             # Check if the student has any Pending or Approved reservations
             active_reservations = [
                 reservation for reservation in student_reservations
-                if reservation['status'] in ['Pending', 'Approved']  # Access 'status' directly
+                if reservation['status'] == 'Pending'  # Access 'status' directly
             ]
             print("Active Reservations:", active_reservations)  # Debugging
 
