@@ -432,6 +432,12 @@
                             data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                 }
                 </td>
+                <td class="px-4 py-3 text-sm text-gray-700">
+                <button class="bg-yellow-500 px-4 py-2 rounded-lg text-white hover:bg-yellow-600 transition"
+                    onclick="resetPassword('${user.idno}')">Reset Password</button>
+                <button class="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600 transition"
+                    onclick="resetSession('${user.idno}')">Reset Session</button>
+                </td>
             </tr>`
             tableBody.innerHTML += row;
         });
@@ -466,6 +472,12 @@
                             data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                 }
                 </td>
+                <td class="px-4 py-3 text-sm text-gray-700">
+                <button class="bg-yellow-500 px-4 py-2 rounded-lg text-white hover:bg-yellow-600 transition"
+                    onclick="resetPassword('${user.idno}')">Reset Password</button>
+                <button class="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600 transition"
+                    onclick="resetSession('${user.idno}')">Reset Session</button>
+                </td>
             </tr>`
             tableBody.innerHTML += row;
         })
@@ -499,6 +511,12 @@
                             data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                 }
                 </td>
+                <td class="px-4 py-3 text-sm text-gray-700">
+                <button class="bg-yellow-500 px-4 py-2 rounded-lg text-white hover:bg-yellow-600 transition"
+                    onclick="resetPassword('${user.idno}')">Reset Password</button>
+                <button class="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600 transition"
+                    onclick="resetSession('${user.idno}')">Reset Session</button>
+                </td>
             </tr>`
             tableBody.innerHTML += row;
         });
@@ -531,10 +549,70 @@
                         data-idno="${user.idno}" data-session="${user.session}">Log-off</button>`
                     }
             </td>
+            <td class="px-4 py-3 text-sm text-gray-700">
+                <button class="bg-yellow-500 px-4 py-2 rounded-lg text-white hover:bg-yellow-600 transition"
+                    onclick="resetPassword('${user.idno}')">Reset Password</button>
+                <button class="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600 transition"
+                    onclick="resetSession('${user.idno}')">Reset Session</button>
+            </td>
         </tr>`
                 tableBody.innerHTML += row;
             });
         });
+    }
+
+    function resetPassword(idno) {
+
+
+    }
+
+    function resetSession(idno) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This will reset the session for this student.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, reset it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Call the API to reset the session
+                fetch(`/admin/api/reset-one-session/${idno}`, {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                'Reset!',
+                                'The session has been reset.',
+                                'success'
+                            ).then(() => {
+                                clearFilter(); // Refresh the user list
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                data.message,
+                                'error'
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred while resetting the session.',
+                            'error'
+                        );
+                    });
+            }
+        });
+    }
+
+    function resetAllSession() {
+
     }
 
 </script>

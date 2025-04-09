@@ -1737,3 +1737,49 @@ def deleteResourceFile(resources_id):
             if os.path.exists(file_path):
                 os.remove(file_path)
                 current_app.logger.info(f"Deleted lab resource file: {file_path}")
+
+
+@admin.route('/api/reset-one-session/<idno>', methods=['POST'])
+def reset_one(idno):
+    """API to reset a single session"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        response = admin_account.reset_one_session(idno=idno)
+
+        if response['success']:
+            return jsonify({'success': True, 'message': 'Session reset successfully!'}), 200
+        else:
+            return jsonify({'success': False, 'message': response['error']}), 500
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@admin.route('/api/reset-all-session')
+def reset_all():
+    """API to reset all sessions"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        response = admin_account.reset_all_sessions()
+
+        if response['success']:
+            return jsonify({'success': True, 'message': 'All sessions reset successfully!'}), 200
+        else:
+            return jsonify({'success': False, 'message': response['error']}), 500
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
