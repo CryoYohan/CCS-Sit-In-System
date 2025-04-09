@@ -74,7 +74,7 @@ class Databasehelper:
 
     def getall_sessionhistory(self, idno:str)->list:
         """Retrieve session history"""
-        query = f"SELECT * FROM sitin_record WHERE idno = ? ORDER BY status DESC"
+        query = f"SELECT * FROM sitin_record_details WHERE idno = ? ORDER BY status DESC"
         return self.getprocess(query, (idno,))
     
     def reset_all_session(self):
