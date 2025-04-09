@@ -79,58 +79,112 @@
 
 <!-- Modal -->
 <div id="reservationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h3 class="text-lg font-medium text-gray-900 text-center">Available Schedules</h3>
+    <div class="bg-white p-8 rounded-lg shadow-xl w-96 space-y-6">
+        <h3 class="text-xl font-semibold text-gray-900 text-center">Available Schedules</h3>
         <form action="#">
-            <div>
-                <label for="lab" class="block text-sm font-medium text-gray-700">Select Laboratory</label>
-                <select id="lab" name="lab"
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    required>
-                    {% for lab in labs %}
-                    <option value="{{ lab['lab_name'] }}">Lab {{ lab['lab_name'] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <!-- Hidden input to store the selected date (month and day) -->
-                <input type="hidden" id="selected-date" name="selected-date">
+            <div class="space-y-4">
+                <div>
+                    <label for="lab" class="block text-sm font-medium text-gray-700">Select Laboratory</label>
+                    <select id="lab" name="lab"
+                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                        <option value="#" selected> Choose a Lab</option>
+                        <!-- Dynamic options will be inserted here -->
+                    </select>
+                </div>
 
-                <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Sit-in</label>
-                <select id="reason" name="purpose"
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    required>
-                    <option value="Programming Related Projects">Programming Related Projects</option>
-                    <option value="Java">Java</option>
-                    <option value="Python">Python</option>
-                    <option value="C">C</option>
-                    <option value="C#">C#</option>
-                    <option value="Web Dev">Web Dev</option>
-                    <option value="School purposes">School purposes</option>
-                    <!-- Add more options as needed -->
-                </select>
-            </div>
-            <div>
-                <label for="time" class="block text-sm font-medium text-gray-700">Time</label>
-                <input type="time" id="sit-in-time" name="sit-in-time" min="09:00" max="18:00" ...>
-            </div>
-            <div class="mt-3" id="scheduleList"></div>
-            <div class="flex justify-center gap-2">
+                <div>
+                    <input type="hidden" id="selected-date" name="selected-date">
+
+                    <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Sit-in</label>
+                    <select id="reason" name="purpose"
+                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                        <option value="#" selected> Choose Reason</option>
+                        <option value="Programming Related Projects">Programming Related Projects</option>
+                        <option value="Java">Java</option>
+                        <option value="Python">Python</option>
+                        <option value="C">C</option>
+                        <option value="C#">C#</option>
+                        <option value="Web Dev">Web Dev</option>
+                        <option value="School purposes">School purposes</option>
+                    </select>
+                </div>
+
+
+                <!-- Dynamic Schedule List -->
                 <div class="mt-4">
-                    <button id="reserve" type="button"
-                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-gray-700">Reserve</button>
+                    <label for="schedule" class="block text-sm font-medium text-gray-700">Available Schedule</label>
+                    <select id="schedule" name="schedule"
+                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Select a time</option>
+                    </select>
                 </div>
-                <div class="mt-4 ">
-                    <button type="button" id="closeModal"
-                        class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700">Close</button>
-                </div>
+            </div>
+
+            <div class="flex justify-center gap-4 mt-6">
+                <button id="reserve" type="button"
+                    class="w-full py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">
+                    Reserve
+                </button>
+            </div>
+
+            <div class="mt-4 flex justify-center">
+                <button type="button" id="closeModal"
+                    class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                    Close
+                </button>
             </div>
         </form>
-
     </div>
 </div>
 
+
 <script>
+    // Fetch labs from the server and populate the "lab" select dropdown
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch('/api/labs')
+            .then(response => response.json())
+            .then(labs => {
+                const labSelect = document.getElementById('lab');
+
+                // Check if labs were successfully fetched
+                if (Array.isArray(labs) && labs.length > 0) {
+                    labs.forEach(lab => {
+                        const option = document.createElement('option');
+                        option.value = lab.lab_id; // Use lab_id as the value
+                        option.textContent = `Lab ${lab.lab_name}`; // Display lab name
+                        labSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching labs:', error));
+
+        // Event listener for when a lab is selected
+        document.getElementById('lab').addEventListener('change', function () {
+            const selectedLabId = this.value;
+            const scheduleSelect = document.getElementById('schedule');
+
+            // Clear previous schedules
+            scheduleSelect.innerHTML = '<option value="">Select a time</option>';
+
+            // Fetch the lab schedules for the selected lab
+            fetch(`/api/labs/${selectedLabId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.vacant_time) {
+                        data.vacant_time.forEach(time => {
+                            const option = document.createElement('option');
+                            option.value = time;
+                            option.textContent = time;
+                            scheduleSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error fetching lab schedules:', error));
+        });
+    });
+
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     let calendarData = {}; // Initialize as an empty object
@@ -481,11 +535,6 @@
         // Store the selected date (month and day) in the hidden input
         const selectedDateInput = document.getElementById('selected-date');
         selectedDateInput.value = date; // Store the full date (YYYY-MM-DD)
-
-        // Display available schedules
-        document.getElementById('scheduleList').innerHTML = schedules.length > 0 ?
-            schedules.map(schedule => `<div class='mb-2'><input type='radio' name='schedule' value='${schedule}' class='mr-2'>${schedule}</div>`).join('')
-            : '<p class="text-gray-500 text-center">No available schedules</p>';
 
         // Show the modal
         document.getElementById('reservationModal').classList.remove('hidden');
