@@ -1783,3 +1783,27 @@ def reset_all():
 
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin.route('/api/reset-password', methods=['POST'])
+def reset_student_password():
+    """API to reset password"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        idno = request.form.get('idno')
+        new_password = request.form.get('newPassword')
+
+        response = admin_account.reset_password(idno=idno, password=new_password)
+        if response['success']:
+            return jsonify({'success': True, 'message': 'Password reset successfully!'}), 200
+        else:
+            return jsonify({'success': False, 'message': response['error']}), 500
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
