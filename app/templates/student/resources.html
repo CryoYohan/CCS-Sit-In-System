@@ -215,14 +215,14 @@
             const tdActions = document.createElement('td');
             tdActions.className = "px-6 py-4 whitespace-nowrap text-sm font-medium";
 
-            // Edit link
+            // Download link
             const downloadLink = document.createElement('a');
             downloadLink.href = "#";
             downloadLink.className = "text-blue-600 hover:text-blue-900 mr-3";
             downloadLink.textContent = "Download";
             downloadLink.addEventListener('click', (e) => {
-                e.preventDefault(); // Prevent default anchor behavior
-                //openEditModal(resource);
+                e.preventDefault();
+                downloadFile(resource.resources_path); // Call download function
             });
 
             // Append all action links
@@ -234,6 +234,26 @@
             // Append the row to the table
             tbody.appendChild(tr);
         });
+    }
+
+    // New function to handle file download
+    function downloadFile(filePath) {
+        // Construct the full URL to your file
+        // Assuming resources_path is relative to static/lab-resources
+        const downloadUrl = `/static/lab-resources/${filePath}`;
+
+        // Create a temporary anchor element to trigger download
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+
+        // Extract filename from path (optional but nice for UX)
+        const fileName = filePath.split('/').pop();
+        link.download = fileName || 'download';
+
+        // Append to body, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
 
