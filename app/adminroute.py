@@ -1629,7 +1629,78 @@ def delete_lab_resource(resources_id):
         admin_account = Admin(**session.get('admin'))
 
     try:
-        # Get the resource details first
+
+        deleteResourceFile(resources_id=resources_id)
+
+        # Call the delete method from your Admin class
+        response = admin_account.delete_lab_resource(resources_id=resources_id)
+        
+        if response['success']:
+            return jsonify({'success': True, 'message': 'Laboratory resource deleted successfully!'}), 200
+        else:
+            return jsonify({'success': False, 'message': response['error']}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin.route('/api/edit-lab-resource/<resources_id>', methods=['POST'])
+def edit_lab_resource(resources_id):
+    """API to edit a lab resource"""
+    global admin_account 
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        print('Admin Object is none')
+        admin_account = Admin(**session.get('admin'))
+        print('Admin object no longer None')
+
+    try:
+
+        filename = ''
+        file = request.files.get("edit-file")
+        
+
+        if file and allowed_file_extension(file.filename):
+
+            deleteResourceFile(resources_id=request.form.get("edit-resources_id"))
+
+            filename = secure_filename(file.filename)
+             # Create upload folder if it doesn't exist
+            upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/lab-resources"))
+            os.makedirs(upload_folder, exist_ok=True)
+
+            # Save file
+            file_path = os.path.join(upload_folder, filename)
+            file.save(file_path)
+            
+            
+        data = {
+            'resources_id': resources_id,
+            'resources_name': request.form.get("edit-resources_name"),
+            'resources_path': filename,  # pass the path instead of file object
+            'description': request.form.get("edit-description"),
+            'resource_type': request.form.get("edit-resource_type"),
+            'status': request.form.get("edit-status"),
+            'upload_date': datetime.now(),
+        }
+
+        print(f'Data for Update {data}')
+
+        response = admin_account.update_lab_resource(**{k:v for k,v in data.items() if not v == ''})  
+
+        if response['success']:
+            return jsonify({'success': True, 'message': 'Laboratory resource edited successfully!'}), 200
+        else:
+            return jsonify({'success': False, 'message': response['error']}), 500
+
+    except Exception as  e:
+         return jsonify({'success': False, 'message': str(e)}), 500
+    
+def deleteResourceFile(resources_id):
+        """Delete a resource file from static folder"""
+     # Get the resource details first
         resource_details = admin_account.get_lab_resource_by_id(resources_id=resources_id)
 
         if resource_details['success'] and resource_details['data']:
@@ -1642,14 +1713,3 @@ def delete_lab_resource(resources_id):
             if os.path.exists(file_path):
                 os.remove(file_path)
                 current_app.logger.info(f"Deleted lab resource file: {file_path}")
-
-        # Call the delete method from your Admin class
-        response = admin_account.delete_lab_resource(resources_id=resources_id)
-        
-        if response['success']:
-            return jsonify({'success': True, 'message': 'Laboratory resource deleted successfully!'}), 200
-        else:
-            return jsonify({'success': False, 'message': response['error']}), 500
-            
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500

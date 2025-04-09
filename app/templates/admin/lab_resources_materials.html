@@ -64,8 +64,7 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="button"
-                    onclick="add_resource()"
+                <button type="button" onclick="add_resource()"
                     class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-300 shadow-lg hover:scale-[1.02] transform">
                     Upload Resource
                 </button>
@@ -96,6 +95,9 @@
                         <tr>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Resource ID</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Title</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -117,10 +119,11 @@
                 </table>
             </div>
 
-           <!-- Pagination -->
+            <!-- Pagination -->
             <div class="mt-4 flex items-center justify-between pagination">
                 <div class="text-sm text-gray-500">
-                    Showing <span class="font-medium">1</span> to <span class="font-medium">3</span> of <span class="font-medium">24</span> resources
+                    Showing <span class="font-medium">1</span> to <span class="font-medium">3</span> of <span
+                        class="font-medium">24</span> resources
                 </div>
                 <div class="flex space-x-2">
                     <!-- Pagination buttons will be inserted here -->
@@ -143,14 +146,61 @@
                 </svg>
             </button>
         </div>
-        <!-- Edit form would go here -->
-        <div class="mt-4">
-            <p>Edit form content would appear here for the selected resource.</p>
-        </div>
-        <div class="mt-4 flex justify-end space-x-3">
-            <button onclick="closeModal()"
-                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
-            <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save Changes</button>
+        <!-- Upload Resources Card -->
+        <div class="bg-white p-6 rounded-xl shadow-md animate-slideUp">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Edit Lab Resource</h2>
+            <form action="#" method="post" enctype="multipart/form-data" class="space-y-4">
+                <input type="text" id="edit-resources-id" name="resources_id" hidden>
+                <!-- Resource Title -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Resource Title</label>
+                    <input type="text" id="edit-resources-name" name="title" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+
+                <!-- Resource Description -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="edit-description" name="description" rows="3" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"></textarea>
+                </div>
+
+                <!-- Resource Type -->
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Resource Type</label>
+                    <select id="edit-resource_type" name="type" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option value="">Select type</option>
+                        <option value="Lecture Note">Lecture Note</option>
+                        <option value="Lab Manual">Lab Manual</option>
+                        <option value="Software">Software</option>
+                        <option value="Tutorial">Tutorial</option>
+                        <option value="Reference">Reference Material</option>
+                    </select>
+                </div>
+
+                <!-- File Upload -->
+                <div>
+                    <label for="file" class="block text-sm font-medium text-gray-700 mb-1">File Upload</label>
+                    <div class="mt-1 flex items-center">
+                        <input type="file" id="edit-file" name="file" required
+                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+                </div>
+
+                <!-- Publish Option -->
+                <div class="flex items-center">
+                    <input id="edit-publish" name="edit-publish" type="checkbox"
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="edit-publish" class="ml-2 block text-sm text-gray-700">Publish immediately</label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" onclick="editResource()"
+                    class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-300 shadow-lg hover:scale-[1.02] transform">
+                    Update Resource
+                </button>
+            </form>
         </div>
     </div>
 </div>
@@ -203,6 +253,7 @@
             const timeAgo = getTimeAgo(uploadDate);
 
             tr.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${resource.resources_id}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm font-medium text-gray-900">${resource.resources_name}</div>
                     <div class="text-sm text-gray-500">${timeAgo}</div>
@@ -214,20 +265,58 @@
                         ${resource.status}
                     </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                    <a href="#" class="${getToggleClass(resource.status)} mr-3">${getToggleText(resource.status)}</a>
-                    <a href="#" onclick="deleteLabResource(${resource.resources_id})" class="text-red-600 hover:text-red-900">Delete</a>
-                </td>
             `;
+
+            // Action buttons container
+            const tdActions = document.createElement('td');
+            tdActions.className = "px-6 py-4 whitespace-nowrap text-sm font-medium";
+
+            // Edit link
+            const editLink = document.createElement('a');
+            editLink.href = "#";
+            editLink.className = "text-blue-600 hover:text-blue-900 mr-3";
+            editLink.textContent = "Edit";
+            editLink.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default anchor behavior
+                openEditModal(resource);
+            });
+
+            // Toggle link (assuming a function exists)
+            const toggleLink = document.createElement('a');
+            toggleLink.href = "#";
+            toggleLink.className = getToggleClass(resource.status) + " mr-3";
+            toggleLink.textContent = getToggleText(resource.status);
+            // You can add toggle logic here if needed
+            // toggleLink.addEventListener('click', () => toggleResource(resource.resources_id));
+
+            // Delete link
+            const deleteLink = document.createElement('a');
+            deleteLink.href = "#";
+            deleteLink.className = "text-red-600 hover:text-red-900";
+            deleteLink.textContent = "Delete";
+            deleteLink.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default anchor behavior
+                deleteLabResource(resource.resources_id);
+            });
+
+            // Append all action links
+            tdActions.appendChild(editLink);
+            tdActions.appendChild(toggleLink);
+            tdActions.appendChild(deleteLink);
+
+            // Append actions to the row
+            tr.appendChild(tdActions);
+
+            // Append the row to the table
             tbody.appendChild(tr);
         });
     }
 
+
     function renderPagination() {
         const totalPages = Math.ceil(resources.length / rowsPerPage);
         const paginationContainer = document.querySelector('.pagination');
-        
+
         // Clear existing pagination
         paginationContainer.innerHTML = '';
 
@@ -245,13 +334,13 @@
             const pageButton = document.createElement('button');
             pageButton.textContent = page;
             pageButton.classList.add('px-4', 'py-2', 'mx-2', 'rounded-lg', 'text-sm', 'font-medium', 'transition', 'duration-150');
-            
+
             // Add active class for the current page
             pageButton.classList.add(currentPage === page ? 'bg-blue-500' : 'bg-gray-200');
-            
+
             // Hover effect for page buttons
             pageButton.classList.add('hover:bg-blue-400', 'hover:text-white');
-            
+
             pageButton.addEventListener('click', () => changePage(page));
             paginationContainer.appendChild(pageButton);
         }
@@ -329,79 +418,79 @@
         const resourceType = document.getElementById('type').value.trim();
         const resourceFile = document.getElementById('file').files[0];
         const resourcePublish = document.getElementById('publish').checked;
-        
+
         const formData = new FormData();
 
-        if (resourcePublish){
+        if (resourcePublish) {
             formData.append('resource_name', resourceTitle);
             formData.append('description', resourceDescription);
             formData.append('resource_type', resourceType);
             formData.append('resource_file', resourceFile);
             formData.append('status', 'Published');
 
-            fetch ('/admin/api/add-lab-resource',{
+            fetch('/admin/api/add-lab-resource', {
                 method: 'POST',
                 body: formData,
                 headers: {
                     'Accept': 'application/json',
                 },
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Resource Added',
-                        text: 'Resource added successfully!',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error adding resource: ' + data.message,
-                        confirmButtonText: 'OK'
-                    });
-                }
-            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Resource Added',
+                            text: 'Resource added successfully!',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error adding resource: ' + data.message,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
         }
         else {
-           formData.append('resource_name', resourceTitle);
+            formData.append('resource_name', resourceTitle);
             formData.append('description', resourceDescription);
             formData.append('resource_type', resourceType);
             formData.append('resource_file', resourceFile);
             formData.append('status', 'Draft');
 
-            fetch ('/admin/api/add-lab-resource',{
+            fetch('/admin/api/add-lab-resource', {
                 method: 'POST',
                 body: formData,
                 headers: {
                     'Accept': 'application/json',
                 },
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Resource Added',
-                        text: 'Resource added successfully!',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error adding resource: ' + data.message,
-                        confirmButtonText: 'OK'
-                    });
-                }
-            })
-        }    
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Resource Added',
+                            text: 'Resource added successfully!',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error adding resource: ' + data.message,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+        }
     }
 
     function deleteLabResource(resourceId) {
@@ -424,38 +513,121 @@
                         'Accept': 'application/json',
                     },
                 })
-                .then(response => {
-                    // Check if the response status is successful
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire(
+                    .then(response => {
+                        // Check if the response status is successful
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
                                 'Deleted!',
                                 'The lab resource has been deleted.',
                                 'success'
                             );
                             fetchLabResources(); // Refresh the resource list
-                    } else {
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'There was an issue deleting the resource: ' + data.message,
+                                'error'
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        // Log the error to debug
+                        console.error('Error:', error);
                         Swal.fire(
                             'Error!',
-                            'There was an issue deleting the resource: ' + data.message,
+                            'An error occurred while deleting the resource. ' + error.message,
                             'error'
                         );
-                    }
+                    });
+            }
+        });
+    }
+
+    function editResource() {
+        // Using SweetAlert2 for confirmation before deletion
+        const resources_id = document.getElementById('edit-resources-id').value.trim();
+        const newResourceName = document.getElementById('edit-resources-name').value.trim();
+        const newDescription = document.getElementById('edit-description').value.trim();
+        const newResourceType = document.getElementById('edit-resource_type').value.trim();
+        const newFile = document.getElementById('edit-file').files[0];
+        var newStatus = document.getElementById('edit-publish').checked;
+
+        if (newStatus) {
+            newStatus = 'Published'
+            console.log(`New Status ${newStatus}`)
+        }
+        else {
+            newStatus = 'Draft'
+            console.log(`New Status ${newStatus}`)
+        }
+
+        const formData = new FormData()
+
+        console.log(`My New Status to UPDATE ${newStatus}`)
+
+        formData.append('edit-resources_name', newResourceName)
+        formData.append('edit-description', newDescription)
+        formData.append('edit-resource_type', newResourceType)
+        formData.append('edit-file', newFile)
+        formData.append('edit-status', newStatus)
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This will update the existing resource details!',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#008000',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If confirmed, proceed with deletion
+                fetch(`/admin/api/edit-lab-resource/${resources_id}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                    },
                 })
-                .catch(error => {
-                    // Log the error to debug
-                    console.error('Error:', error);
-                    Swal.fire(
-                        'Error!',
-                        'An error occurred while deleting the resource. ' + error.message,
-                        'error'
-                    );
-                });
+                    .then(response => {
+                        // Check if the response status is successful
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                'Updated!',
+                                'The lab resource has been updated.',
+                                'success'
+                            );
+                            fetchLabResources(); // Refresh the resource list
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'There was an issue updating the resource: ' + data.message,
+                                'error'
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        // Log the error to debug
+                        console.error('Error:', error);
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred while deleting the resource. ' + error.message,
+                            'error'
+                        );
+                    });
             }
         });
     }
@@ -467,6 +639,24 @@
 
     function closeModal() {
         document.getElementById('edit-modal').classList.add('hidden');
+    }
+
+    function openEditModal(resource) {
+        const editModal = document.getElementById('edit-modal')
+        editModal.classList.remove('hidden')
+
+        // Populate the modal with resource data
+        document.getElementById('edit-resources-id').value = resource.resources_id
+        document.getElementById('edit-resources-name').value = resource.resources_name
+        document.getElementById('edit-description').value = resource.description
+        document.getElementById('edit-resource_type').value = resource.resource_type
+        //document.getElementById('edit-file').value = resource.resources_path
+
+    }
+
+    function closeEditModal() {
+        const editModal = document.getElementById('edit-modal')
+        editModal.classlist.add('hidden')
     }
 
     // Sample edit button handlers - in a real app these would be dynamic
