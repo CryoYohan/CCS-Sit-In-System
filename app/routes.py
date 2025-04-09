@@ -632,6 +632,7 @@ def get_session_records(idno):
         json_formatted_data = [{
             'record_id': data['record_id'],  # Add this line
             'idno': data['idno'],
+            'lab_name': data['lab_name'],
             'sitin_in': data['sitin_in'],
             'sitin_out': data['sitin_out'],
             'reason': data['reason'],

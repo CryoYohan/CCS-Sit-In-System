@@ -33,6 +33,7 @@
         <tr>
           <th class="py-2 px-4 border-b text-center">Session ID</th>
           <th class="py-2 px-4 border-b text-center">ID Number</th>
+          <th class="py-2 px-4 border-b text-center">Lab</th>
           <th class="py-2 px-4 border-b text-center">Sit-in Date/Time</th>
           <th class="py-2 px-4 border-b text-center">Log-off Date/Time</th>
           <th class="py-2 px-4 border-b text-center">Purpose</th>
@@ -171,6 +172,7 @@
         row.innerHTML = `
                 <td class="py-2 px-4 border-b text-center">${session.record_id}</td>
                 <td class="py-2 px-4 border-b text-center">${session.idno}</td>
+                 <td class="py-2 px-4 border-b text-center">${session.lab_name}</td>
                 <td class="py-2 px-4 border-b text-center">${formatDate(session.sitin_in)}</td> 
                 <td class="py-2 px-4 border-b text-center">${formatDate(session.sitin_out)}</td> 
                 <td class="py-2 px-4 border-b text-center">${session.reason}</td>
