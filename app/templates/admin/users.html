@@ -562,8 +562,80 @@
     }
 
     function resetPassword(idno) {
+        Swal.fire({
+            title: 'Reset Password',
+            html: `
+                <div class="mt-4">
+                    <input 
+                        type="password" 
+                        id="newPassword" 
+                        class="swal2-input" 
+                        placeholder="Enter new password"
+                        autocomplete="new-password"
+                    >
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        class="swal2-input mt-2" 
+                        placeholder="Confirm new password"
+                        autocomplete="new-password"
+                    >
+                </div>
+            `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Reset Password',
+            cancelButtonText: 'Cancel',
+            preConfirm: () => {
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
 
+                if (!newPassword || !confirmPassword) {
+                    Swal.showValidationMessage('Please fill in both fields');
+                    return false;
+                }
 
+                if (newPassword !== confirmPassword) {
+                    Swal.showValidationMessage('Passwords do not match');
+                    return false;
+                }
+
+                return { newPassword };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('idno', idno);
+                formData.append('newPassword', result.value.newPassword);
+
+                fetch('/admin/api/reset-password', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                'Success!',
+                                'Password has been reset successfully.',
+                                'success'
+                            );
+                        } else {
+                            Swal.fire('Error!', data.message || 'Failed to reset password', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error!', 'An error occurred while resetting password', 'error');
+                    });
+            }
+        });
     }
 
     function resetSession(idno) {
@@ -612,7 +684,48 @@
     }
 
     function resetAllSession() {
-
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This will reset all sessions for all students.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, reset it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Call the API to reset the session
+                fetch(`/admin/api/reset-all-session`, {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                'Reset!',
+                                'All sessions has been reset.',
+                                'success'
+                            ).then(() => {
+                                clearFilter(); // Refresh the user list
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                data.message,
+                                'error'
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred while resetting the session.',
+                            'error'
+                        );
+                    });
+            }
+        });
     }
 
 </script>

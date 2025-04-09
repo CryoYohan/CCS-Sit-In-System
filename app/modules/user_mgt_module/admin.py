@@ -358,6 +358,15 @@ class Admin(User):
             return {'success': True}
         except Exception as e:
             return {'success': False, 'message': str(e)}
+
+    def reset_password(self, idno, password):
+        """Reset password"""
+        try:
+            hashed_password = self.auth.hashpassword(password)
+            self.db.update_record(table='user', idno=idno, password=hashed_password)
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
         
 
     def delete(self):
