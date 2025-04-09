@@ -142,7 +142,7 @@ class Databasehelper:
     
     def get_reservations_by_status(self, status):
         """Fetch reservations by status"""
-        query = "SELECT * FROM reservation WHERE status = ?"
+        query = "SELECT * FROM reservation_details WHERE status = ?"
         return self.getprocess(query, (status,))
 
     def add_record(self, table:str, **kwargs):

@@ -203,10 +203,13 @@
       }
     }
 
-    // Helper functions (unchanged)
-    function formatDate(datetime) {
-      if (!datetime) return 'N/A';
-      return new Date(datetime).toLocaleString();
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const month = date.toLocaleString('default', { month: 'long' });
+      const day = date.getDate();
+      const year = date.getFullYear();
+      const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      return `${month} ${day}, ${year}, ${time}`;
     }
 
     function getStatusColor(status) {

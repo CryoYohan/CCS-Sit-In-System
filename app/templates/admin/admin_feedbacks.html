@@ -359,11 +359,13 @@
         }
     }
 
-    // Helper function to format date
     function formatDate(dateString) {
-        if (!dateString) return 'N/A';
         const date = new Date(dateString);
-        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        const month = date.toLocaleString('default', { month: 'long' });
+        const day = date.getDate();
+        const year = date.getFullYear();
+        const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        return `${month} ${day}, ${year}, ${time}`;
     }
 
     // Helper function to get status CSS class
