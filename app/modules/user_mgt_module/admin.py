@@ -354,8 +354,11 @@ class Admin(User):
     def reset_all_sessions(self):
         """Reset all sessions"""
         try:
-            self.db.reset_all_session()
-            return {'success': True}
+            ok = self.db.reset_all_session()
+            if ok:
+                return {'success': True}
+            else:
+                return {'success': False, 'message': 'Failed to reset sessions'}
         except Exception as e:
             return {'success': False, 'message': str(e)}
 
