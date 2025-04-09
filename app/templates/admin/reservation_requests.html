@@ -51,8 +51,10 @@
                 <tr>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Request ID</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Student IDNO</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Student Name</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Lab</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Date/Time</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Request Date</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Reservation Date</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
                 </tr>
@@ -149,8 +151,10 @@
                 row.innerHTML = `
                     <td class="px-4 py-3">${reservation.reservation_id}</td>
                     <td class="px-4 py-3">${reservation.idno}</td>
-                    <td class="px-4 py-3">${reservation.lab_id}</td>
-                    <td class="px-4 py-3">${reservation.reserve_date}</td>
+                     <td class="px-4 py-3">${reservation.fullname}</td>
+                    <td class="px-4 py-3">${reservation.lab_name}</td>
+                    <td class="px-4 py-3">${formatDate(reservation.request_date)}</td>
+                    <td class="px-4 py-3">${formatDate(reservation.reserve_date)}</td>
                     <td class="px-4 py-3">${reservation.status}</td>
                     <td class="px-4 py-3">
                         <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
@@ -256,5 +260,16 @@
             }
         }
     }
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const month = date.toLocaleString('default', { month: 'long' });
+        const day = date.getDate();
+        const year = date.getFullYear();
+        const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        return `${month} ${day}, ${year}, ${time}`;
+    }
+
+
 </script>
 {% endblock %}

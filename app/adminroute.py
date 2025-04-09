@@ -526,7 +526,8 @@ def get_pending_reservations():
             reservations_list.append({
                 "reservation_id": reservation["reservation_id"],
                 "idno": reservation["idno"],
-                "lab_id": reservation["lab_id"],
+                "fullname" : reservation["fullname"],
+                "lab_name": reservation["lab_name"],
                 "reserve_date": reservation["reserve_date"],
                 "request_date": reservation["request_date"],
                 "status": reservation["status"]
