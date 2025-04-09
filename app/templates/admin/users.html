@@ -16,37 +16,54 @@
 
     <!-- Search and Filter -->
     <div class="mb-8 bg-white p-6 rounded-xl shadow-md animate-slideUp">
-        <div class="flex justify-between">
-            <!-- Search Bar -->
-            <div class="flex items-center gap-2">
-                <input type="text" id="search-user" placeholder="Search name or ID" class="border px-2 py-1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500
-                focus:border-blue-500 transition" value="{{ dash_search }}" />
-                <button type="button" onclick="searchUser()"
-                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                    Search
-                </button>
-                <!-- Clear Filter Button -->
-                <button type="button" onclick="clearFilter()"
-                    class="w-64 p-2 text-center bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
-                    Clear Filter
-                </button>
+        <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:justify-between md:items-center">
+            <!-- Left Section - Search -->
+            <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2 md:items-center">
+                <!-- Search Bar -->
+                <div class="relative flex-grow">
+                    <input type="text" id="search-user" placeholder="Search name or ID"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        value="{{ dash_search }}" />
+                </div>
+
+                <div class="flex space-x-2">
+                    <button type="button" onclick="searchUser()"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition whitespace-nowrap">
+                        Search
+                    </button>
+
+                    <!-- Clear Filter Button -->
+                    <button type="button" onclick="clearFilter()"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition whitespace-nowrap">
+                        Clear Filter
+                    </button>
+                </div>
             </div>
 
-            <!-- Filter by Lab Status -->
-            <div class="flex items-center gap-2">
-                <div class="flex items-center gap-2">
-                    <label class="block text-sm font-medium text-gray-600 mb-2">Filter by Lab Status</label>
-                    <select id="filter-status" class="border px-2 py-1">
+            <!-- Middle Section - Status Filter -->
+            <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2 md:items-center">
+                <label class="text-sm font-medium text-gray-600 whitespace-nowrap">Filter by Lab Status</label>
+                <div class="flex space-x-2">
+                    <select id="filter-status"
+                        class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                         <option value="all">All</option>
                         <option value="Idle">Sit-in</option>
                         <option value="In-lab">Log-off</option>
                     </select>
 
                     <button type="button" onclick="filterStatus()"
-                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition whitespace-nowrap">
                         Filter
                     </button>
                 </div>
+            </div>
+
+            <!-- Right Section - Reset -->
+            <div>
+                <button type="button" onclick="resetAllSession()"
+                    class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition whitespace-nowrap">
+                    Reset All Session
+                </button>
             </div>
         </div>
     </div>
@@ -683,49 +700,49 @@
         });
     }
 
-    function resetAllSession() {
-        Swal.fire({
+    async function resetAllSession() {
+        const result = await Swal.fire({
             title: 'Are you sure?',
-            text: "This will reset all sessions for all students.",
+            text: "This will reset all sessions to Idle status.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, reset it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Call the API to reset the session
-                fetch(`/admin/api/reset-all-session`, {
-                    method: 'POST'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire(
-                                'Reset!',
-                                'All sessions has been reset.',
-                                'success'
-                            ).then(() => {
-                                clearFilter(); // Refresh the user list
-                            });
-                        } else {
-                            Swal.fire(
-                                'Error!',
-                                data.message,
-                                'error'
-                            );
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire(
-                            'Error!',
-                            'An error occurred while resetting the session.',
-                            'error'
-                        );
-                    });
-            }
+            confirmButtonText: 'Yes, reset all!'
         });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch('/admin/api/reset-all-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include' // Important for session cookies
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Failed to reset sessions');
+                }
+
+                await Swal.fire(
+                    'Success!',
+                    data.message || 'All sessions have been reset.',
+                    'success'
+                );
+                clearFilter(); // Refresh the view
+
+            } catch (error) {
+                console.error('Reset error:', error);
+                await Swal.fire(
+                    'Error!',
+                    error.message || 'Could not reset sessions',
+                    'error'
+                );
+            }
+        }
     }
 
 </script>

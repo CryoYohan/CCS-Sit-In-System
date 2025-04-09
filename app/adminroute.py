@@ -1762,27 +1762,37 @@ def reset_one(idno):
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
-@admin.route('/api/reset-all-session')
+@admin.route('/api/reset-all-session', methods=['POST'])
 def reset_all():
     """API to reset all sessions"""
-    global admin_account
-
     if not session.get('admin'):
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
-    if admin_account is None:
-        admin_account = Admin(**session.get('admin'))
-
     try:
-        response = admin_account.reset_all_sessions()
+        # Initialize admin if needed
+        global admin_account
+        if admin_account is None:
+            admin_account = Admin(**session.get('admin'))
 
-        if response['success']:
-            return jsonify({'success': True, 'message': 'All sessions reset successfully!'}), 200
+        # Reset sessions
+        success = admin_account.reset_all_sessions()
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'All sessions reset successfully!'
+            }), 200
         else:
-            return jsonify({'success': False, 'message': response['error']}), 500
+            return jsonify({
+                'success': False,
+                'message': 'Failed to reset sessions (database error)'
+            }), 500
 
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        return jsonify({
+            'success': False,
+            'message': f'Server error: {str(e)}'
+        }), 500
 
 @admin.route('/api/reset-password', methods=['POST'])
 def reset_student_password():

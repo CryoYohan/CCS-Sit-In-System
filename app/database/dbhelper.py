@@ -79,8 +79,9 @@ class Databasehelper:
     
     def reset_all_session(self):
         """Retrieve session history"""
-        query = f"UPDATE user SET session = 30 WHERE role = 'Student'"
-        return self.getprocess(query)
+        max_sessions = 30
+        query = f"UPDATE user SET session = ? WHERE role = 'Student'"
+        return self.postprocess(query, (max_sessions,))
     
     def getall_feedbacks(self, idno)->list:
         query = f"SELECT * FROM student_feedback WHERE idno = ? ORDER BY submitted_on DESC"
