@@ -1686,8 +1686,6 @@ def edit_lab_resource(resources_id):
             'upload_date': datetime.now(),
         }
 
-        print(f'Data for Update {data}')
-
         response = admin_account.update_lab_resource(**{k:v for k,v in data.items() if not v == ''})  
 
         if response['success']:
@@ -1698,6 +1696,7 @@ def edit_lab_resource(resources_id):
     except Exception as  e:
          return jsonify({'success': False, 'message': str(e)}), 500
     
+
 def deleteResourceFile(resources_id):
         """Delete a resource file from static folder"""
      # Get the resource details first

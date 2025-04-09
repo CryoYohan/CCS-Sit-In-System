@@ -286,8 +286,10 @@
             toggleLink.href = "#";
             toggleLink.className = getToggleClass(resource.status) + " mr-3";
             toggleLink.textContent = getToggleText(resource.status);
-            // You can add toggle logic here if needed
-            // toggleLink.addEventListener('click', () => toggleResource(resource.resources_id));
+            toggleLink.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default anchor behavior
+                toggleResource(resource.resources_id, resource.status);
+            });
 
             // Delete link
             const deleteLink = document.createElement('a');
@@ -631,6 +633,65 @@
             }
         });
     }
+
+    function toggleResource(resources_id, currentStatus) {
+        console.log(currentStatus)
+        const isPublishing = currentStatus === 'Draft'; // If currently Draft, we will publish
+        const newStatus = isPublishing ? 'Published' : 'Draft';
+
+        const alertTitle = isPublishing
+            ? 'Are you sure you want to publish?'
+            : 'Are you sure you want to unpublish?';
+
+        const alertText = isPublishing
+            ? 'This will publish the lab resource!'
+            : 'This will set the lab resource to draft.';
+
+        Swal.fire({
+            title: alertTitle,
+            text: alertText,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#008000',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: `Yes, ${isPublishing ? 'publish' : 'unpublish'} it!`,
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('edit-status', newStatus);
+
+                fetch(`/admin/api/edit-lab-resource/${resources_id}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                `${isPublishing ? 'Published' : 'Unpublished'}!`,
+                                `The lab resource has been ${newStatus.toLowerCase()}.`,
+                                'success'
+                            );
+                            fetchLabResources(); // Refresh the list
+                        } else {
+                            Swal.fire('Error!', `There was an issue: ${data.message}`, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error!', 'An error occurred: ' + error.message, 'error');
+                    });
+            }
+        });
+    }
+
 
     // Modal functions
     function openModal() {
