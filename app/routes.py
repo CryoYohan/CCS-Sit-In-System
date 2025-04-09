@@ -551,7 +551,7 @@ def fetch_labs():
     )
 @main.route('/api/labs/<lab_id>')
 def fetch_lab(lab_id):
-    """FETCH ONE LAB"""
+    """FETCH ONE LAB ALONG WITH ITS SCHEDULES"""
     global student
     if not session.get('student'):
         return jsonify({
@@ -563,15 +563,18 @@ def fetch_lab(lab_id):
     
     labs = reservation.retrieve_one_lab(lab_id=lab_id)
 
-
     if labs['success']:
         lab = labs['data'][0]  # Directly use the single lab object
+        
+        # Parse the vacant times into a list
+        vacant_times = lab['vacant_time'].split(',')
+        vacant_times = [time.strip() for time in vacant_times]  # Remove any extra spaces
         
         return jsonify({
             'lab_id': lab['lab_id'],
             'lab_name': lab['lab_name'],
             'lab_description': lab['lab_description'],
-            'vacant_time': lab['vacant_time'],
+            'vacant_time': vacant_times,  # List of available schedules
             'slots': lab['slots'],
             'image': lab['image'],
             'success': True
@@ -581,6 +584,7 @@ def fetch_lab(lab_id):
             'success': False,
             'message': labs['error']
         })
+
 
 @main.route('/api/session-records/<idno>')
 def get_session_records(idno):
