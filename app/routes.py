@@ -193,6 +193,32 @@ def records():
         #session['student'] = None
         return redirect(url_for('main.login'))
 
+@main.route('/resources')
+def resources():
+    """Resources Page"""
+    global student
+    try:
+
+        if not session['student'] == None:
+            if student == None:
+                student_data = session.get('student')
+                student = Student(**student_data)
+
+            return render_template('resources.html', student=student,
+                                   user_in_login_page=True,
+                                   action='Logout')
+
+        else:
+            message = "Please login first."
+            flash(message)
+            return redirect(url_for('main.login'))
+        
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
+
 @main.route('/sessions')
 def sessions():
     """Remaining Sessions Page"""
@@ -862,3 +888,34 @@ def get_feedbacks():
             'success': False,
             'message': str(e)
         }), 400
+
+
+@main.route('/api/get-lab-resources', methods=['GET'])
+def get_lab_resources():
+    """API to retrieve all lab resources"""
+    global student
+    if not session.get('student'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    if student is None:
+        student = Student(**session.get('student'))
+
+    try:
+        resources = student.get_lab_resources()  
+
+        # Convert objects to dictionaries
+        resources_list = [{
+            "resources_id": resource["resources_id"],
+            "resources_name": resource["resources_name"],
+            "description": resource["description"],
+            "resource_type": resource["resource_type"],
+            "resources_path": resource["resources_path"],
+            "status": resource["status"],
+            "upload_date": resource["upload_date"],
+        } 
+        for resource in resources['data']
+        ]
+
+        return jsonify({'success': True, 'resources': resources_list}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
