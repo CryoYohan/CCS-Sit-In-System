@@ -99,7 +99,7 @@ class Admin(User):
     def retrieve_all_feedbacks(self):
         """Retrieve all feedbacks"""
         try:
-            feedbacks = self.db.getall_records(table='student_feedback')
+            feedbacks = self.db.getall_feedbacks_admin()
             return {
                 'success': True, 'data': feedbacks
             }

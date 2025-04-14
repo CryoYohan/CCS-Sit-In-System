@@ -86,7 +86,7 @@ class Reservation():
         print(f"RESERVATION ID FROM KWARGS {kwargs.get('reservation_id')}")
         try:
             # Fetch the reservation to cancel
-            reservation = self.db.find_reservation(reservation_id=kwargs.get('reservation_id'))
+            reservation = self.db.fetchOne(table='reservation',reservation_id=kwargs.get('reservation_id'))
             print("Reservation to Cancel:", reservation)  # Debugging
 
             if not reservation:
