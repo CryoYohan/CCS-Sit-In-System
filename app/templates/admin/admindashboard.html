@@ -133,13 +133,15 @@
                 </div>
                 <div class="col-span-12 mt-5">
                     <div class="grid gap-2 grid-cols-1 lg:grid-cols-2">
-                        <div class="bg-white shadow-lg p-4" id="chartline"></div>
-                        <div class="bg-white shadow-lg" id="chartpie"></div>
+                        <!-- Sit-in Purposes Chart -->
+                        <div class="bg-white shadow-lg p-4" id="purposeChart"></div>
+                        
+                        <!-- Sit-in Trends Chart -->
+                        <div class="bg-white shadow-lg p-4" id="trendChart"></div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </main>
 </div>
@@ -184,18 +186,144 @@
             const totalLabs_count = totalLabs.length;
             totalLabs_p.textContent = totalLabs_count;
 
-
         } catch (error) {
             console.error("Error fetching sit-in data:", error);
             currentsitin_p.textContent = "Error loading data";
             totalStudents_p.textContent = "Error loading data";
             totalPendingRequests_p.textContent = "Error loading data";
         }
+
+        // Initialize charts after data is loaded
+        initCharts();
     });
+
+    function initCharts() {
+        // Sit-in Purposes Chart (Bar Chart)
+        var purposeOptions = {
+            series: [{
+                name: 'Students',
+                data: [45, 32, 28, 15, 8]
+            }],
+            chart: {
+                type: 'bar',
+                height: 350,
+                toolbar: {
+                    show: false
+                }
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 4,
+                    horizontal: false,
+                    distributed: true,
+                    colors: {
+                        ranges: [{
+                            from: 0,
+                            to: 100,
+                            color: '#3B82F6' // Blue
+                        }]
+                    }
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
+            xaxis: {
+                categories: ['Academic Study', 'Group Project', 'Research', 'Exam Prep', 'Other'],
+                title: {
+                    text: 'Purpose of Visit'
+                }
+            },
+            yaxis: {
+                title: {
+                    text: 'Number of Students'
+                }
+            },
+            title: {
+                text: 'Sit-in Purposes Distribution',
+                align: 'center',
+                style: {
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return val + " students";
+                    }
+                }
+            }
+        };
+
+        var purposeChart = new ApexCharts(document.querySelector("#purposeChart"), purposeOptions);
+        purposeChart.render();
+
+        // Sit-in Trends Chart (Line Chart)
+        var trendOptions = {
+            series: [{
+                name: 'Sit-ins',
+                data: [30, 40, 35, 50, 49, 60, 70, 91, 125, 110, 95, 120]
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                },
+                toolbar: {
+                    show: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            colors: ['#10B981'],
+            xaxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                title: {
+                    text: 'Month'
+                }
+            },
+            yaxis: {
+                title: {
+                    text: 'Number of Sit-ins'
+                }
+            },
+            title: {
+                text: 'Monthly Sit-in Trends',
+                align: 'center',
+                style: {
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                }
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'],
+                    opacity: 0.5
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return val + " sit-ins";
+                    }
+                }
+            }
+        };
+
+        var trendChart = new ApexCharts(document.querySelector("#trendChart"), trendOptions);
+        trendChart.render();
+    }
+
     function data() {
-
         return {
-
             isSideMenuOpen: false,
             toggleSideMenu() {
                 this.isSideMenuOpen = !this.isSideMenuOpen
@@ -221,117 +349,7 @@
             togglePagesMenu() {
                 this.isPagesMenuOpen = !this.isPagesMenuOpen
             },
-
         }
     }
-    var chart = document.querySelector('#chartline')
-    var options = {
-        series: [{
-            name: 'TEAM A',
-            type: 'area',
-            data: [44, 55, 31, 47, 31, 43, 26, 41, 31, 47, 33]
-        }, {
-            name: 'TEAM B',
-            type: 'line',
-            data: [55, 69, 45, 61, 43, 54, 37, 52, 44, 61, 43]
-        }],
-        chart: {
-            height: 350,
-            type: 'line',
-            zoom: {
-                enabled: false
-            }
-        },
-        stroke: {
-            curve: 'smooth'
-        },
-        fill: {
-            type: 'solid',
-            opacity: [0.35, 1],
-        },
-        labels: ['Dec 01', 'Dec 02', 'Dec 03', 'Dec 04', 'Dec 05', 'Dec 06', 'Dec 07', 'Dec 08', 'Dec 09 ',
-            'Dec 10', 'Dec 11'
-        ],
-        markers: {
-            size: 0
-        },
-        yaxis: [{
-            title: {
-                text: 'Series A',
-            },
-        },
-        {
-            opposite: true,
-            title: {
-                text: 'Series B',
-            },
-        },
-        ],
-        tooltip: {
-            shared: true,
-            intersect: false,
-            y: {
-                formatter: function (y) {
-                    if (typeof y !== "undefined") {
-                        return y.toFixed(0) + " points";
-                    }
-                    return y;
-                }
-            }
-        }
-    };
-    var chart = new ApexCharts(chart, options);
-    chart.render();
-    var chart = document.querySelector('#chartpie')
-    var options = {
-        series: [44, 55, 67, 83],
-        chart: {
-            height: 350,
-            type: 'radialBar',
-        },
-        plotOptions: {
-            radialBar: {
-                dataLabels: {
-                    name: {
-                        fontSize: '22px',
-                    },
-                    value: {
-                        fontSize: '16px',
-                    },
-                    total: {
-                        show: true,
-                        label: 'Total Sit-ins by Lab',
-                        formatter: function (w) {
-                            // By default this function returns the average of all series. The below is just an example to show the use of custom formatter function
-                            return 249
-                        }
-                    }
-                }
-            }
-        },
-        labels: ['Lab 530', 'Oranges', 'Bananas', 'Berries'],
-        title: {
-            text: 'Laboratory Sit-ins',
-            align: 'center',
-
-        },
-        legend: {
-            show: true,
-            position: 'bottom', // Places the legend at the bottom
-            horizontalAlign: 'center' // Centers the legend
-        }
-    };
-    var chart = new ApexCharts(chart, options);
-    chart.render();
-
-    document.getElementById("searchButton").addEventListener("click", function () {
-        const searchInput = document.getElementById("searchInput").value.trim(); // Get search value
-
-        if (searchInput) {
-            window.location.href = `/users/${encodeURIComponent(searchInput)}`;
-        } else {
-            window.location.href = `/users/`; // Redirect without search query
-        }
-    });
 </script>
 {% endblock %}

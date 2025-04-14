@@ -541,29 +541,29 @@ action,user, image) %} {% if not user_in_login_page %}
         >
           <option value="#" selected>Select Purpose</option>
           <option value="Python">Python</option>
-          <option value="ASP NET CORE">ASP NET CORE #</option>
+          <option value="C#">C#</option>
           <option value="Java">Java</option>
           <option value="WEB DEV">WEB DEV</option>
-          <option value="Other">Other</option>
+          <option value="Database">Database</option>
+          <option value="Digital Logic & Design">Digital Logic & Design</option>
+          <option value="Embedded System & IoT">Embedded System & IoT</option>
+          <option value="System Integration & Architecture">System Integration & Architecture</option>
+          <option value="Computer Application">Computer Application</option>
+          <option value="Project Management">Project Management</option>
+          <option value="IT Trends">IT Trends</option>
+          <option value="Technopreneurship">Technopreneurship</option>
+          <option value="Capstone">Capstone</option>
         </select>
       </div>
       <!-- Lab Dropdown -->
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Lab</label>
-        <select
-          name="lab_id"
-          class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-          required
-        >
-          <option value="#" selected>Select Lab</option>
-          <option value="4">544</option>
-          <option value="1">530</option>
-          <option value="1">542</option>
-          <option value="2">526</option>
-          <option value="528">528</option>
-          <option value="3">524</option>
+        <select id="lab" name="lab_id"
+            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            required>
+            <option value="#" selected> Choose a Lab</option>
+            <!-- Dynamic options will be inserted here -->
         </select>
-      </div>
       <!-- Remaining Session -->
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700"
@@ -588,4 +588,49 @@ action,user, image) %} {% if not user_in_login_page %}
     </form>
   </div>
 </div>
+<script>
+  // Fetch labs from the server and populate the "lab" select dropdown
+  document.addEventListener('DOMContentLoaded', () => {
+        fetch('/admin/api/get-laboratories')
+            .then(response => response.json())
+            .then(labs => {
+                const labSelect = document.getElementById('lab');
+
+                // Check if labs were successfully fetched
+                if (Array.isArray(labs) && labs.length > 0) {
+                    labs.forEach(lab => {
+                        const option = document.createElement('option');
+                        option.value = lab.lab_id; // Use lab_id as the value
+                        option.textContent = `Lab ${lab.lab_name}`; // Display lab name
+                        labSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching labs:', error));
+
+        // Event listener for when a lab is selected
+        document.getElementById('lab').addEventListener('change', function () {
+            const selectedLabId = this.value;
+            const scheduleSelect = document.getElementById('schedule');
+
+            // Clear previous schedules
+            scheduleSelect.innerHTML = '<option value="">Select a time</option>';
+
+            // Fetch the lab schedules for the selected lab
+            fetch(`/api/labs/${selectedLabId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.vacant_time) {
+                        data.vacant_time.forEach(time => {
+                            const option = document.createElement('option');
+                            option.value = time;
+                            option.textContent = time;
+                            scheduleSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error fetching lab schedules:', error));
+        });
+    });
+</script>
 {% endmacro %}
