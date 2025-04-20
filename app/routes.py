@@ -978,10 +978,40 @@ def get_leaderboards():
             for leaderboard in leaderboards['data']
         ] 
 
-        print(leaderboards_list)
-
 
         return jsonify({'success': True, 'leaderboards': leaderboards_list}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+    
+@main.route('/api/myRank/<idno>')
+def my_rank(idno):
+    """Fetch my rank"""
+    global student
+    try:
+        # Check authentication
+        if not session.get('student'):
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+            
+        # Get rank data
+        student = Student(**session.get('student'))
+        rank_data = student.get_my_rank(idno=idno)
+        
+        if not rank_data:
+            return jsonify({'success': False, 'error': 'Rank not found'}), 404
+            
+        return jsonify({
+            'success': True,
+            'data': {
+                'rank': rank_data['data'][0]['rank'],
+                'session_count': rank_data['data'][0]['session_count'],
+                'name': rank_data['data'][0]['Name'],
+                'program': rank_data['data'][0]['Program']
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+
 

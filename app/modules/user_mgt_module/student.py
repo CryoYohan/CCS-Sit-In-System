@@ -88,4 +88,15 @@ class Student(User):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
+    def get_my_rank(self, idno):
+        """Get Rank"""
+        try:
+            rank = self.db.fetchOne(table='leaderboards', idno=idno)
+            if rank:
+                return {'success': True, 'data':rank} 
+            return {'success': False, 'error': 'Rank not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}      
+    
+
     
