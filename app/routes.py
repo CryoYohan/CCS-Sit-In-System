@@ -83,6 +83,7 @@ def leaderboards():
     """Dashboard page."""
     global student
     try:
+        update_date = datetime.today().strftime('%B %d, %Y')
 
         if session.get('student') is not None:
             if student is None:
@@ -93,6 +94,7 @@ def leaderboards():
                                     student=student,
                                     user_in_login_page=True,
                                     action='Logout',
+                                    update_date= update_date
                                    )
          
         else:
@@ -963,15 +965,20 @@ def get_leaderboards():
     try:
         leaderboards = student.retrieve_leaderboards() 
 
+
         leaderboards_list = [
             {
                 'Name': leaderboard['Name'],
                 'Program': leaderboard['Program'],
                 'session_count' : leaderboard['session_count'],
-                'rank': leaderboard['rank']
+                'rank': leaderboard['rank'],
+                'idno':leaderboard['idno'],
+                'image':leaderboard['image']
             }
-            for leaderboard in leaderboards
+            for leaderboard in leaderboards['data']
         ] 
+
+        print(leaderboards_list)
 
 
         return jsonify({'success': True, 'leaderboards': leaderboards_list}), 200

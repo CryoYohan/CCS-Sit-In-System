@@ -10,7 +10,7 @@
                         CCSit Leaderboard
                     </span>
                 </h2>
-                <span class="text-sm text-gray-500">Updated: June 15, 2023</span>
+                <span id="updateDate" class="text-sm text-gray-500">Loading...</span>
             </div>
             <p class="mt-1 text-gray-600">Top students by lab sessions completed</p>
         </div>
@@ -21,8 +21,8 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Rank</th>
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank
+                        </th>
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Student</th>
@@ -41,169 +41,7 @@
                     </tr>
                 </thead>
                 <tbody id="leaderboardsTbody" class="bg-white divide-y divide-gray-200">
-                    <!-- Rank 1 -->
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span
-                                class="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-white font-bold mx-auto">1</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-full"
-                                        src="https://randomuser.me/api/portraits/women/44.jpg" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Maria Garcia</div>
-                                    <div class="text-sm text-gray-500">2021-00123</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">BS Computer Science</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span
-                                class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">34</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">68</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="flex justify-center space-x-1">
-                                <span class="text-yellow-500"><i class="fas fa-crown"></i></span>
-                                <span class="text-blue-500"><i class="fas fa-fire"></i></span>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Rank 2 -->
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span
-                                class="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 text-gray-800 font-bold mx-auto">2</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-full"
-                                        src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">John Smith</div>
-                                    <div class="text-sm text-gray-500">2021-00456</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">BS Information Tech</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span
-                                class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">28</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">56</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="flex justify-center space-x-1">
-                                <span class="text-blue-500"><i class="fas fa-fire"></i></span>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Rank 3 -->
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span
-                                class="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-white font-bold mx-auto">3</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-full"
-                                        src="https://randomuser.me/api/portraits/women/68.jpg" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Sarah Johnson</div>
-                                    <div class="text-sm text-gray-500">2021-00789</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">BS Computer Science</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span
-                                class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">25</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">50</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="flex justify-center space-x-1">
-                                <span class="text-purple-500"><i class="fas fa-star"></i></span>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Rank 4 -->
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="text-gray-600 font-medium">4</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-full"
-                                        src="https://randomuser.me/api/portraits/men/75.jpg" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Michael Chen</div>
-                                    <div class="text-sm text-gray-500">2022-00321</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">BS Data Science</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span
-                                class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">22</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">44</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="flex justify-center space-x-1">
-                                <span class="text-green-500"><i class="fas fa-seedling"></i></span>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Rank 5 -->
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="text-gray-600 font-medium">5</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-full"
-                                        src="https://randomuser.me/api/portraits/women/25.jpg" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Emily Wilson</div>
-                                    <div class="text-sm text-gray-500">2022-00567</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">BS Information Tech</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span
-                                class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">20</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">40</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="flex justify-center space-x-1">
-                                <span class="text-yellow-500"><i class="fas fa-bolt"></i></span>
-                            </div>
-                        </td>
-                    </tr>
+                    <!-- Will be populated by JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -211,17 +49,18 @@
         <!-- Footer -->
         <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
             <div class="flex justify-between items-center">
-                <div class="text-sm text-gray-500">
-                    Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span
-                        class="font-medium">24</span> students
+                <div id="paginationInfo" class="text-sm text-gray-500">
+                    Loading data...
                 </div>
                 <div class="flex space-x-2">
-                    <button
-                        class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    <button id="prevBtn"
+                        class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                        disabled>
                         Previous
                     </button>
-                    <button
-                        class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    <button id="nextBtn"
+                        class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                        disabled>
                         Next
                     </button>
                 </div>
@@ -229,4 +68,143 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set current date
+        const now = new Date();
+        document.getElementById('updateDate').textContent = `Updated: ${now.toLocaleDateString()}`;
+
+        // Fetch leaderboard data
+        fetchLeaderboards();
+    });
+
+    function fetchLeaderboards() {
+        fetch('/api/leaderboards')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    renderLeaderboards(data.leaderboards);
+                } else {
+                    showError(data.error || 'Failed to load leaderboards');
+                }
+            })
+            .catch(error => {
+                showError(error.message);
+                console.error('Error fetching leaderboards:', error);
+            });
+    }
+
+    function renderLeaderboards(leaderboards) {
+        const tbody = document.getElementById('leaderboardsTbody');
+        tbody.innerHTML = ''; // Clear existing content
+
+        if (!leaderboards || leaderboards.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                No leaderboard data available
+            </td>
+        `;
+            tbody.appendChild(row);
+            return;
+        }
+
+        leaderboards.forEach((student, index) => {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50';
+
+            // Determine rank styling
+            let rankClass = 'text-gray-600 font-medium';
+            let rankContent = index + 1;
+
+            if (index === 0) {
+                rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-white font-bold mx-auto';
+            } else if (index === 1) {
+                rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 text-gray-800 font-bold mx-auto';
+            } else if (index === 2) {
+                rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-white font-bold mx-auto';
+            }
+
+            // Determine session count styling
+            let sessionClass = 'px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ';
+            if (student.session_count >= 30) {
+                sessionClass += 'bg-green-100 text-green-800';
+            } else if (student.session_count >= 20) {
+                sessionClass += 'bg-blue-100 text-blue-800';
+            } else {
+                sessionClass += 'bg-gray-100 text-gray-800';
+            }
+
+            // Calculate points (assuming 2 points per session)
+            const points = student.session_count * 2;
+
+            // Determine badges based on rank
+            let badges = '';
+            if (index === 0) {
+                badges = '<span class="text-yellow-500"><i class="fas fa-crown"></i></span><span class="text-blue-500"><i class="fas fa-fire"></i></span>';
+            } else if (index === 1) {
+                badges = '<span class="text-blue-500"><i class="fas fa-fire"></i></span>';
+            } else if (index === 2) {
+                badges = '<span class="text-purple-500"><i class="fas fa-star"></i></span>';
+            } else if (index < 10) {
+                badges = '<span class="text-green-500"><i class="fas fa-seedling"></i></span>';
+            }
+
+            row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+                <span class="${rankClass}">${rankContent}</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                        <img class="h-10 w-10 rounded-full" src="static/images/profileicons/${student.image}" alt="${student.Name}">
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">${student.Name}</div>
+                        <div class="text-sm text-gray-500">${student.Program ? student.Program.substring(0, 3).toUpperCase() + '-' + (10000 + index).toString().substring(1) : 'N/A'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">${student.Program || 'Not specified'}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+                <span class="${sessionClass}">${student.session_count}</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">${points}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+                <div class="flex justify-center space-x-1">${badges}</div>
+            </td>
+        `;
+
+            tbody.appendChild(row);
+        });
+
+        // Update pagination info
+        document.getElementById('paginationInfo').innerHTML = `
+        Showing <span class="font-medium">1</span> to <span class="font-medium">${leaderboards.length}</span> of <span class="font-medium">${leaderboards.length}</span> students
+    `;
+
+        // Enable buttons if needed
+        document.getElementById('prevBtn').disabled = true;
+        document.getElementById('nextBtn').disabled = true;
+    }
+
+    function showError(message) {
+        const tbody = document.getElementById('leaderboardsTbody');
+        tbody.innerHTML = `
+        <tr>
+            <td colspan="6" class="px-6 py-4 text-center text-red-500">
+                ${message}
+            </td>
+        </tr>
+    `;
+    }
+</script>
 {% endblock %}
