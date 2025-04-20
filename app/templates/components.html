@@ -59,7 +59,8 @@ action,user, image) %} {% if not user_in_login_page %}
   </div>
 </nav>
 {% elif user_in_login_page and action=='Logout' and user.role == 'Student'%}
-<nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm">
+<nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm"
+  data-user-id="{{ user.idno }}">
   <div
     class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text">
     <a href="{{ url_for('main.dashboard') }}">CCSit.</a>
@@ -107,7 +108,7 @@ action,user, image) %} {% if not user_in_login_page %}
       <div class="relative">
         <div
           class="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full text-white font-bold">
-          6
+          <p id="rankingP">N/A</p>
         </div>
         <div
           class="absolute -bottom-1 -right-1 bg-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -143,6 +144,48 @@ action,user, image) %} {% if not user_in_login_page %}
     </div>
   </div>
 </nav>
+<script>
+  document.addEventListener('DOMContentLoaded', async function () {
+    try {
+      const rankElement = document.getElementById('rankingP');
+      const response = await fetch(`/api/myRank/${"{{ user.idno }}"}`); // Direct Jinja2 insertion
+
+      // Handle unauthorized access
+      if (response.status === 401) {
+        window.location.href = '/login';
+        return;
+      }
+
+      // Handle other HTTP errors
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Check response structure
+      if (data.success && data.data) {
+        rankElement.textContent = data.data.rank;
+
+        // Optional: Update other elements if needed
+        // document.getElementById('sessionCount').textContent = data.data.session_count;
+        // document.getElementById('studentName').textContent = data.data.name;
+      } else {
+        throw new Error(data.error || 'Invalid response format');
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      document.getElementById('rankingP').textContent = 'N/A';
+
+      // Optional: Show error to user
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'Failed to fetch rank data. Please try again later.',
+      });
+    }
+  });
+</script>
 {% elif user_in_login_page and action=='Logout' and user.role == 'Staff'%}
 <nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm">
   <div

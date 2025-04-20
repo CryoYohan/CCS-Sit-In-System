@@ -83,6 +83,7 @@ def leaderboards():
     """Dashboard page."""
     global student
     try:
+        update_date = datetime.today().strftime('%B %d, %Y')
 
         if session.get('student') is not None:
             if student is None:
@@ -93,6 +94,7 @@ def leaderboards():
                                     student=student,
                                     user_in_login_page=True,
                                     action='Logout',
+                                    update_date= update_date
                                    )
          
         else:
@@ -963,18 +965,53 @@ def get_leaderboards():
     try:
         leaderboards = student.retrieve_leaderboards() 
 
+
         leaderboards_list = [
             {
                 'Name': leaderboard['Name'],
                 'Program': leaderboard['Program'],
                 'session_count' : leaderboard['session_count'],
-                'rank': leaderboard['rank']
+                'rank': leaderboard['rank'],
+                'idno':leaderboard['idno'],
+                'image':leaderboard['image']
             }
-            for leaderboard in leaderboards
+            for leaderboard in leaderboards['data']
         ] 
 
 
         return jsonify({'success': True, 'leaderboards': leaderboards_list}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+    
+@main.route('/api/myRank/<idno>')
+def my_rank(idno):
+    """Fetch my rank"""
+    global student
+    try:
+        # Check authentication
+        if not session.get('student'):
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+            
+        # Get rank data
+        student = Student(**session.get('student'))
+        rank_data = student.get_my_rank(idno=idno)
+        
+        if not rank_data:
+            return jsonify({'success': False, 'error': 'Rank not found'}), 404
+            
+        return jsonify({
+            'success': True,
+            'data': {
+                'rank': rank_data['data'][0]['rank'],
+                'session_count': rank_data['data'][0]['session_count'],
+                'name': rank_data['data'][0]['Name'],
+                'program': rank_data['data'][0]['Program']
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+
 
