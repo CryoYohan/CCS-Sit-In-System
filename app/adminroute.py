@@ -87,6 +87,25 @@ def dashboard():
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
 
+@admin.route('/adminleaderboards')
+def adminleaderboards():
+    """Admin Dashboard"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        return render_template(
+                                'admin_leaderboards.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account,
+                               )
+    else:
+        flash('Unauthorized Access is Prohibited', 'error')
+        return redirect(url_for('admin.adminlogin'))   
+
 @admin.route('/statistics')
 def statistics():
     """Admin Dashboard"""
@@ -1818,3 +1837,33 @@ def reset_student_password():
     
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin.route('/api/adminleaderboards')
+def get_leaderboards():
+    """Fetch Leaderboards"""
+    global admin_account
+    if not session.get('admin'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    if admin is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        leaderboards = admin_account.retrieve_leaderboards() 
+
+
+        leaderboards_list = [
+            {
+                'Name': leaderboard['Name'],
+                'Program': leaderboard['Program'],
+                'session_count' : leaderboard['session_count'],
+                'rank': leaderboard['rank'],
+                'idno':leaderboard['idno'],
+                'image':leaderboard['image']
+            }
+            for leaderboard in leaderboards['data']
+        ] 
+
+
+        return jsonify({'success': True, 'leaderboards': leaderboards_list}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
