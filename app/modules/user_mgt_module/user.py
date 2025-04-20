@@ -40,3 +40,11 @@ class User():
 
     def random_profile(self)->str:
         return choice(self.profileicons)
+
+    def retrieve_leaderboards(self):
+        """Fetch Leaderboards"""
+        try:
+            records = self.db.getall_records(table='leaderboards')
+            return {'success': True, 'data': records}
+        except Exception as e:
+             return {'success': False, 'message': str(e)}

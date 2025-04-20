@@ -76,6 +76,36 @@ def dashboard():
         flash("Please try again")
         #session['student'] = None
         return redirect(url_for('main.login'))
+    
+@main.route('/leaderboards')
+def leaderboards():
+    """Render leaderboards"""
+    """Dashboard page."""
+    global student
+    try:
+
+        if session.get('student') is not None:
+            if student is None:
+                student_data = session.get('student')
+                student = Student(**student_data)
+            return render_template(
+                                    'leaderboards.html', 
+                                    student=student,
+                                    user_in_login_page=True,
+                                    action='Logout',
+                                   )
+         
+        else:
+            message = "Please login first."
+            flash(message)
+            return redirect(url_for('main.login'))
+        
+    except Exception as e:
+        flash(str(e),'error')
+        flash("Please try again")
+        #session['student'] = None
+        return redirect(url_for('main.login'))
+
 
 
 @main.route('/announcements')
@@ -917,6 +947,34 @@ def get_lab_resources():
         ]
 
         return jsonify({'success': True, 'resources': resources_list}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+
+@main.route('/api/leaderboards')
+def get_leaderboards():
+    """Fetch Leaderboards"""
+    global student
+    if not session.get('student'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    if student is None:
+        student = Student(**session.get('student'))
+
+    try:
+        leaderboards = student.retrieve_leaderboards() 
+
+        leaderboards_list = [
+            {
+                'Name': leaderboard['Name'],
+                'Program': leaderboard['Program'],
+                'session_count' : leaderboard['session_count'],
+                'rank': leaderboard['rank']
+            }
+            for leaderboard in leaderboards
+        ] 
+
+
+        return jsonify({'success': True, 'leaderboards': leaderboards_list}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
