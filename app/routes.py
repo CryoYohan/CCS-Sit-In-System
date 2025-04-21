@@ -357,7 +357,6 @@ def uploadprofile():
 
     filenamefromicon = request.form['profile_icon2'] # Extract default icon selection
 
-
     print(f'Filename from icon: {filenamefromicon}')
     print("Request files:", request.files)  # Debugging: Print received files
 
@@ -365,7 +364,6 @@ def uploadprofile():
     print(f'Profile picture uploaded: {profile_picture_uploaded}')
 
     if profile_picture_uploaded and not filenamefromicon: 
-
         file = request.files['profile_picture']
 
         if file.filename == '':
@@ -373,12 +371,26 @@ def uploadprofile():
             return redirect(url_for('main.profilesettings'))
 
         if file and allowed_file(file.filename):
+            # First, delete the previous profile picture if it exists
+            if student.image:  # Check if there's an existing profile icon
+                old_image_path = os.path.join(
+                    current_app.static_folder,
+                    'images',
+                    'profileicons',
+                    student.image
+                )
+                if os.path.exists(old_image_path):
+                    try:
+                        os.remove(old_image_path)
+                        print(f"Deleted old profile picture: {old_image_path}")
+                    except Exception as e:
+                        print(f"Error deleting old profile picture: {str(e)}")
+
             filename = secure_filename(file.filename)  # Secure filename
 
             upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/profileicons"))
             filepath = os.path.join(upload_folder, filename)
 
-            # 🔥 FIX: Don't create a new folder—only check if it exists!
             if not os.path.isdir(upload_folder):
                 print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
                 flash("Upload folder missing. Contact admin.", "danger")
@@ -392,7 +404,6 @@ def uploadprofile():
             else:
                 print("❌ File was NOT saved!")
 
-            
             response = student.upload_profile_icon(profile_icon=filename, student=student)
 
             if response['success']:
@@ -405,6 +416,8 @@ def uploadprofile():
                 return redirect(url_for('main.profilesettings'))
 
     elif filenamefromicon and profile_picture_uploaded:
+        # If selecting a default icon, we might not need to delete the old file
+        # since default icons are shared and shouldn't be deleted
         response = student.upload_profile_icon(profile_icon=filenamefromicon, student=student)
 
         if response['success']:
@@ -418,7 +431,6 @@ def uploadprofile():
     else:
         flash("Please select a profile picture or upload one.", "error")
         return redirect(url_for('main.profilesettings'))
-
 
 
 
