@@ -75,136 +75,169 @@
         const now = new Date();
         document.getElementById('updateDate').textContent = `Updated: ${now.toLocaleDateString()}`;
 
+        // Initialize pagination variables
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let allLeaderboards = [];
+
         // Fetch leaderboard data
         fetchLeaderboards();
-    });
 
-    function fetchLeaderboards() {
-        fetch('/api/leaderboards')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    renderLeaderboards(data.leaderboards);
-                } else {
-                    showError(data.error || 'Failed to load leaderboards');
-                }
-            })
-            .catch(error => {
-                showError(error.message);
-                console.error('Error fetching leaderboards:', error);
-            });
-    }
-
-    function renderLeaderboards(leaderboards) {
-        const tbody = document.getElementById('leaderboardsTbody');
-        tbody.innerHTML = ''; // Clear existing content
-
-        if (!leaderboards || leaderboards.length === 0) {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                No leaderboard data available
-            </td>
-        `;
-            tbody.appendChild(row);
-            return;
-        }
-
-        leaderboards.forEach((student, index) => {
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-gray-50';
-
-            // Determine rank styling
-            let rankClass = 'text-gray-600 font-medium';
-            let rankContent = index + 1;
-
-            if (index === 0) {
-                rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-white font-bold mx-auto';
-            } else if (index === 1) {
-                rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 text-gray-800 font-bold mx-auto';
-            } else if (index === 2) {
-                rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-white font-bold mx-auto';
+        // Add event listeners for pagination buttons
+        document.getElementById('prevBtn').addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderLeaderboards(allLeaderboards, currentPage, itemsPerPage);
+                updatePaginationControls();
             }
-
-            // Determine session count styling
-            let sessionClass = 'px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ';
-            if (student.session_count >= 30) {
-                sessionClass += 'bg-green-100 text-green-800';
-            } else if (student.session_count >= 20) {
-                sessionClass += 'bg-blue-100 text-blue-800';
-            } else {
-                sessionClass += 'bg-gray-100 text-gray-800';
-            }
-
-            // Calculate points (assuming 2 points per session)
-            const points = student.session_count * 2;
-
-            // Determine badges based on rank
-            let badges = '';
-            if (index === 0) {
-                badges = '<span class="text-yellow-500"><i class="fas fa-crown"></i></span><span class="text-blue-500"><i class="fas fa-fire"></i></span>';
-            } else if (index === 1) {
-                badges = '<span class="text-blue-500"><i class="fas fa-fire"></i></span>';
-            } else if (index === 2) {
-                badges = '<span class="text-purple-500"><i class="fas fa-star"></i></span>';
-            } else if (index < 10) {
-                badges = '<span class="text-green-500"><i class="fas fa-seedling"></i></span>';
-            }
-
-            row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-                <span class="${rankClass}">${rankContent}</span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10">
-                        <img class="h-10 w-10 rounded-full" src="static/images/profileicons/${student.image}" alt="${student.Name}">
-                    </div>
-                    <div class="ml-4">
-                        <div class="text-sm font-medium text-gray-900">${student.Name}</div>
-                        <div class="text-sm text-gray-500">${student.idno}</div>
-                    </div>
-                </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">${student.Program || 'Not specified'}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-                <span class="${sessionClass}">${student.session_count}</span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">${points}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-                <div class="flex justify-center space-x-1">${badges}</div>
-            </td>
-        `;
-
-            tbody.appendChild(row);
         });
 
-        // Update pagination info
-        document.getElementById('paginationInfo').innerHTML = `
-        Showing <span class="font-medium">1</span> to <span class="font-medium">${leaderboards.length}</span> of <span class="font-medium">${leaderboards.length}</span> students
-    `;
+        document.getElementById('nextBtn').addEventListener('click', function() {
+            const totalPages = Math.ceil(allLeaderboards.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderLeaderboards(allLeaderboards, currentPage, itemsPerPage);
+                updatePaginationControls();
+            }
+        });
 
-        // Enable buttons if needed
-        document.getElementById('prevBtn').disabled = true;
-        document.getElementById('nextBtn').disabled = true;
-    }
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(allLeaderboards.length / itemsPerPage);
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+        }
 
-    function showError(message) {
-        const tbody = document.getElementById('leaderboardsTbody');
-        tbody.innerHTML = `
-        <tr>
-            <td colspan="6" class="px-6 py-4 text-center text-red-500">
-                ${message}
-            </td>
-        </tr>
-    `;
-    }
+        function fetchLeaderboards() {
+            fetch('/api/leaderboards')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        allLeaderboards = data.leaderboards;
+                        renderLeaderboards(allLeaderboards, currentPage, itemsPerPage);
+                        updatePaginationControls();
+                    } else {
+                        showError(data.error || 'Failed to load leaderboards');
+                    }
+                })
+                .catch(error => {
+                    showError(error.message);
+                    console.error('Error fetching leaderboards:', error);
+                });
+        }
+
+        function renderLeaderboards(leaderboards, page = 1, perPage = 10) {
+            const tbody = document.getElementById('leaderboardsTbody');
+            tbody.innerHTML = ''; // Clear existing content
+
+            if (!leaderboards || leaderboards.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                    No leaderboard data available
+                </td>
+            `;
+                tbody.appendChild(row);
+                return;
+            }
+
+            // Calculate pagination
+            const startIndex = (page - 1) * perPage;
+            const endIndex = Math.min(startIndex + perPage, leaderboards.length);
+            const paginatedData = leaderboards.slice(startIndex, endIndex);
+
+            paginatedData.forEach((student, index) => {
+                const globalIndex = startIndex + index;
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+
+                // Determine rank styling
+                let rankClass = 'text-gray-600 font-medium';
+                let rankContent = globalIndex + 1;
+
+                if (globalIndex === 0) {
+                    rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-white font-bold mx-auto';
+                } else if (globalIndex === 1) {
+                    rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 text-gray-800 font-bold mx-auto';
+                } else if (globalIndex === 2) {
+                    rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-white font-bold mx-auto';
+                }
+
+                // Determine session count styling
+                let sessionClass = 'px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ';
+                if (student.session_count >= 30) {
+                    sessionClass += 'bg-green-100 text-green-800';
+                } else if (student.session_count >= 20) {
+                    sessionClass += 'bg-blue-100 text-blue-800';
+                } else {
+                    sessionClass += 'bg-gray-100 text-gray-800';
+                }
+
+                // Calculate points (assuming 2 points per session)
+                const points = student.session_count * 2;
+
+                // Determine badges based on rank
+                let badges = '';
+                if (globalIndex === 0) {
+                    badges = '<span class="text-yellow-500"><i class="fas fa-crown"></i></span><span class="text-blue-500"><i class="fas fa-fire"></i></span>';
+                } else if (globalIndex === 1) {
+                    badges = '<span class="text-blue-500"><i class="fas fa-fire"></i></span>';
+                } else if (globalIndex === 2) {
+                    badges = '<span class="text-purple-500"><i class="fas fa-star"></i></span>';
+                } else if (globalIndex < 10) {
+                    badges = '<span class="text-green-500"><i class="fas fa-seedling"></i></span>';
+                }
+
+                row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="${rankClass}">${rankContent}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10">
+                            <img class="h-10 w-10 rounded-full" src="static/images/profileicons/${student.image}" alt="${student.Name}">
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${student.Name}</div>
+                            <div class="text-sm text-gray-500">${student.idno}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${student.Program || 'Not specified'}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="${sessionClass}">${student.session_count}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">${points}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <div class="flex justify-center space-x-1">${badges}</div>
+                </td>
+            `;
+
+                tbody.appendChild(row);
+            });
+
+            // Update pagination info
+            document.getElementById('paginationInfo').innerHTML = `
+            Showing <span class="font-medium">${startIndex + 1}</span> to <span class="font-medium">${endIndex}</span> of <span class="font-medium">${leaderboards.length}</span> students
+        `;
+        }
+
+        function showError(message) {
+            const tbody = document.getElementById('leaderboardsTbody');
+            tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-red-500">
+                    ${message}
+                </td>
+            </tr>
+        `;
+        }
+    });
 </script>
 {% endblock %}
