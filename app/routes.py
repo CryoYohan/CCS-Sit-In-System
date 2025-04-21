@@ -369,10 +369,11 @@ def uploadprofile():
         if file.filename == '':
             flash("No selected file")
             return redirect(url_for('main.profilesettings'))
+        profileicons = ['bear.png','cat.png','chicken.png', 'meerkat.png','panda.png','polar-bear.png', 'shark.png','weasel.png','wolf.png']
 
         if file and allowed_file(file.filename):
             # First, delete the previous profile picture if it exists
-            if student.image:  # Check if there's an existing profile icon
+            if student.image and not student.image in profileicons:  # Check if there's an existing profile icon
                 old_image_path = os.path.join(
                     current_app.static_folder,
                     'images',
