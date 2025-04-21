@@ -980,25 +980,42 @@ def get_leaderboards():
         student = Student(**session.get('student'))
 
     try:
-        leaderboards = student.retrieve_leaderboards() 
-
+        leaderboards = student.retrieve_leaderboards()
 
         leaderboards_list = [
             {
                 'Name': leaderboard['Name'],
                 'Program': leaderboard['Program'],
-                'session_count' : leaderboard['session_count'],
+                'session_count': leaderboard['session_count'],
                 'rank': leaderboard['rank'],
-                'idno':leaderboard['idno'],
-                'image':leaderboard['image']
+                'idno': leaderboard['idno'],
+                'image': leaderboard['image']
             }
             for leaderboard in leaderboards['data']
-        ] 
+        ]
 
+        total_students = len(leaderboards_list)
+        current_student_id = student.idno
 
-        return jsonify({'success': True, 'leaderboards': leaderboards_list}), 200
+        current_student_entry = next((entry for entry in leaderboards_list if entry['idno'] == current_student_id), None)
+
+        if current_student_entry:
+            rank = current_student_entry['rank']
+            percentage = (1 - ((rank - 1) / total_students)) * 100
+        else:
+            rank = None
+            percentage = None
+
+        return jsonify({
+            'success': True,
+            'leaderboards': leaderboards_list,
+            'student_rank': rank,
+            'ranking_percentage': round(percentage, 2) if percentage is not None else None,
+            'total_students': total_students
+        }), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
     
 @main.route('/api/myRank/<idno>')
 def my_rank(idno):

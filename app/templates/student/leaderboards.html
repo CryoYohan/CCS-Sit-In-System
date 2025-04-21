@@ -1,43 +1,74 @@
 {% extends 'dashboard_template.html' %}
 {% block content %}
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  .highlight-row {
+    background: linear-gradient(90deg, rgba(236,253,245,0.5) 0%, rgba(236,253,245,1) 50%, rgba(236,253,245,0.5) 100%);
+    border-left: 4px solid #10b981;
+    animation: float 3s ease-in-out infinite;
+  }
+  .rank-1 { background: linear-gradient(90deg, rgba(253,230,138,0.1) 0%, rgba(254,243,199,0.3) 100%); }
+  .rank-2 { background: linear-gradient(90deg, rgba(229,231,235,0.1) 0%, rgba(243,244,246,0.3) 100%); }
+  .rank-3 { background: linear-gradient(90deg, rgba(252,211,77,0.1) 0%, rgba(254,243,199,0.3) 100%); }
+  .sparkle {
+    position: absolute;
+    background: rgba(255,255,255,0.8);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+</style>
+
 <div class="container mx-auto px-4 py-8">
-    <div class="bg-white shadow-md rounded-xl overflow-hidden">
+    <div class="bg-white shadow-xl rounded-xl overflow-hidden card-hover-effect">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
             <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-gray-800">
+                <h2 class="text-3xl font-bold text-gray-800">
                     <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                         CCSit Leaderboard
                     </span>
                 </h2>
-                <span id="updateDate" class="text-sm text-gray-500">Loading...</span>
+                <span id="updateDate" class="text-sm text-gray-500 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                    </svg>
+                    <span id="dateText">Updated: Loading...</span>
+                </span>
             </div>
-            <p class="mt-1 text-gray-600">Top students by lab sessions completed</p>
+            <p class="mt-2 text-gray-600 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                </svg>
+                Top students by lab sessions completed
+            </p>
         </div>
 
         <!-- Leaderboard Table -->
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-gradient-to-r from-blue-50 to-purple-50">
                     <tr>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Rank
                         </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Student</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Program</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Sessions</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Points</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Badges</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Student
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Program
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Sessions
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Points
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Badges
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="leaderboardsTbody" class="bg-white divide-y divide-gray-200">
@@ -47,21 +78,26 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div class="px-6 py-4 border-t border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
             <div class="flex justify-between items-center">
-                <div id="paginationInfo" class="text-sm text-gray-500">
+                <div id="paginationInfo" class="text-sm text-gray-600 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                    </svg>
                     Loading data...
                 </div>
                 <div class="flex space-x-2">
-                    <button id="prevBtn"
-                        class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                        disabled>
+                    <button id="prevBtn" class="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 transition flex items-center disabled:opacity-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
                         Previous
                     </button>
-                    <button id="nextBtn"
-                        class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                        disabled>
+                    <button id="nextBtn" class="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 transition flex items-center disabled:opacity-50">
                         Next
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -71,19 +107,16 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Set current date
         const now = new Date();
-        document.getElementById('updateDate').textContent = `Updated: ${now.toLocaleDateString()}`;
+        document.getElementById('dateText').textContent = `Updated: ${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
-        // Initialize pagination variables
         let currentPage = 1;
         const itemsPerPage = 10;
         let allLeaderboards = [];
+        let currentStudentId = "{{ student.idno }}"; // Assuming you have student data in template
 
-        // Fetch leaderboard data
         fetchLeaderboards();
 
-        // Add event listeners for pagination buttons
         document.getElementById('prevBtn').addEventListener('click', function() {
             if (currentPage > 1) {
                 currentPage--;
@@ -110,16 +143,17 @@
         function fetchLeaderboards() {
             fetch('/api/leaderboards')
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
+                    if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
                 })
                 .then(data => {
                     if (data.success) {
-                        allLeaderboards = data.leaderboards;
+                        allLeaderboards = data.leaderboards.map((student, index) => {
+                            return { ...student, rank: index + 1 };
+                        });
                         renderLeaderboards(allLeaderboards, currentPage, itemsPerPage);
                         updatePaginationControls();
+                        highlightCurrentStudent();
                     } else {
                         showError(data.error || 'Failed to load leaderboards');
                     }
@@ -132,42 +166,39 @@
 
         function renderLeaderboards(leaderboards, page = 1, perPage = 10) {
             const tbody = document.getElementById('leaderboardsTbody');
-            tbody.innerHTML = ''; // Clear existing content
+            tbody.innerHTML = '';
 
             if (!leaderboards || leaderboards.length === 0) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                     No leaderboard data available
-                </td>
-            `;
+                </td>`;
                 tbody.appendChild(row);
                 return;
             }
 
-            // Calculate pagination
             const startIndex = (page - 1) * perPage;
             const endIndex = Math.min(startIndex + perPage, leaderboards.length);
             const paginatedData = leaderboards.slice(startIndex, endIndex);
 
-            paginatedData.forEach((student, index) => {
-                const globalIndex = startIndex + index;
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50';
+            paginatedData.forEach((student) => {
+                const rank = student.rank;
+                const isCurrentStudent = student.idno === currentStudentId;
 
-                // Determine rank styling
+                // Rank styling
                 let rankClass = 'text-gray-600 font-medium';
-                let rankContent = globalIndex + 1;
+                let rankContent = rank;
 
-                if (globalIndex === 0) {
+                if (rank === 1) {
                     rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-white font-bold mx-auto';
-                } else if (globalIndex === 1) {
+                } else if (rank === 2) {
                     rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 text-gray-800 font-bold mx-auto';
-                } else if (globalIndex === 2) {
+                } else if (rank === 3) {
                     rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-white font-bold mx-auto';
                 }
 
-                // Determine session count styling
+                // Session count styling
                 let sessionClass = 'px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ';
                 if (student.session_count >= 30) {
                     sessionClass += 'bg-green-100 text-green-800';
@@ -177,32 +208,71 @@
                     sessionClass += 'bg-gray-100 text-gray-800';
                 }
 
-                // Calculate points (assuming 2 points per session)
                 const points = student.session_count * 2;
 
-                // Determine badges based on rank
+                // Badges
                 let badges = '';
-                if (globalIndex === 0) {
-                    badges = '<span class="text-yellow-500"><i class="fas fa-crown"></i></span><span class="text-blue-500"><i class="fas fa-fire"></i></span>';
-                } else if (globalIndex === 1) {
-                    badges = '<span class="text-blue-500"><i class="fas fa-fire"></i></span>';
-                } else if (globalIndex === 2) {
-                    badges = '<span class="text-purple-500"><i class="fas fa-star"></i></span>';
-                } else if (globalIndex < 10) {
-                    badges = '<span class="text-green-500"><i class="fas fa-seedling"></i></span>';
+                if (rank === 1) {
+                    badges = `
+                        <span class="text-yellow-500 relative group">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-yellow-500 rounded-full">1st</span>
+                        </span>
+                        <span class="text-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd" />
+                            </svg>
+                        </span>`;
+                } else if (rank === 2) {
+                    badges = `
+                        <span class="text-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd" />
+                            </svg>
+                        </span>`;
+                } else if (rank === 3) {
+                    badges = `
+                        <span class="text-purple-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                            </svg>
+                        </span>`;
+                } else if (rank <= 10) {
+                    badges = `
+                        <span class="text-green-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </span>`;
                 }
 
+                const row = document.createElement('tr');
+                row.className = `hover:bg-gray-50 transition ${isCurrentStudent ? 'highlight-row' : ''} rank-${rank <= 3 ? rank : ''}`;
+                
                 row.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-center">
                     <span class="${rankClass}">${rankContent}</span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10">
-                            <img class="h-10 w-10 rounded-full" src="static/images/profileicons/${student.image}" alt="${student.Name}">
+                        <div class="flex-shrink-0 h-10 w-10 relative">
+                            <img class="h-10 w-10 rounded-full border-2 ${rank === 1 ? 'border-yellow-400' : rank === 2 ? 'border-gray-300' : rank === 3 ? 'border-amber-600' : 'border-gray-200'}" 
+                                 src="static/images/profileicons/${student.image}" alt="${student.Name}">
+                            ${rank <= 3 ? `
+                            <span class="absolute -bottom-1 -right-1 inline-flex items-center justify-center h-5 w-5 rounded-full ${rank === 1 ? 'bg-yellow-500' : rank === 2 ? 'bg-gray-400' : 'bg-amber-600'} text-white text-xs font-bold">
+                                ${rank}
+                            </span>` : ''}
                         </div>
                         <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">${student.Name}</div>
+                            <div class="text-sm font-medium text-gray-900 flex items-center">
+                                ${student.Name}
+                                ${isCurrentStudent ? `
+                                <span class="ml-2 px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
+                                    You
+                                </span>` : ''}
+                            </div>
                             <div class="text-sm text-gray-500">${student.idno}</div>
                         </div>
                     </div>
@@ -213,19 +283,41 @@
                 <td class="px-6 py-4 whitespace-nowrap text-center">
                     <span class="${sessionClass}">${student.session_count}</span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">${points}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-semibold ${rank <= 3 ? 'text-blue-600' : 'text-gray-600'}">
+                    ${points}
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <div class="flex justify-center space-x-1">${badges}</div>
+                    <div class="flex justify-center space-x-2">${badges}</div>
                 </td>
             `;
-
                 tbody.appendChild(row);
             });
 
-            // Update pagination info
             document.getElementById('paginationInfo').innerHTML = `
-            Showing <span class="font-medium">${startIndex + 1}</span> to <span class="font-medium">${endIndex}</span> of <span class="font-medium">${leaderboards.length}</span> students
-        `;
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                </svg>
+                Showing <span class="font-medium">${startIndex + 1}</span> to <span class="font-medium">${endIndex}</span> of <span class="font-medium">${leaderboards.length}</span> students
+            `;
+        }
+
+        function highlightCurrentStudent() {
+            const currentStudentRow = document.querySelector(`tr.highlight-row`);
+            if (currentStudentRow) {
+                currentStudentRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Add celebration effect
+                const confetti = document.createElement('div');
+                confetti.className = 'absolute inset-0 pointer-events-none';
+                confetti.innerHTML = `
+                    <div class="confetti-particle" style="left: 10%; animation-delay: 0s;"></div>
+                    <div class="confetti-particle" style="left: 20%; animation-delay: 0.2s;"></div>
+                    <div class="confetti-particle" style="left: 30%; animation-delay: 0.4s;"></div>
+                    <div class="confetti-particle" style="left: 40%; animation-delay: 0.6s;"></div>
+                    <div class="confetti-particle" style="left: 50%; animation-delay: 0.8s;"></div>
+                `;
+                currentStudentRow.appendChild(confetti);
+            }
         }
 
         function showError(message) {
@@ -233,11 +325,31 @@
             tbody.innerHTML = `
             <tr>
                 <td colspan="6" class="px-6 py-4 text-center text-red-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
                     ${message}
                 </td>
-            </tr>
-        `;
+            </tr>`;
         }
+
+        // Add sparkle effects to cards
+        document.querySelectorAll('.card-hover-effect').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = `${e.offsetX}px`;
+                sparkle.style.top = `${e.offsetY}px`;
+                sparkle.style.width = `${Math.random() * 10 + 5}px`;
+                sparkle.style.height = sparkle.style.width;
+                sparkle.style.opacity = Math.random() * 0.5 + 0.5;
+                card.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 1000);
+            });
+        });
     });
 </script>
 {% endblock %}
