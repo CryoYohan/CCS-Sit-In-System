@@ -71,19 +71,15 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Set current date
         const now = new Date();
         document.getElementById('updateDate').textContent = `Updated: ${now.toLocaleDateString()}`;
 
-        // Initialize pagination variables
         let currentPage = 1;
         const itemsPerPage = 10;
         let allLeaderboards = [];
 
-        // Fetch leaderboard data
         fetchLeaderboards();
 
-        // Add event listeners for pagination buttons
         document.getElementById('prevBtn').addEventListener('click', function() {
             if (currentPage > 1) {
                 currentPage--;
@@ -110,9 +106,7 @@
         function fetchLeaderboards() {
             fetch('/api/leaderboards')
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
+                    if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
                 })
                 .then(data => {
@@ -132,42 +126,38 @@
 
         function renderLeaderboards(leaderboards, page = 1, perPage = 10) {
             const tbody = document.getElementById('leaderboardsTbody');
-            tbody.innerHTML = ''; // Clear existing content
+            tbody.innerHTML = '';
 
             if (!leaderboards || leaderboards.length === 0) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                     No leaderboard data available
-                </td>
-            `;
+                </td>`;
                 tbody.appendChild(row);
                 return;
             }
 
-            // Calculate pagination
             const startIndex = (page - 1) * perPage;
             const endIndex = Math.min(startIndex + perPage, leaderboards.length);
             const paginatedData = leaderboards.slice(startIndex, endIndex);
 
-            paginatedData.forEach((student, index) => {
-                const globalIndex = startIndex + index;
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50';
+            paginatedData.forEach((student) => {
+                const rank = student.rank;
 
-                // Determine rank styling
+                // Rank styling
                 let rankClass = 'text-gray-600 font-medium';
-                let rankContent = globalIndex + 1;
+                let rankContent = rank;
 
-                if (globalIndex === 0) {
+                if (rank === 1) {
                     rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 text-white font-bold mx-auto';
-                } else if (globalIndex === 1) {
+                } else if (rank === 2) {
                     rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 text-gray-800 font-bold mx-auto';
-                } else if (globalIndex === 2) {
+                } else if (rank === 3) {
                     rankClass = 'flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-white font-bold mx-auto';
                 }
 
-                // Determine session count styling
+                // Session count styling
                 let sessionClass = 'px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ';
                 if (student.session_count >= 30) {
                     sessionClass += 'bg-green-100 text-green-800';
@@ -177,21 +167,22 @@
                     sessionClass += 'bg-gray-100 text-gray-800';
                 }
 
-                // Calculate points (assuming 2 points per session)
                 const points = student.session_count * 2;
 
-                // Determine badges based on rank
+                // Badges
                 let badges = '';
-                if (globalIndex === 0) {
+                if (rank === 1) {
                     badges = '<span class="text-yellow-500"><i class="fas fa-crown"></i></span><span class="text-blue-500"><i class="fas fa-fire"></i></span>';
-                } else if (globalIndex === 1) {
+                } else if (rank === 2) {
                     badges = '<span class="text-blue-500"><i class="fas fa-fire"></i></span>';
-                } else if (globalIndex === 2) {
+                } else if (rank === 3) {
                     badges = '<span class="text-purple-500"><i class="fas fa-star"></i></span>';
-                } else if (globalIndex < 10) {
+                } else if (rank <= 10) {
                     badges = '<span class="text-green-500"><i class="fas fa-seedling"></i></span>';
                 }
 
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
                 row.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-center">
                     <span class="${rankClass}">${rankContent}</span>
@@ -218,14 +209,12 @@
                     <div class="flex justify-center space-x-1">${badges}</div>
                 </td>
             `;
-
                 tbody.appendChild(row);
             });
 
-            // Update pagination info
             document.getElementById('paginationInfo').innerHTML = `
-            Showing <span class="font-medium">${startIndex + 1}</span> to <span class="font-medium">${endIndex}</span> of <span class="font-medium">${leaderboards.length}</span> students
-        `;
+                Showing <span class="font-medium">${startIndex + 1}</span> to <span class="font-medium">${endIndex}</span> of <span class="font-medium">${leaderboards.length}</span> students
+            `;
         }
 
         function showError(message) {
@@ -235,9 +224,9 @@
                 <td colspan="6" class="px-6 py-4 text-center text-red-500">
                     ${message}
                 </td>
-            </tr>
-        `;
+            </tr>`;
         }
     });
 </script>
+
 {% endblock %}
