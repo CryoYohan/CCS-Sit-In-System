@@ -350,36 +350,26 @@ def sitin_lab():
 def uploadprofile():
     """Upload Profile Picture Route"""
     global student
-    if not session['student'] == None:
-            if student == None:
-                student_data = session.get('student')
-                student = Student(**student_data)
+    if session.get('student') and student is None:
+        student_data = session.get('student')
+        student = Student(**student_data)
 
-    filenamefromicon = request.form['profile_icon2'] # Extract default icon selection
+    filenamefromicon = request.form.get('profile_icon2', '')  # Default icon selection
+    uploaded_file = request.files.get('profile_picture')      # Uploaded file
 
     print(f'Filename from icon: {filenamefromicon}')
-    print("Request files:", request.files)  # Debugging: Print received files
+    print("Request files:", request.files)
+    print(f'Profile picture uploaded: {bool(uploaded_file and uploaded_file.filename)}')
 
-    profile_picture_uploaded = 'profile_picture' in request.files
-    print(f'Profile picture uploaded: {profile_picture_uploaded}')
+    profileicons = ['bear.png', 'cat.png', 'chicken.png', 'meerkat.png',
+                    'panda.png', 'polar-bear.png', 'shark.png', 'weasel.png', 'wolf.png']
 
-    if profile_picture_uploaded and not filenamefromicon: 
-        file = request.files['profile_picture']
-
-        if file.filename == '':
-            flash("No selected file")
-            return redirect(url_for('main.profilesettings'))
-        profileicons = ['bear.png','cat.png','chicken.png', 'meerkat.png','panda.png','polar-bear.png', 'shark.png','weasel.png','wolf.png']
-
-        if file and allowed_file(file.filename):
-            # First, delete the previous profile picture if it exists
-            if student.image and not student.image in profileicons:  # Check if there's an existing profile icon
-                old_image_path = os.path.join(
-                    current_app.static_folder,
-                    'images',
-                    'profileicons',
-                    student.image
-                )
+    # CASE 1: Uploading a new custom picture
+    if uploaded_file and uploaded_file.filename and not filenamefromicon:
+        if allowed_file(uploaded_file.filename):
+            # Delete old uploaded picture if not a default icon
+            if student.image and student.image not in profileicons:
+                old_image_path = os.path.join(current_app.static_folder, 'images', 'profileicons', student.image)
                 if os.path.exists(old_image_path):
                     try:
                         os.remove(old_image_path)
@@ -387,20 +377,18 @@ def uploadprofile():
                     except Exception as e:
                         print(f"Error deleting old profile picture: {str(e)}")
 
-            filename = secure_filename(file.filename)  # Secure filename
-
+            # Save new file
+            filename = secure_filename(uploaded_file.filename)
             upload_folder = os.path.abspath(os.path.join(current_app.root_path, "static/images/profileicons"))
             filepath = os.path.join(upload_folder, filename)
 
             if not os.path.isdir(upload_folder):
-                print(f"⚠️ ERROR: Directory {upload_folder} does NOT exist!")
                 flash("Upload folder missing. Contact admin.", "danger")
                 return redirect(url_for('main.profilesettings'))
 
-            print(f"Saving file to: {filepath}")  # Debugging line
-            file.save(filepath.replace("\\", "/"))  # Fix Windows backslash issue
+            uploaded_file.save(filepath.replace("\\", "/"))
 
-            if os.path.exists(filepath):  # Verify if the file was actually saved
+            if os.path.exists(filepath):
                 print("✅ File successfully saved!")
             else:
                 print("❌ File was NOT saved!")
@@ -409,29 +397,45 @@ def uploadprofile():
 
             if response['success']:
                 flash("Profile picture uploaded successfully!", "success")
-                student = response['student'] # reload new student object with new image
-                session['student'] = student.__dict__ # reload new student session with new image from new student object
+                student = response['student']
+                session['student'] = student.__dict__
                 return redirect(url_for('main.profilesettings'))
             else:
                 flash(response['error'], "error")
                 return redirect(url_for('main.profilesettings'))
 
-    elif filenamefromicon and profile_picture_uploaded:
-        # If selecting a default icon, we might not need to delete the old file
-        # since default icons are shared and shouldn't be deleted
+        else:
+            flash("Invalid file type.", "error")
+            return redirect(url_for('main.profilesettings'))
+
+    # CASE 2: Selecting a default icon only
+    elif filenamefromicon:
+        # Delete old uploaded picture if not a default icon
+        if student.image and student.image not in profileicons:
+            old_image_path = os.path.join(current_app.static_folder, 'images', 'profileicons', student.image)
+            if os.path.exists(old_image_path):
+                try:
+                    os.remove(old_image_path)
+                    print(f"Deleted old profile picture: {old_image_path}")
+                except Exception as e:
+                    print(f"Error deleting old profile picture: {str(e)}")
+
         response = student.upload_profile_icon(profile_icon=filenamefromicon, student=student)
 
         if response['success']:
-            flash("Profile picture uploaded successfully2!", "success")
+            flash("Profile picture changed successfully!", "success")
             student = response['student']
-            session['student'] = student.__dict__ # reload new student session with new image from new student object
+            session['student'] = student.__dict__
             return redirect(url_for('main.profilesettings'))
         else:
             flash(response['error'], "error")
             return redirect(url_for('main.profilesettings'))
+
+    # CASE 3: Neither uploaded nor selected
     else:
         flash("Please select a profile picture or upload one.", "error")
         return redirect(url_for('main.profilesettings'))
+
 
 
 
