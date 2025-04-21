@@ -125,7 +125,9 @@
                                     </svg>
                                     <div
                                         class="bg-blue-500 rounded-full h-6 px-2 flex justify-items-center text-white font-semibold text-sm">
-                                        <span class="flex items-center">30%</span>
+                                        <span class="flex items-center">
+                                            <p id="rank-percent2"></p>
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="ml-2 w-full flex-1">
@@ -136,21 +138,21 @@
                                                     a 15.9155 15.9155 0 0 1 0 31.831
                                                     a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e6e6e6"
                                                     stroke-width="3" />
-                                                <path d="M18 2.0845
+                                                <path id="rank-stroke" d="M18 2.0845
                                                     a 15.9155 15.9155 0 0 1 0 31.831
                                                     a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#3b82f6"
-                                                    stroke-width="3" stroke-dasharray="60, 100" />
+                                                    stroke-width="3" stroke-dasharray="0, 100" />
                                             </svg>
-                                            <div
-                                                class="absolute inset-0 flex items-center justify-center text-lg font-bold">
-                                                6</div>
+                                            <div id="rank-number" class="absolute inset-0 flex items-center justify-center text-lg font-bold">
+                                                -
+                                            </div>
                                         </div>
                                         <div>
                                             <div class="text-lg font-semibold">Ranking</div>
-                                            <div class="text-sm text-gray-500">Top 20%</div>
+                                            <div id="rank-percent" class="text-sm text-gray-500">Top --%</div>
                                         </div>
                                     </div>
-                                </div>
+                                </div>                                
                             </div>
                         </a>
                     </div>
@@ -242,6 +244,20 @@
     document.addEventListener('DOMContentLoaded', fetchAnnouncements1);
 
     document.addEventListener('DOMContentLoaded', fetchTotalSitins);
+
+    fetch('/api/leaderboards')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+            document.getElementById('rank-number').textContent = data.student_rank;
+            document.getElementById('rank-percent').textContent = `Top ${data.ranking_percentage}%`;
+            document.getElementById('rank-percent2').textContent = `${data.ranking_percentage}%`;
+
+            // Update stroke progress
+            const stroke = document.getElementById('rank-stroke');
+            stroke.setAttribute('stroke-dasharray', `${data.ranking_percentage}, 100`);
+            }
+        });
 
     document.addEventListener('DOMContentLoaded', async () => {
         try {
