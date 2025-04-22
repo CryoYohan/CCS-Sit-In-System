@@ -1858,7 +1858,8 @@ def get_leaderboards():
                 'session_count' : leaderboard['session_count'],
                 'rank': leaderboard['rank'],
                 'idno':leaderboard['idno'],
-                'image':leaderboard['image']
+                'image':leaderboard['image'],
+                'points': leaderboard['points']
             }
             for leaderboard in leaderboards['data']
         ] 

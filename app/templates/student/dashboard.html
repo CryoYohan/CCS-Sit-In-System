@@ -225,7 +225,7 @@
                                 <div class="ml-2 w-full flex-1">
                                     <div>
                                         <div class="mt-3 text-3xl font-bold leading-8 text-gray-800">
-                                            <p id="total-sitins" class="flex items-center">
+                                            <p id="total-points" class="flex items-center">
                                                 <span class="animate-pulse">•••</span>
                                                 <span class="text-sm ml-2 text-blue-500 font-normal">points</span>
                                             </p>
@@ -277,7 +277,7 @@
                                                 <path
                                                     d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                                             </svg>
-                                            <p id="rank-percent2">
+                                            <p id="rank-percent">
 
                                             </p>
                                         </span>
@@ -424,15 +424,13 @@
     // Fetch announcements when the page loads
     document.addEventListener('DOMContentLoaded', fetchAnnouncements1);
 
-    document.addEventListener('DOMContentLoaded', fetchTotalSitins);
-
     fetch('/api/leaderboards')
         .then(res => res.json())
         .then(data => {
             if (data.success) {
                 document.getElementById('rank-number').textContent = data.student_rank;
                 document.getElementById('rank-percent').textContent = `Top ${data.ranking_percentage}%`;
-                document.getElementById('rank-percent2').textContent = `${data.ranking_percentage}%`;
+                document.getElementById('total-points').textContent = `${data.points}`;
 
                 // Update stroke progress
                 const stroke = document.getElementById('rank-stroke');
@@ -441,7 +439,6 @@
             else {
                 document.getElementById('rank-number').textContent = 'N/A';
                 document.getElementById('rank-percent').textContent = 'N/A';
-                document.getElementById('rank-percent2').textContent = 'N/A';
 
                 // Update stroke progress
                 const stroke = document.getElementById('rank-stroke');
@@ -486,7 +483,7 @@
         }
     });
 
-    async function fetchTotalSitins() {
+    /* async function fetchTotalSitins() {
         try {
             const student_idno = '{{ student.idno }}'; // Ensure this is correctly populated
             const response = await fetch(`/api/session-records/${student_idno}`, {
@@ -527,7 +524,7 @@
                 text: 'Failed to fetch total sit-ins. Please try again later.',
             });
         }
-    }
+    } */
 
     async function fetchAnnouncements1() {
         try {
