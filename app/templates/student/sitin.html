@@ -10,7 +10,7 @@
   </div>
   <!-- Laboratory Carousel Section -->
   <div class="mb-8 relative">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4">Available Laboratories</h2>
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Laboratory Information</h2>
 
     <div class="relative">
       <!-- Carousel Container -->
@@ -45,53 +45,25 @@
     </div>
   </div>
 
-  <!-- Reservation Form -->
-  <div class="bg-white shadow-md rounded-lg p-6">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sit-in Laboratory</h2>
-    <form action="{{ url_for('main.sitin_lab') }}" method="POST" class="space-y-4">
-      <div>
-        <label for="date" class="block text-sm font-medium text-gray-700">Sit-in Date and Time</label>
-        <input type="text" id="date" name="date" readonly
-          class="mt-1 bg-blue-400 text-white block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm cursor-not-allowed">
+  <!-- Laboratory Schedules Section -->
+  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <!-- Tabs -->
+    <div class="flex border-b" id="lab-tabs">
+      <!-- Tabs will be populated by JavaScript -->
+      <div class="px-4 py-3 text-center text-gray-500">Loading labs...</div>
+    </div>
+
+    <!-- Schedule Content -->
+    <div class="p-6" id="schedule-content">
+      <div class="text-center py-8 text-gray-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <p class="mt-2">Select a laboratory to view its schedule</p>
       </div>
-      <div>
-        <label for="lab" class="block text-sm font-medium text-gray-700">Select Laboratory</label>
-        <select id="lab" name="lab"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required>
-          <option value="" disabled selected>Select a lab...</option>
-          <!-- Options will be populated by JavaScript -->
-        </select>
-      </div>
-      <div>
-        <label for="reason" class="block text-sm font-medium text-gray-700">Reason for Sit-in</label>
-        <select id="reason" name="reason"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          required>
-          <option value="#" selected>Select Purpose</option>
-          <option value="Python">Python</option>
-          <option value="C#">C#</option>
-          <option value="Java">Java</option>
-          <option value="WEB DEV">WEB DEV</option>
-          <option value="Database">Database</option>
-          <option value="Digital Logic & Design">Digital Logic & Design</option>
-          <option value="Embedded System & IoT">Embedded System & IoT</option>
-          <option value="System Integration & Architecture">System Integration & Architecture</option>
-          <option value="Computer Application">Computer Application</option>
-          <option value="Project Management">Project Management</option>
-          <option value="IT Trends">IT Trends</option>
-          <option value="Technopreneurship">Technopreneurship</option>
-          <option value="Capstone">Capstone</option>
-        </select>
-      </div>
-      <div>
-        <div class="flex justify-center">
-          <button type="submit"
-            class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-6 py-2 rounded-lg text-lg hover:bg-blue-700 transition duration-300 shadow-md">
-            Request Sit-in
-          </button>
-        </div>
-    </form>
+    </div>
   </div>
 </div>
 
@@ -163,85 +135,222 @@
         class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">
         Close
       </button>
-      <button 
-          onclick="window.location.href='{{ url_for('main.reserve') }}'"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-      Reserve Now
-    </button>
+      <button onclick="window.location.href='{{ url_for('main.reserve') }}'"
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        Reserve Now
+      </button>
+    </div>
   </div>
-</div>
 
-<script>
-  // Function to format the current date and time
-  function formatCurrentDateTime() {
-    const now = new Date();
+  <script>
+    // Function to format the current date and time
+    function formatCurrentDateTime() {
+      const now = new Date();
 
-    // Format date (e.g., "March 15, 2023")
-    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    const formattedDate = now.toLocaleDateString('en-US', dateOptions);
+      // Format date (e.g., "March 15, 2023")
+      const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+      const formattedDate = now.toLocaleDateString('en-US', dateOptions);
 
-    // Format time (e.g., "2:30 PM")
-    const timeOptions = { hour: '2-digit', minute: '2-digit' };
-    const formattedTime = now.toLocaleTimeString('en-US', timeOptions);
+      // Format time (e.g., "2:30 PM")
+      const timeOptions = { hour: '2-digit', minute: '2-digit' };
+      const formattedTime = now.toLocaleTimeString('en-US', timeOptions);
 
-    return `${formattedDate} ${formattedTime}`;
-  }
-
-  // Set the current date and time when page loads
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('date').value = formatCurrentDateTime();
-  });
-
-  // Function to populate lab dropdown
-  function populateLabDropdown(labs) {
-    const select = document.getElementById('lab');
-
-    // Clear existing options except the first one
-    while (select.options.length > 1) {
-      select.remove(1);
+      return `${formattedDate} ${formattedTime}`;
     }
 
-    // Add labs from API response
-    labs.forEach(lab => {
-      const option = document.createElement('option');
-      option.value = lab.lab_name;
-      option.textContent = `Lab ${lab.lab_name}`;
-      select.appendChild(option);
-    });
-  }
+    // Function to parse time slots from the API
+    function parseTimeSlots(vacantTime) {
+      if (!vacantTime) return [];
 
-  // Update your existing fetch call to use the carousel
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const response = await fetch('/api/labs');
-      if (!response.ok) throw new Error('Failed to fetch labs');
-      const labs = await response.json();
-      renderLabs(labs); // This now uses the carousel
-    } catch (error) {
-      console.error('Error fetching labs:', error);
-      document.getElementById('labs-track').innerHTML = `
-      <div class="w-full text-center py-8 text-red-500 flex-shrink-0">
-        Failed to load laboratories. Please try again later.
+      // Split by comma and clean up each time slot
+      return vacantTime.split(',')
+        .map(time => time.trim())
+        .filter(time => time.length > 0);
+    }
+
+    // Function to format a time slot for display
+    function formatTimeSlot(time) {
+      // Convert to uppercase for consistent display
+      return time.toUpperCase();
+    }
+    // Function to render schedule for a lab
+    function renderLabSchedule(lab) {
+      const scheduleContent = document.getElementById('schedule-content');
+      const timeSlots = parseTimeSlots(lab.vacant_time);
+
+      // Clear previous content
+      scheduleContent.innerHTML = '';
+
+      if (!lab || timeSlots.length === 0) {
+        scheduleContent.innerHTML = `
+        <div class="text-center py-8 text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="mt-2">No available time slots for this laboratory</p>
+          ${lab.vacant_time ? `<p class="text-sm mt-2 text-gray-400">Raw data: ${lab.vacant_time}</p>` : ''}
+        </div>
+      `;
+        return;
+      }
+
+      // Create a container for the schedule
+      const scheduleContainer = document.createElement('div');
+      scheduleContainer.innerHTML = `
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">${lab.lab_name} Available Time Slots</h3>
+        <p class="text-gray-600">Current status: <span class="font-medium ${lab.slots > 0 ? 'text-green-600' : 'text-red-600'}">${lab.slots > 0 ? 'Available' : 'Fully Booked'}</span></p>
+        <p class="text-sm text-gray-500 mt-1">${lab.lab_description || ''}</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="time-slots-container">
+        <!-- Time slots will be added here -->
+      </div>
+      
+      <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+        <h4 class="text-sm font-medium text-blue-800 mb-2">Notes:</h4>
+        <ul class="text-sm text-blue-700 list-disc pl-5 space-y-1">
+          <li>All times are in 12-hour format</li>
+          <li>Click "Reserve" to book a specific time slot</li>
+          <li>Laboratory may be closed during holidays</li>
+        </ul>
       </div>
     `;
+
+      scheduleContent.appendChild(scheduleContainer);
+
+      // Add time slots to the container
+      const timeSlotsContainer = document.getElementById('time-slots-container');
+      timeSlots.forEach((time, index) => {
+        const timeSlotElement = document.createElement('div');
+        timeSlotElement.className = 'bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow';
+        timeSlotElement.innerHTML = `
+        <div class="flex items-center mb-2">
+          <span class="w-3 h-3 rounded-full ${index % 3 === 0 ? 'bg-blue-500' : index % 3 === 1 ? 'bg-purple-500' : 'bg-pink-500'} mr-2"></span>
+          <h4 class="font-medium text-gray-700">Slot ${index + 1}</h4>
+        </div>
+        <div class="flex items-center text-gray-800">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          ${formatTimeSlot(time)}
+        </div>
+        <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+          <span class="text-xs text-gray-500">${lab.slots} seats available</span>
+          <a href="{{ url_for('main.reserve') }}" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition">
+            Reserve
+          </a>
+        </div>
+      `;
+        timeSlotsContainer.appendChild(timeSlotElement);
+      });
     }
-  });
 
-  // Render labs in the grid
-  function renderLabs(labs) {
-    const container = document.getElementById('labs-container');
+    // Function to initialize lab tabs
+    function initLabTabs(labs) {
+      const tabsContainer = document.getElementById('lab-tabs');
 
-    if (!labs || labs.length === 0) {
-      container.innerHTML = `
+      if (!labs || labs.length === 0) {
+        tabsContainer.innerHTML = `
+        <div class="px-4 py-3 text-center text-gray-500 w-full">
+          No laboratories available
+        </div>
+      `;
+        return;
+      }
+
+      tabsContainer.innerHTML = labs.map((lab, index) => `
+      <button 
+        class="px-4 py-3 font-medium text-sm border-b-2 transition-all duration-200 ${index === 0 ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}" 
+        onclick="switchLabTab('${lab.lab_id}', ${index}, this)"
+        data-lab-id="${lab.lab_id}"
+      >
+        Lab ${lab.lab_name}
+      </button>
+    `).join('');
+
+      // Load first lab's schedule by default
+      if (labs.length > 0) {
+        renderLabSchedule(labs[0]);
+      }
+    }
+
+    // Function to switch between lab tabs
+    function switchLabTab(labId, labIndex, buttonElement) {
+      // Update active tab styling
+      document.querySelectorAll('#lab-tabs button').forEach(btn => {
+        btn.classList.remove('border-blue-500', 'text-blue-600');
+        btn.classList.add('border-transparent', 'text-gray-500');
+      });
+
+      buttonElement.classList.add('border-blue-500', 'text-blue-600');
+      buttonElement.classList.remove('border-transparent', 'text-gray-500');
+
+      // Find the lab data and render its schedule
+      const lab = window.labsData[labIndex];
+      if (lab) {
+        renderLabSchedule(lab);
+      }
+    }
+
+
+    // Function to format the current date and time
+    function formatCurrentDateTime() {
+      const now = new Date();
+
+      // Format date (e.g., "March 15, 2023")
+      const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+      const formattedDate = now.toLocaleDateString('en-US', dateOptions);
+
+      // Format time (e.g., "2:30 PM")
+      const timeOptions = { hour: '2-digit', minute: '2-digit' };
+      const formattedTime = now.toLocaleTimeString('en-US', timeOptions);
+
+      return `${formattedDate} ${formattedTime}`;
+    }
+
+    // Set the current date and time when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('date').value = formatCurrentDateTime();
+    });
+
+
+    // Update your existing fetch call
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('/api/labs');
+        if (!response.ok) throw new Error('Failed to fetch labs');
+        const labs = await response.json();
+
+        // Store labs data globally for tab switching
+        window.labsData = labs;
+
+        renderLabs(labs); // This now uses the carousel
+        initLabTabs(labs); // Initialize the tabs
+      } catch (error) {
+        console.error('Error fetching labs:', error);
+        document.getElementById('labs-track').innerHTML = `
+        <div class="w-full text-center py-8 text-red-500 flex-shrink-0">
+          Failed to load laboratories. Please try again later.
+        </div>
+      `;
+      }
+    });
+
+    // Render labs in the grid
+    function renderLabs(labs) {
+      const container = document.getElementById('labs-container');
+
+      if (!labs || labs.length === 0) {
+        container.innerHTML = `
         <div class="col-span-full text-center py-8 text-gray-500">
           No laboratories available.
         </div>
       `;
-      return;
-    }
+        return;
+      }
 
-    container.innerHTML = labs.map(lab => `
+      container.innerHTML = labs.map(lab => `
       <div class="bg-white shadow-md rounded-lg overflow-hidden transform transition-transform hover:scale-105 cursor-pointer"
            onclick="openModal('${lab.lab_id}')">
         <img src="{{ url_for('static', filename='images/laboratories/') }}${lab.image || 'default_image.avif'}" 
@@ -259,104 +368,104 @@
         </div>
       </div>
     `).join('');
-  }
-  // Animation for modal
-  const modalInAnimation = [
-    { opacity: 0, transform: 'translateY(20px) scale(0.95)' },
-    { opacity: 1, transform: 'translateY(0) scale(1)' }
-  ];
-
-  const modalTiming = {
-    duration: 200,
-    easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
-    fill: 'forwards'
-  };
-
-  async function openModal(labId) {
-    try {
-      const response = await fetch(`/api/labs/${labId}`);
-      if (!response.ok) throw new Error('Failed to fetch lab details');
-      const lab = await response.json();
-
-      // Determine if today is weekend (Saturday or Sunday)
-      const today = new Date();
-      const isWeekend = (today.getDay() === 6) || (today.getDay() === 0); // 6 = Saturday, 0 = Sunday
-
-      // Set status based on day of week
-      const labStatus = isWeekend ? 'Closed (Weekend)' : lab.status || 'Open';
-
-      // Populate modal with lab data
-      document.getElementById('modalLabName').textContent = `Lab ${lab.lab_name}`;
-      document.getElementById('modalLabDescription').textContent = lab.lab_description || 'No description available';
-
-      // Set the image source with url_for
-      const labImage = document.getElementById('modalLabImage');
-      labImage.src = "{{ url_for('static', filename='images/laboratories/') }}" + (lab.image || 'default_image.avif');
-      labImage.onerror = function () {
-        this.src = "{{ url_for('static', filename='images/laboratories/default-lab.jpg') }}";
-      };
-
-      document.getElementById('modalAvailableSeats').textContent = lab.slots;
-      document.getElementById('modalTotalSeats').textContent = 50;
-      document.getElementById('modalLabStatus').textContent = labStatus;
-      document.getElementById('modalLabSchedule').textContent = lab.vacant_time;
-
-      // Show modal with animation
-      const modal = document.getElementById('labModal');
-      modal.classList.remove('hidden');
-      modal.querySelector('.animate-modalIn').animate(modalInAnimation, modalTiming);
-
-    } catch (error) {
-      console.error('Error opening lab modal:', error);
-      alert('Failed to load lab details');
     }
-  }
+    // Animation for modal
+    const modalInAnimation = [
+      { opacity: 0, transform: 'translateY(20px) scale(0.95)' },
+      { opacity: 1, transform: 'translateY(0) scale(1)' }
+    ];
 
-  function closeModal() {
-    const modal = document.getElementById('labModal');
-    modal.classList.add('hidden');
-  }
-  // Carousel functionality
-  let currentSlide = 0;
-  let slidesPerView = 4;
-  let totalSlides = 0;
+    const modalTiming = {
+      duration: 200,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      fill: 'forwards'
+    };
 
-  function updateSlidesPerView() {
-    if (window.innerWidth < 640) slidesPerView = 1;
-    else if (window.innerWidth < 768) slidesPerView = 2;
-    else if (window.innerWidth < 1024) slidesPerView = 3;
-    else slidesPerView = 4;
-    updateCarousel();
-  }
+    async function openModal(labId) {
+      try {
+        const response = await fetch(`/api/labs/${labId}`);
+        if (!response.ok) throw new Error('Failed to fetch lab details');
+        const lab = await response.json();
 
-  function updateCarousel() {
-    const track = document.getElementById('labs-track');
-    const slideWidth = 100 / slidesPerView;
-    track.style.transform = `translateX(-${currentSlide * slideWidth}%)`;
+        // Determine if today is weekend (Saturday or Sunday)
+        const today = new Date();
+        const isWeekend = (today.getDay() === 6) || (today.getDay() === 0); // 6 = Saturday, 0 = Sunday
 
-    document.querySelectorAll('.carousel-indicator').forEach((indicator, index) => {
-      indicator.classList.toggle('bg-blue-500', index === Math.floor(currentSlide / slidesPerView));
-      indicator.classList.toggle('bg-gray-300', index !== Math.floor(currentSlide / slidesPerView));
-    });
+        // Set status based on day of week
+        const labStatus = isWeekend ? 'Closed (Weekend)' : lab.status || 'Open';
 
-    document.getElementById('carousel-prev').classList.toggle('hidden', currentSlide === 0);
-    document.getElementById('carousel-next').classList.toggle('hidden', currentSlide >= totalSlides - slidesPerView);
-  }
+        // Populate modal with lab data
+        document.getElementById('modalLabName').textContent = `Lab ${lab.lab_name}`;
+        document.getElementById('modalLabDescription').textContent = lab.lab_description || 'No description available';
 
-  function initCarousel(labs) {
-    const track = document.getElementById('labs-track');
-    const indicators = document.getElementById('carousel-indicators');
+        // Set the image source with url_for
+        const labImage = document.getElementById('modalLabImage');
+        labImage.src = "{{ url_for('static', filename='images/laboratories/') }}" + (lab.image || 'default_image.avif');
+        labImage.onerror = function () {
+          this.src = "{{ url_for('static', filename='images/laboratories/default-lab.jpg') }}";
+        };
 
-    if (!labs || labs.length === 0) {
-      track.innerHTML = `
+        document.getElementById('modalAvailableSeats').textContent = lab.slots;
+        document.getElementById('modalTotalSeats').textContent = 50;
+        document.getElementById('modalLabStatus').textContent = labStatus;
+        document.getElementById('modalLabSchedule').textContent = lab.vacant_time;
+
+        // Show modal with animation
+        const modal = document.getElementById('labModal');
+        modal.classList.remove('hidden');
+        modal.querySelector('.animate-modalIn').animate(modalInAnimation, modalTiming);
+
+      } catch (error) {
+        console.error('Error opening lab modal:', error);
+        alert('Failed to load lab details');
+      }
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('labModal');
+      modal.classList.add('hidden');
+    }
+    // Carousel functionality
+    let currentSlide = 0;
+    let slidesPerView = 4;
+    let totalSlides = 0;
+
+    function updateSlidesPerView() {
+      if (window.innerWidth < 640) slidesPerView = 1;
+      else if (window.innerWidth < 768) slidesPerView = 2;
+      else if (window.innerWidth < 1024) slidesPerView = 3;
+      else slidesPerView = 4;
+      updateCarousel();
+    }
+
+    function updateCarousel() {
+      const track = document.getElementById('labs-track');
+      const slideWidth = 100 / slidesPerView;
+      track.style.transform = `translateX(-${currentSlide * slideWidth}%)`;
+
+      document.querySelectorAll('.carousel-indicator').forEach((indicator, index) => {
+        indicator.classList.toggle('bg-blue-500', index === Math.floor(currentSlide / slidesPerView));
+        indicator.classList.toggle('bg-gray-300', index !== Math.floor(currentSlide / slidesPerView));
+      });
+
+      document.getElementById('carousel-prev').classList.toggle('hidden', currentSlide === 0);
+      document.getElementById('carousel-next').classList.toggle('hidden', currentSlide >= totalSlides - slidesPerView);
+    }
+
+    function initCarousel(labs) {
+      const track = document.getElementById('labs-track');
+      const indicators = document.getElementById('carousel-indicators');
+
+      if (!labs || labs.length === 0) {
+        track.innerHTML = `
       <div class="w-full text-center py-8 text-gray-500 flex-shrink-0">
         No laboratories available.
       </div>
     `;
-      return;
-    }
+        return;
+      }
 
-    track.innerHTML = labs.map(lab => `
+      track.innerHTML = labs.map(lab => `
     <div class="px-2 flex-shrink-0" style="width: ${100 / slidesPerView}%">
       <div class="bg-white shadow-md rounded-lg overflow-hidden transform transition-transform hover:scale-105 cursor-pointer h-full"
            onclick="openModal('${lab.lab_id}')">
@@ -377,67 +486,66 @@
     </div>
   `).join('');
 
-    totalSlides = labs.length;
-    indicators.innerHTML = Array.from({ length: Math.ceil(totalSlides / slidesPerView) }, (_, i) => `
+      totalSlides = labs.length;
+      indicators.innerHTML = Array.from({ length: Math.ceil(totalSlides / slidesPerView) }, (_, i) => `
     <button class="carousel-indicator w-3 h-3 rounded-full ${i === 0 ? 'bg-blue-500' : 'bg-gray-300'}" 
             onclick="goToSlide(${i})"></button>
   `).join('');
 
-    indicators.classList.remove('hidden');
-    document.getElementById('carousel-prev').classList.remove('hidden');
-    document.getElementById('carousel-next').classList.remove('hidden');
+      indicators.classList.remove('hidden');
+      document.getElementById('carousel-prev').classList.remove('hidden');
+      document.getElementById('carousel-next').classList.remove('hidden');
 
-    document.getElementById('carousel-prev').addEventListener('click', () => {
-      if (currentSlide > 0) {
-        currentSlide--;
-        updateCarousel();
-      }
-    });
+      document.getElementById('carousel-prev').addEventListener('click', () => {
+        if (currentSlide > 0) {
+          currentSlide--;
+          updateCarousel();
+        }
+      });
 
-    document.getElementById('carousel-next').addEventListener('click', () => {
-      if (currentSlide < totalSlides - slidesPerView) {
-        currentSlide++;
-        updateCarousel();
-      }
-    });
+      document.getElementById('carousel-next').addEventListener('click', () => {
+        if (currentSlide < totalSlides - slidesPerView) {
+          currentSlide++;
+          updateCarousel();
+        }
+      });
 
-    updateSlidesPerView();
-    window.addEventListener('resize', updateSlidesPerView);
-  }
+      updateSlidesPerView();
+      window.addEventListener('resize', updateSlidesPerView);
+    }
 
-  function goToSlide(slideIndex) {
-    currentSlide = slideIndex * slidesPerView;
-    updateCarousel();
-  }
+    function goToSlide(slideIndex) {
+      currentSlide = slideIndex * slidesPerView;
+      updateCarousel();
+    }
 
-  // Update your existing renderLabs function
-  function renderLabs(labs) {
-    initCarousel(labs);
-    populateLabDropdown(labs);
-  }
-</script>
+    // Update your existing renderLabs function
+    function renderLabs(labs) {
+      initCarousel(labs);
+    }
+  </script>
 
-<style>
-  .animate-modalIn {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
+  <style>
+    .animate-modalIn {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
 
-  #labs-carousel {
-    width: 100%;
-  }
+    #labs-carousel {
+      width: 100%;
+    }
 
-  #labs-track {
-    display: flex;
-    width: 100%;
-  }
+    #labs-track {
+      display: flex;
+      width: 100%;
+    }
 
-  .carousel-indicator {
-    transition: background-color 0.3s ease;
-  }
+    .carousel-indicator {
+      transition: background-color 0.3s ease;
+    }
 
-  .carousel-indicator:hover {
-    background-color: #93c5fd !important;
-  }
-</style>
-{% endblock %}
+    .carousel-indicator:hover {
+      background-color: #93c5fd !important;
+    }
+  </style>
+  {% endblock %}
