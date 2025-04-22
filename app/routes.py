@@ -1002,6 +1002,7 @@ def get_leaderboards():
 
         if current_student_entry:
             rank = current_student_entry['rank']
+            points = current_student_entry['points']
             percentage = (1 - ((rank - 1) / total_students)) * 100
         else:
             rank = None
@@ -1013,6 +1014,7 @@ def get_leaderboards():
             'student_rank': rank,
             'ranking_percentage': round(percentage, 2) if percentage is not None else None,
             'total_students': total_students,
+            'points':points
         }), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
