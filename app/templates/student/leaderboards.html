@@ -170,7 +170,7 @@
                 .then(data => {
                     if (data.success) {
                         allLeaderboards = data.leaderboards.map((student, index) => {
-                            return { ...student, rank: index + 1 };
+                            return { ...student, rank: student.rank };
                         });
                         renderLeaderboards(allLeaderboards, currentPage, itemsPerPage);
                         updatePaginationControls();
@@ -305,7 +305,7 @@
                     <span class="${sessionClass}">${student.session_count}</span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-semibold ${rank <= 3 ? 'text-blue-600' : 'text-gray-600'}">
-                    ${points}
+                    ${student.points}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-center">
                     <div class="flex justify-center space-x-2">${badges}</div>

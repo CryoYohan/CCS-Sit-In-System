@@ -44,7 +44,7 @@ class User():
     def retrieve_leaderboards(self):
         """Fetch Leaderboards"""
         try:
-            records = self.db.getall_records(table='leaderboards')
+            records = self.db.getall_leaderboards(table='leaderboards')
             return {'success': True, 'data': records}
         except Exception as e:
              return {'success': False, 'message': str(e)}
