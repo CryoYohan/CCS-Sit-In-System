@@ -113,6 +113,7 @@ class Authorization():
                 student_add_data_to_object['password'] = hashed_password
                 student_add_data_to_object['image'] = choice(self.profileicons) # Add random profile icon
                 student_add_data_to_object['session'] = 30 # Add default amount of sessions
+                student_add_data_to_object['points'] = 0 # Add default points
 
                 self.db.add_record(table='user',**student_add_data_to_object) 
 

@@ -293,9 +293,9 @@
                             if (data.success) {
                                 Swal.fire("Logged Off!", "Student has been logged off.", "success")
                                     .then(() => clearFilter()); // Refresh the table without reloading the page
-                                    Swal.fire({
-                                        title: 'Reward Student Before Logging Off!',
-                                        html: `
+                                Swal.fire({
+                                    title: 'Reward Student Before Logging Off!',
+                                    html: `
                                             <div class="text-left">
                                             <p class="mb-4 text-gray-600">How productive were you today?</p>
                                             
@@ -339,66 +339,97 @@
                                             <p class="text-sm text-gray-500">Selected points: <span id="selectedPointsDisplay" class="font-bold">0</span></p>
                                             </div>
                                         `,
-                                        background: '#ffffff',
-                                        showCancelButton: true,
-                                        confirmButtonText: 'Confirm & Log Off',
-                                        cancelButtonText: 'Skip for now',
-                                        confirmButtonColor: '#4f46e5',
-                                        cancelButtonColor: '#6b7280',
-                                        width: '600px',
-                                        customClass: {
-                                            popup: 'rounded-2xl shadow-xl',
-                                            title: 'text-2xl font-bold text-gray-800',
-                                            htmlContainer: 'text-left',
-                                            confirmButton: 'px-4 py-2 rounded-lg font-medium',
-                                            cancelButton: 'px-4 py-2 rounded-lg font-medium'
-                                        },
-                                        didOpen: () => {
-                                            let selectedPoints = 0;
-                                            const pointOptions = document.querySelectorAll('.point-option');
-                                            
-                                            // Handle point selection
-                                            pointOptions.forEach(option => {
-                                            option.addEventListener('click', function() {
+                                    background: '#ffffff',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Confirm & Log Off',
+                                    cancelButtonText: 'Skip for now',
+                                    confirmButtonColor: '#4f46e5',
+                                    cancelButtonColor: '#6b7280',
+                                    width: '600px',
+                                    customClass: {
+                                        popup: 'rounded-2xl shadow-xl',
+                                        title: 'text-2xl font-bold text-gray-800',
+                                        htmlContainer: 'text-left',
+                                        confirmButton: 'px-4 py-2 rounded-lg font-medium',
+                                        cancelButton: 'px-4 py-2 rounded-lg font-medium'
+                                    },
+                                    didOpen: () => {
+                                        let selectedPoints = 0;
+                                        const pointOptions = document.querySelectorAll('.point-option');
+
+                                        // Handle point selection
+                                        pointOptions.forEach(option => {
+                                            option.addEventListener('click', function () {
                                                 // Remove selected class from all options
                                                 pointOptions.forEach(opt => opt.classList.remove('selected', 'ring-2', 'ring-blue-500'));
-                                                
+
                                                 // Add selected class to clicked option
                                                 this.classList.add('selected', 'ring-2', 'ring-blue-500');
-                                                
+
                                                 // Get points value
                                                 selectedPoints = parseInt(this.id.replace('point', ''));
                                                 document.getElementById('selectedPointsDisplay').textContent = selectedPoints;
-                                                
+
                                                 // Enable confirm button
                                                 Swal.getConfirmButton().disabled = false;
                                                 Swal.getConfirmButton().classList.remove('opacity-50');
                                             });
-                                            });
-                                            
-                                            // Initially disable confirm button
-                                            Swal.getConfirmButton().disabled = true;
-                                            Swal.getConfirmButton().classList.add('opacity-50');
-                                        }
-                                        }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            // Here you would normally send the points to your backend
-                                            // For now, we'll just show a success message
+                                        });
+
+                                        // Initially disable confirm button
+                                        Swal.getConfirmButton().disabled = true;
+                                        Swal.getConfirmButton().classList.add('opacity-50');
+                                    }
+                                }).then(async (result) => {
+                                    if (result.isConfirmed) {
+                                        // Fetch API for Adding Points
+                                        const new_points = document.getElementById('selectedPointsDisplay').textContent
+                                        const urlPath = `/admin/api/add-points/${idno}/${new_points}`;
+
+                                        const response = await fetch(`${urlPath}`, {
+                                            method: "POST",
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                points: document.getElementById('selectedPointsDisplay').textContent,
+                                                idno: idno
+                                            })
+                                        });
+
+                                        const data = await response.json();
+
+                                        if (data.success) {
+                                            // Display success sweetalert2 modal
                                             Swal.fire({
-                                            title: 'Points Added!',
-                                            text: `You've earned ${document.getElementById('selectedPointsDisplay').textContent} points today!`,
-                                            icon: 'success',
+                                                title: 'Points Added!',
+                                                text: `You've earned ${new_points} points today!`,
+                                                icon: 'success',
+                                                confirmButtonText: 'Continue to Log Off',
+                                            });
+                                        }
+                                        else {
+                                            Swal.fire({
+                                                title: 'Error',
+                                                text: data.message,
+                                                icon: 'error',
+                                                confirmButtonText: 'Continue to Log Off'
+                                            })
+                                        }
+                                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                        // Skip points and proceed with logout
+                                        Swal.fire({
+                                            title: 'No Points Added',
+                                            text: `No points added for this student.`,
+                                            icon: 'info',
                                             confirmButtonText: 'Continue to Log Off',
                                             willClose: () => {
                                                 // Proceed with actual logout
 
                                             }
-                                            });
-                                        } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                            // Skip points and proceed with logout
-
-                                        }
                                         });
+                                    }
+                                });
                             } else {
                                 Swal.fire("Error!", data.message, "error");
                             }
@@ -407,7 +438,7 @@
                         }
                     }
                 });
-                
+
             }
         });
     });
