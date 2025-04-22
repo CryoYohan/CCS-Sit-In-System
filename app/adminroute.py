@@ -1867,3 +1867,32 @@ def get_leaderboards():
         return jsonify({'success': True, 'leaderboards': leaderboards_list}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
+
+@admin.route('/api/add-points/<idno>/<points>', methods=['POST'])
+def add_points(idno, points):
+    """Fetch API to add points to a student to be logged out"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({
+            'success':False,
+            'error': 'Unauthorized'}), 401
+    if not admin_account:
+        admin_account = Admin(**session.get('admin'))
+    try:
+        response = admin_account.add_points(idno=idno, points=points)
+        if response['success']:
+            return jsonify({
+                'success':True
+            }),200
+        else:
+            return jsonify({
+                'success':False,
+                'message': f'Failed to add points. Error: {response['error']}'
+                            })
+    except Exception as e:
+        return jsonify({
+            'success':False,
+            'error': f'An error occured: {str(e)}'
+        })

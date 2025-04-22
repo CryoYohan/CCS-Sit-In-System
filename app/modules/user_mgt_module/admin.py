@@ -372,8 +372,22 @@ class Admin(User):
             return {'success': False, 'message': str(e)}
         
 
-    def delete(self):
-        pass
+    def add_points(self, idno, points):
+        """Add points to a student"""
+        try:
+            user = self.db.fetchOne(table='user', idno=idno)
+            if user:
+                new_points = user[0]['points'] + int(points)
+                self.db.update_record(table='user', idno=idno, points=new_points)
+                print('Successfully added points')
+                return {'success': True}
+            else:
+                print('have not added points')
+                return {'success': False, 'error': 'User not found'}
+
+        except Exception as e:
+            print(f'Error caught {str(e)}')
+            return {'success':False, 'error': str(e)}
 
     def __str__(self):
         return f"{self.firstname.title()} {self.middlename[0].capitalize()}. {self.lastname.title()}"

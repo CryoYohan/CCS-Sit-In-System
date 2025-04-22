@@ -1030,7 +1030,7 @@ def my_rank(idno):
         student = Student(**session.get('student'))
         rank_data = student.get_my_rank(idno=idno)
         
-        if not rank_data:
+        if not rank_data['success']:
             return jsonify({'success': False, 'error': 'Rank not found'}), 404
             
         return jsonify({
