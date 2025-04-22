@@ -103,15 +103,21 @@ action,user, image) %} {% if not user_in_login_page %}
       </div>
     </div>
 
-    <!-- Ranking Badge - Added this new section -->
-    <div class="hidden sm:flex items-center space-x-2 bg-white dark:bg-gray-700 px-3 py-1 rounded-full shadow-sm">
-      <div class="relative">
-        <div
-          class="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full text-white font-bold">
+    <!-- Ranking Badge - Updated with fire animations -->
+    <div
+      class="hidden sm:flex items-center space-x-2 bg-white dark:bg-gray-700 px-3 py-1 rounded-full shadow-sm relative">
+      <!-- Fire animation container -->
+      <div id="rank-fire-animation" class="absolute -inset-1 rounded-full pointer-events-none overflow-hidden hidden">
+        <!-- Fire particles will be added here by JavaScript -->
+      </div>
+
+      <div class="relative z-10">
+        <div id="rank-badge"
+          class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold relative">
           <p id="rankingP">N/A</p>
         </div>
         <div
-          class="absolute -bottom-1 -right-1 bg-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+          class="absolute -bottom-1 -right-1 bg-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center z-20">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd"
               d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
@@ -145,47 +151,140 @@ action,user, image) %} {% if not user_in_login_page %}
   </div>
 </nav>
 <script>
+  // Function to create fire animation
+  function createFireAnimation(rank) {
+    const colors = {
+      1: { base: 'from-yellow-400 to-red-500', fire: 'from-red-500 to-yellow-300' },
+      2: { base: 'from-gray-300 to-gray-500', fire: 'from-gray-400 to-white' },
+      3: { base: 'from-amber-500 to-amber-700', fire: 'from-amber-600 to-yellow-200' }
+    };
+
+    const badge = document.getElementById('rank-badge');
+    const fireContainer = document.getElementById('rank-fire-animation');
+
+    // Clear previous animation
+    fireContainer.innerHTML = '';
+    fireContainer.className = 'absolute -inset-1 rounded-full pointer-events-none overflow-hidden hidden';
+
+    // Set base color for badge
+    badge.className = `w-8 h-8 flex items-center justify-center rounded-full text-white font-bold relative bg-gradient-to-br ${colors[rank].base}`;
+
+    // Only show fire for top 3
+    if (rank <= 3) {
+      fireContainer.classList.remove('hidden');
+
+      // Create fire particles
+      for (let i = 0; i < 12; i++) {
+        const particle = document.createElement('div');
+        particle.className = `absolute rounded-full bg-gradient-to-b ${colors[rank].fire} opacity-80`;
+
+        // Random positioning and sizing
+        const size = Math.random() * 8 + 4;
+        const posX = Math.random() * 30 - 15;
+        const posY = Math.random() * 30 - 15;
+
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `calc(50% + ${posX}px)`;
+        particle.style.top = `calc(50% + ${posY}px)`;
+        particle.style.transform = 'translate(-50%, -50%)';
+
+        // Animation
+        particle.style.animation = `fire-flicker ${Math.random() * 0.5 + 0.5}s infinite alternate`;
+
+        fireContainer.appendChild(particle);
+      }
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', async function () {
     try {
       const rankElement = document.getElementById('rankingP');
-      const response = await fetch(`/api/myRank/${"{{ user.idno }}"}`); // Direct Jinja2 insertion
+      const response = await fetch(`/api/myRank/${"{{ user.idno }}"}`);
 
-      // Handle unauthorized access
       if (response.status === 401) {
         window.location.href = '/login';
         return;
       }
 
-      // Handle other HTTP errors
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const data = await response.json();
 
-      // Check response structure
       if (data.success && data.data) {
-        rankElement.textContent = data.data.rank;
+        const rank = data.data.rank;
+        rankElement.textContent = rank;
 
-        // Optional: Update other elements if needed
-        // document.getElementById('sessionCount').textContent = data.data.session_count;
-        // document.getElementById('studentName').textContent = data.data.name;
+        // Add special effects for top 3 ranks
+        if (rank <= 3) {
+          createFireAnimation(rank);
+
+          // Add crown for 1st place
+          if (rank === 1) {
+            const crown = document.createElement('div');
+            crown.innerHTML = `
+              <svg class="absolute -top-5 -left-2 w-10 h-10 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0V6H8a1 1 0 010-2h1V3a1 1 0 011-1zm-3 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H8a1 1 0 01-1-1V8z" clip-rule="evenodd" />
+                <path d="M4 10a1 1 0 011-1h1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1zm10-1a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1V9a1 1 0 011-1z" />
+              </svg>
+            `;
+            document.getElementById('rank-badge').appendChild(crown);
+          }
+        } else {
+          // Default styling for ranks > 3
+          document.getElementById('rank-badge').className =
+            'w-8 h-8 flex items-center justify-center bg-blue-400 rounded-full text-white font-bold relative';
+        }
       } else {
         throw new Error(data.error || 'Invalid response format');
       }
     } catch (error) {
       console.error('Fetch error:', error);
       document.getElementById('rankingP').textContent = 'N/A';
-
-      // Optional: Show error to user
-      Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: 'Failed to fetch rank data. Please try again later.',
-      });
     }
   });
 </script>
+<style>
+  @keyframes fire-flicker {
+    0% {
+      opacity: 0.8;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    100% {
+      opacity: 0.6;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
+
+  #rank-fire-animation div {
+    filter: blur(1px);
+    will-change: transform, opacity;
+  }
+
+  /* Special glow for 1st place */
+  .rank-1-glow {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+    animation: gold-pulse 2s infinite alternate;
+  }
+
+  @keyframes gold-pulse {
+    0% {
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    100% {
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
+    }
+  }
+</style>
 {% elif user_in_login_page and action=='Logout' and user.role == 'Staff'%}
 <nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm">
   <div
