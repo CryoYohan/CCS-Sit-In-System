@@ -10,11 +10,13 @@ import csv
 import io
 from reportlab.pdfgen import canvas
 from docx import Document
+from docx.shared import Pt
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 import pandas as pd
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.units import inch
 
 
@@ -1230,21 +1232,23 @@ def export_records_pdf(lab_name=None, purpose=None):
         print("ELSE CONDITION")
         records = admin_account.retrieve_all_sitinrecords()
 
-    
-    # # Fetch records
-    # records = (
-    #     admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
-    #            if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
-    
     filename = f"sit_in_records_lab_{lab_name}.pdf" if lab_name else "sit_in_records_all.pdf"
     output = io.BytesIO()
     doc = SimpleDocTemplate(output, pagesize=landscape(letter), leftMargin=30, rightMargin=30, topMargin=50, bottomMargin=30)
     elements = []
+
     
-    styles = getSampleStyleSheet()
-    title = Paragraph(f"Sit-In Records - {lab_name if lab_name else 'All Labs'}", styles['Title'])
-    elements.append(title)
-    
+    # University Header (only appears on the first page)
+    university_header = [
+        Paragraph("<b>University of Cebu Main Campus</b>", 
+                  ParagraphStyle(name='Center', alignment=1, fontSize=16, fontName='Helvetica-Bold',leading=20,spaceAfter=7)),
+        Paragraph("College of Computer Studies", 
+                  ParagraphStyle(name='Center', alignment=1, fontSize=14,leading=20,spaceAfter=7)),
+        Paragraph(f"<b>Sit-In Records - {lab_name+ '-' + purpose if lab_name else 'All Labs'}</b>", 
+                  ParagraphStyle(name='Center', alignment=1, fontSize=14, fontName='Helvetica-Bold',leading=20,spaceAfter=7)),
+        Spacer(1, 0.5 * inch)  # Add space after header
+    ]
+ 
     # Table Headers
     data = [['Record ID', 'Student ID', 'Lab', 'Check-in', 'Check-out', 'Status', 'Reason']]
     
@@ -1273,8 +1277,8 @@ def export_records_pdf(lab_name=None, purpose=None):
         ('FONTSIZE', (0, 1), (-1, -1), 10)
     ]))
     
-    elements.append(table)
-    doc.build(elements)
+    content = elements + university_header + [table]
+    doc.build(content)
     output.seek(0)
 
     response = make_response(output.getvalue())
@@ -1327,13 +1331,31 @@ def export_records_word(lab_name=None, purpose=None):
         print("ELSE CONDITION")
         records = admin_account.retrieve_all_sitinrecords()
 
-    # # Fetch records
-    # records = (admin_account.retrieve_sitinrecord_by_lab(lab_name=lab_name)
-    #            if lab_name and lab_name != 'all' else admin_account.retrieve_all_sitinrecords())
-
     # Create Word document
     document = Document()
-    document.add_heading('Sit-In Records', 0)
+
+     # Configure the first section to have a different first page header
+    section = document.sections[0]
+    section.different_first_page_header_footer = True  # This ensures the header appears only on the first page
+    
+    # Add Header (only appears on the first page due to different_first_page_header_footer)
+    header = section.first_page_header
+    header_para = header.paragraphs[0]
+    
+    # University Name - make it bold and centered
+    university = header_para.add_run("University of Cebu Main Campus")
+    university.bold = True
+    university.font.size = Pt(14)
+    
+    # College Name
+    header_para.add_run("\nCollege of Computer Studies").font.size = Pt(12)
+    
+    # Report Title
+    header_para.add_run("\nLaboratory Sit-in Monitoring").bold = True
+    header_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+    # Add some space after header
+    document.add_paragraph("\n")
     
     # Create table
     table = document.add_table(rows=1, cols=7)
@@ -1355,8 +1377,8 @@ def export_records_word(lab_name=None, purpose=None):
         row[0].text = str(record['record_id'])
         row[1].text = str(record['idno'])
         row[2].text = record['lab_name']
-        row[3].text = record['sitin_in']
-        row[4].text = record['sitin_out'] or ''
+        row[3].text = format_date(record['sitin_in'])
+        row[4].text = format_date(record['sitin_out']) or ''
         row[5].text = record['status']
         row[6].text = record['reason'] or ''
     
