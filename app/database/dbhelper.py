@@ -66,11 +66,6 @@ class Databasehelper:
         """Retrieve all sit-in records"""
         query = "SELECT * FROM sitin_record_details"
         return self.getprocess(query)
-    
-    def retrieve_all_students_to_sitin(self):
-        """ Retrieve all students joined sitin reservation"""
-        query = f"SELECT DISTINCT * FROM students_to_sitin ORDER BY lastname ASC"
-        return self.getprocess(query)
 
     def retrieve_all_current_sitins(self):
         """ Retrieve all students who currently in lab"""

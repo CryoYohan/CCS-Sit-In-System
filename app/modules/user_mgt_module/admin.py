@@ -242,16 +242,9 @@ class Admin(User):
     def logoff_student(self, idno,staff_idno):
         """Log-off student"""
         try:
-            reservation = self.db.find_reservation_record(table='sitin_reservation',idno=idno)
+            print(f'IDNO: {idno}')
+            reservation = self.db.find_record(table='current_sitin',idno=idno)
             user = self.db.find_record(table='user', idno=idno)
-
-            update_status_session = {
-                'idno' : idno,
-                'session': user[0]['session']-1,
-                'status': 'Idle'
-            }
-
-            self.db.update_record(table='user',**update_status_session)
 
             data={
                     'reservation_id': reservation[0]['reservation_id'],
@@ -271,9 +264,18 @@ class Admin(User):
                 table='sitin_record',
                 **data
             )
+
+            update_status_session = {
+                'idno' : idno,
+                'session': user[0]['session']-1,
+                'status': 'Idle'
+            }
+
+            self.db.update_record(table='user',**update_status_session)
             print('successfully logged off the student')
             return {'success': True}
         except Exception as e:
+            print(f'failed logged off the student{str(e)}')
             return {'success': False, 'message': str(e)}
         
 
