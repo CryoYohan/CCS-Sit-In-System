@@ -242,7 +242,7 @@ class Admin(User):
     def logoff_student(self, idno,staff_idno):
         """Log-off student"""
         try:
-            reservation = self.db.find_record(table='sitin_reservation',idno=idno)
+            reservation = self.db.find_reservation_record(table='sitin_reservation',idno=idno)
             user = self.db.find_record(table='user', idno=idno)
 
             update_status_session = {
@@ -271,6 +271,7 @@ class Admin(User):
                 table='sitin_record',
                 **data
             )
+            print('successfully logged off the student')
             return {'success': True}
         except Exception as e:
             return {'success': False, 'message': str(e)}
