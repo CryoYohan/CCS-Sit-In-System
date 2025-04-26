@@ -1578,6 +1578,70 @@ def delete_laboratory(lab_id):
             'message': str(e)
         }), 500
 
+@admin.route('/api/labs/update-computer/<lab_id>')
+def update_computer(lab_id):
+    """Update Laboratory Computers Slot"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+    
+    try:
+        # Get the new number of slots from the request
+        update_index = request.args.get('slots', type=int)
+
+        if update_index is None:
+            return jsonify({'success': False, 'message': 'Slots parameter is required'}), 400
+
+        # Call the update method from your Admin class
+        response = admin_account.update_computer_slots(lab_id=lab_id, slots=update_index)
+
+        if response['success']:
+            return jsonify({'success': True, 'message': 'Laboratory computers updated successfully!'}), 200
+        else:
+            return jsonify({'success': False, 'message': response['error']}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@admin.route('/api/labs/find-lab/<lab_id>')
+def find_lab(lab_id):
+    """Find Laboratory"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))    
+
+    try:
+        # Call the find method from your Admin class
+        response = admin_account.find_lab(lab_id=lab_id)
+
+        print(f'Response data {response['data'][0]}')
+
+        computers_list = list(response['data'][0]['computers'])
+
+        data = {
+            'computers':computers_list,
+            'slots': response['data'][0]['slots'],
+        }
+
+
+        if response['success']:
+            print('Success!')
+            return jsonify({'success': True, 'message': 'Laboratory found successfully!', 'data': data}), 200
+        else:
+            print('Error!')
+            return jsonify({'success': False, 'message': response['error']}), 500
+        
+    except Exception as e:
+        print(f'Error in Catch {str(e)}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 @admin.route('/api/get-lab-resources', methods=['GET'])
 def get_lab_resources():

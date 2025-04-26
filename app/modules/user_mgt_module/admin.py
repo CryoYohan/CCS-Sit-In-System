@@ -391,6 +391,42 @@ class Admin(User):
         except Exception as e:
             print(f'Error caught {str(e)}')
             return {'success':False, 'error': str(e)}
+        
+    def update_computer_slots(self, lab_id, update_index, status):
+        """Update computer slots"""
+        try:
+            lab = self.db.find_record(table='lab', lab_id=lab_id)
+            if not lab:
+                return {'success': False, 'message': 'Lab not found'}
+            
+            computers_list:list = list(lab[0]['computers'])
+
+            if len(computers_list) != len(update_index):
+                return {'success': False, 'message': 'Mismatch in computer slots length'}
+            
+            computers_list[update_index] = status
+
+            updated_computers = ''.join(computers_list)
+
+            self.db.update_record(table='lab', lab_id=lab_id, computers=updated_computers)
+            return {'success': True}
+        
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+    
+    def find_lab(self,lab_id):
+        """Find a lab"""
+        try:
+            lab = self.db.fetchOne(table='lab', lab_id=lab_id)
+            if lab:
+                print('Retrieve Find Lab success!')
+                return {'success': True, 'data': lab}
+            else:
+                print('Retrieve Find Lab fail!')
+                return {'success': False, 'message': 'Lab not found'}
+        except Exception as e:
+            print(f'Retrieve Find Lab Catch error! LAB ID {lab_id}')
+            return {'success': False, 'error': str(e)}
 
     def __str__(self):
         return f"{self.firstname.title()} {self.middlename[0].capitalize()}. {self.lastname.title()}"
