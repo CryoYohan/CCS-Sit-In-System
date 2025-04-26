@@ -435,7 +435,7 @@ class Admin(User):
     def retrieve_logs(self):
         """Retrieve all logs"""
         try:
-            logs = self.db.fetchAll(table='logs_for_approval_denial_reservation')
+            logs = self.db.fetchAll(table='detailed_logs_view')
             return {'success': True, 'data': logs}
         except Exception as e:
             return {'success': False, 'error': str(e)}

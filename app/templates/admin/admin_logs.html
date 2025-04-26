@@ -13,7 +13,7 @@
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
                 </div>
-                <input type="text"
+                <input type="text" id="searchInput"
                     class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Search...">
             </div>
@@ -70,153 +70,8 @@
                             Purpose</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    <!-- Row 1 -->
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#1</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#202</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div
-                                    class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                    <span class="text-blue-600">JD</span>
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Juan Dela Cruz</div>
-                                    <div class="text-sm text-gray-500">2023-0001</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Apr 27, 2025</div>
-                            <div class="text-sm text-gray-500">10:30 AM</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                Approved
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                STF001
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 25, 2025</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 28, 2025</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                Lab 101
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                PC-01
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Research</td>
-                    </tr>
-
-                    <!-- Row 2 -->
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#2</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#203</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div
-                                    class="flex-shrink-0 h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center">
-                                    <span class="text-pink-600">MC</span>
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Maria Clara</div>
-                                    <div class="text-sm text-gray-500">2023-0002</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Apr 27, 2025</div>
-                            <div class="text-sm text-gray-500">11:00 AM</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                Denied
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                STF002
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 25, 2025</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 29, 2025</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                Lab 102
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                PC-05
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Project Work</td>
-                    </tr>
-
-                    <!-- Row 3 -->
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#3</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#204</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div
-                                    class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                                    <span class="text-green-600">AB</span>
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Andres Bonifacio</div>
-                                    <div class="text-sm text-gray-500">2023-0003</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">Apr 27, 2025</div>
-                            <div class="text-sm text-gray-500">1:15 PM</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                Approved
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                STF001
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 26, 2025</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 30, 2025</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                Lab 103
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                PC-10
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Thesis</td>
-                    </tr>
+                <tbody id="logsTableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Rows will be dynamically inserted here -->
                 </tbody>
             </table>
         </div>
@@ -225,14 +80,13 @@
         <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
             <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
-                    <p class="text-sm text-gray-700">
-                        Showing <span class="font-medium">1</span> to <span class="font-medium">3</span> of <span
-                            class="font-medium">3</span> results
+                    <p id="paginationInfo" class="text-sm text-gray-700">
+                        Loading data...
                     </p>
                 </div>
                 <div>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        <a href="#"
+                        <button id="prevPage"
                             class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                             <span class="sr-only">Previous</span>
                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -241,20 +95,11 @@
                                     d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
                                     clip-rule="evenodd" />
                             </svg>
-                        </a>
-                        <a href="#" aria-current="page"
-                            class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                            1
-                        </a>
-                        <a href="#"
-                            class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                            2
-                        </a>
-                        <a href="#"
-                            class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                            3
-                        </a>
-                        <a href="#"
+                        </button>
+                        <div id="pageNumbers" class="flex">
+                            <!-- Page numbers will be inserted here -->
+                        </div>
+                        <button id="nextPage"
                             class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                             <span class="sr-only">Next</span>
                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -263,11 +108,238 @@
                                     d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                                     clip-rule="evenodd" />
                             </svg>
-                        </a>
+                        </button>
                     </nav>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Global variables for pagination
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let totalItems = 0;
+    let allLogs = [];
+
+    // Format date function
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    }
+
+    // Get initials for avatar
+    function getInitials(name) {
+        if (!name) return '';
+        const names = name.split(' ');
+        let initials = names[0].substring(0, 1).toUpperCase();
+        if (names.length > 1) {
+            initials += names[names.length - 1].substring(0, 1).toUpperCase();
+        }
+        return initials;
+    }
+
+    // Get random color for avatar
+    function getRandomColor() {
+        const colors = ['blue', 'pink', 'green', 'purple', 'indigo', 'yellow', 'red'];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    // Render logs to the table
+    function renderLogs(logs) {
+        const tableBody = document.getElementById('logsTableBody');
+        tableBody.innerHTML = '';
+
+        if (logs.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td colspan="11" class="px-6 py-4 text-center text-sm text-gray-500">
+                No logs found
+            </td>
+        `;
+            tableBody.appendChild(row);
+            return;
+        }
+
+        logs.forEach(log => {
+            const initials = getInitials(log.fullname);
+            const color = getRandomColor();
+            const actionDate = formatDate(log.action_taken_on);
+            const requestDate = formatDate(log.request_date);
+            const reserveDate = formatDate(log.reserve_date);
+
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50 transition';
+            row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#${log.log_id}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#${log.reservation_id}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-${color}-100 flex items-center justify-center">
+                        <span class="text-${color}-600">${initials}</span>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">${log.fullname || 'N/A'}</div>
+                        <div class="text-sm text-gray-500">${log.student_idno || 'N/A'}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                ${actionDate ? `<div class="text-sm text-gray-900">${actionDate.split(',')[0]}</div>
+                <div class="text-sm text-gray-500">${actionDate.split(',')[1]?.trim() || ''}</div>` : 'N/A'}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                    ${log.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                    log.status === 'Denied' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'}">
+                    ${log.status || 'N/A'}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                    ${log.staff_idno || 'N/A'}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${requestDate || 'N/A'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${reserveDate || 'N/A'}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                    ${log.lab_name || 'N/A'}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                    ${log.computer ? 'PC-' + log.computer.toString().padStart(2, '0') : 'N/A'}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${log.purpose || 'N/A'}</td>
+        `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Update pagination controls
+    function updatePagination() {
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const pageNumbersContainer = document.getElementById('pageNumbers');
+        const paginationInfo = document.getElementById('paginationInfo');
+
+        // Update pagination info
+        const startItem = (currentPage - 1) * itemsPerPage + 1;
+        const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+        paginationInfo.innerHTML = `Showing <span class="font-medium">${startItem}</span> to <span class="font-medium">${endItem}</span> of <span class="font-medium">${totalItems}</span> results`;
+
+        // Update page numbers
+        pageNumbersContainer.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.className = `relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === i ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`;
+            pageButton.textContent = i;
+            pageButton.addEventListener('click', () => {
+                currentPage = i;
+                fetchLogs();
+            });
+            pageNumbersContainer.appendChild(pageButton);
+        }
+
+        // Enable/disable previous/next buttons
+        document.getElementById('prevPage').disabled = currentPage === 1;
+        document.getElementById('nextPage').disabled = currentPage === totalPages;
+    }
+
+    // Fetch logs from the API
+    async function fetchLogs() {
+        try {
+            // Show loading state
+            document.getElementById('logsTableBody').innerHTML = `
+            <tr>
+                <td colspan="11" class="px-6 py-4 text-center text-sm text-gray-500">
+                    Loading data...
+                </td>
+            </tr>
+        `;
+
+            const response = await fetch('/admin/api/retrieve-logs');
+            if (!response.ok) {
+                throw new Error('Failed to fetch logs');
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                allLogs = data.data;
+                totalItems = allLogs.length;
+
+                // Apply pagination
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const paginatedLogs = allLogs.slice(startIndex, endIndex);
+
+                renderLogs(paginatedLogs);
+                updatePagination();
+            } else {
+                throw new Error(data.error || 'Failed to fetch logs');
+            }
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+            document.getElementById('logsTableBody').innerHTML = `
+            <tr>
+                <td colspan="11" class="px-6 py-4 text-center text-sm text-red-500">
+                    Error loading data: ${error.message}
+                </td>
+            </tr>
+        `;
+        }
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+        if (searchTerm === '') {
+            // If search is empty, show all logs with pagination
+            currentPage = 1;
+            fetchLogs();
+            return;
+        }
+
+        // Filter logs based on search term
+        const filteredLogs = allLogs.filter(log =>
+            (log.fullname && log.fullname.toLowerCase().includes(searchTerm)) ||
+            (log.idno && log.idno.toLowerCase().includes(searchTerm)) ||
+            (log.reservation_id && log.reservation_id.toString().includes(searchTerm)) ||
+            (log.lab_name && log.lab_name.toLowerCase().includes(searchTerm)) ||
+            (log.purpose && log.purpose.toLowerCase().includes(searchTerm))
+        );
+
+        totalItems = filteredLogs.length;
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
+
+        renderLogs(paginatedLogs);
+        updatePagination();
+    });
+
+    // Pagination event listeners
+    document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            fetchLogs();
+        }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+        if (currentPage < Math.ceil(totalItems / itemsPerPage)) {
+            currentPage++;
+            fetchLogs();
+        }
+    });
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchLogs();
+    });
+</script>
 {% endblock %}
