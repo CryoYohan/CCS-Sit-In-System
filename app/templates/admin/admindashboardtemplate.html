@@ -187,6 +187,19 @@
                         </a>
                      </li>
                      <li>
+                        <a href="{{ url_for('admin.logs') }}"
+                           class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                           <svg
+                              class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                              xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                              <path
+                                 d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V5h14v14Zm-7-9h5v2h-5v-2Zm0 4h5v2h-5v-2ZM7 7h10v2H7V7Zm0 4h4v2H7v-2Zm0 4h4v2H7v-2Z" />
+                           </svg>
+                           <span class="ms-3">Activity Logs</span>
+                        </a>
+                     </li>
+
+                     <li>
                         <a href="{{ url_for('admin.admin_reservation_requests') }}"
                            class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"

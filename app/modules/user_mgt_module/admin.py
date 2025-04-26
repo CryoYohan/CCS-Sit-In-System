@@ -432,5 +432,13 @@ class Admin(User):
             print(f'Retrieve Find Lab Catch error! LAB ID {lab_id}')
             return {'success': False, 'error': str(e)}
 
+    def retrieve_logs(self):
+        """Retrieve all logs"""
+        try:
+            logs = self.db.fetchAll(table='logs_for_approval_denial_reservation')
+            return {'success': True, 'data': logs}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
     def __str__(self):
         return f"{self.firstname.title()} {self.middlename[0].capitalize()}. {self.lastname.title()}"

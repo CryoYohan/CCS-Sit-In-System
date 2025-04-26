@@ -302,6 +302,21 @@ def admin_feedbacks():
         flash('Unauthorized Access is Prohibited', 'error')
         return redirect(url_for('admin.adminlogin'))
 
+@admin.route('/logs')
+def logs():
+    """Render Logs HTML"""
+    global admin_account
+    if not session['admin'] == None:
+        if admin_account == None:
+            admin_account = session.get('admin')
+            admin_account = Admin(**admin_account)
+
+        return render_template(
+                                'admin_logs.html',
+                                user_in_login_page=True, 
+                                action='Logout',
+                                admin=admin_account,
+                                )
 
 
 @admin.route('/adminlogout')
@@ -1994,3 +2009,19 @@ def add_points(idno, points):
             'success':False,
             'error': f'An error occured: {str(e)}'
         })
+
+@admin.route('/api/retrieve-logs')
+def retrieve_logs():
+    """FETCH API Retrieve logs"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        logs = admin_account.retrieve_logs()
+        return jsonify({'success': True, 'data': logs['data']}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
