@@ -551,7 +551,10 @@ def get_pending_reservations():
                 "lab_name": reservation["lab_name"],
                 "reserve_date": reservation["reserve_date"],
                 "request_date": reservation["request_date"],
-                "status": reservation["status"]
+                "status": reservation["status"],
+                "computer": reservation["computer"],
+                "purpose": reservation["purpose"],
+
             })
 
         return jsonify(reservations_list)

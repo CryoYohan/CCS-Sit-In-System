@@ -128,6 +128,16 @@
                 </div>
             </div>
 
+            <!-- NEW: Available Computers Dropdown -->
+            <div class="mt-4">
+                <label for="computer" class="block text-sm font-medium text-gray-700">Available Computers</label>
+                <select id="computer" name="computer"
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    required>
+                    <option value="">Select a computer</option>
+                </select>
+            </div>
+
             <div class="flex justify-center gap-4 mt-6">
                 <button id="reserve" type="button"
                     class="w-full py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">
@@ -147,6 +157,47 @@
 
 
 <script>
+    // Function to fetch and populate available computers
+    async function fetchAvailableComputers(labId) {
+        try {
+            const response = await fetch(`/api/labs/${labId}`);
+            if (!response.ok) throw new Error('Failed to fetch lab data');
+
+            const labData = await response.json();
+            const computerDropdown = document.getElementById('computer');
+            computerDropdown.innerHTML = '<option value="">Select a computer</option>';
+
+            if (labData.success && labData.computers) {
+                const computersList = labData.computers.split('');
+                computersList.forEach((status, index) => {
+                    if (status === '1') { // Only show available computers (1)
+                        const computerNumber = (index + 1).toString().padStart(2, '0');
+                        const option = document.createElement('option');
+                        option.value = index; // Using index as value
+                        option.textContent = `PC-${computerNumber}`;
+                        computerDropdown.appendChild(option);
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching computers:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to load available computers'
+            });
+        }
+    }
+
+    // Add event listener to lab dropdown
+    document.getElementById('lab').addEventListener('change', function () {
+        const labId = this.value;
+        if (labId && labId !== '#') {
+            fetchAvailableComputers(labId);
+        } else {
+            document.getElementById('computer').innerHTML = '<option value="">Select a computer</option>';
+        }
+    });
     // Fetch labs from the server and populate the "lab" select dropdown
     document.addEventListener('DOMContentLoaded', () => {
         fetch('/api/labs')
@@ -552,6 +603,7 @@
         const selectedTimeRange = document.getElementById('schedule').value; // Get the selected time range (e.g., "8:00am-9:30am")
         const lab = document.getElementById('lab').value; // Get the selected lab (if you have a lab dropdown)
         const purpose = document.getElementById('reason').value; // Get the purpose from the dropdown
+        const computer = document.getElementById('computer').value; // Get the selected computer
 
         if (selectedDate && selectedTimeRange && lab && purpose) {
             // Extract the start time from the time range (e.g., "8:00am-9:30am" => "8:00am")
@@ -570,6 +622,7 @@
                 reserve_date: selectedDate,
                 time: formattedTime,
                 fullDateTime: fullDateTime,
+                computer: computer
             });
 
             // Send the data to the server as JSON
@@ -584,6 +637,7 @@
                     reserve_date: selectedDate,
                     time: formattedTime,
                     fullDateTime: fullDateTime,
+                    computer: computer, // Include the selected computer
                 }),
             })
                 .then(response => response.json())

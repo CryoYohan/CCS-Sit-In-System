@@ -37,6 +37,41 @@ action,user, image) %} {% if not user_in_login_page %}
     <a href="{{ url_for('admin.dashboard') }}">CCSit.</a>
   </div>
   <div class="relative flex items-center space-x-8 pr-12">
+    <!-- Notification Button (existing) -->
+    <div class="relative">
+      <button id="notification-button"
+        class="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white relative"
+        aria-label="Notifications">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        <span id="notification-badge"
+          class="hidden absolute top-0 right-0 inline-block w-3 h-3 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
+      </button>
+
+      <!-- Notification Dropdown -->
+      <div id="notification-dropdown"
+        class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-50 divide-y divide-gray-100 dark:divide-gray-600">
+        <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+          <p class="font-medium">Notifications</p>
+        </div>
+        <div class="py-1 max-h-96 overflow-y-auto">
+          <!-- Empty State -->
+          <div id="empty-notifications" class="px-4 py-3 text-center text-sm text-gray-500 dark:text-gray-400">
+            No new notifications
+          </div>
+          <!-- Notification Items (dynamically populated) -->
+          <div id="notification-items"></div>
+        </div>
+        <div class="py-1">
+          <a href="#"
+            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 text-center">
+            View all notifications
+          </a>
+        </div>
+      </div>
+    </div>
     <div class="relative">
       <button id="profile-menu-admin"
         class="flex items-center space-x-3 p-2 bg-white dark:bg-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600">
@@ -58,6 +93,250 @@ action,user, image) %} {% if not user_in_login_page %}
     </div>
   </div>
 </nav>
+<!-- Reservation Details Modal -->
+<div id="reservationDetailsModal"
+  class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Reservation Details</h3>
+      <button onclick="closeReservationModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">ID Number</label>
+        <p id="modal-idno" class="mt-1 text-sm text-gray-900 dark:text-white"></p>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Request Date</label>
+        <p id="modal-request-date" class="mt-1 text-sm text-gray-900 dark:text-white"></p>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Reservation Date</label>
+        <p id="modal-reserve-date" class="mt-1 text-sm text-gray-900 dark:text-white"></p>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Laboratory</label>
+        <p id="modal-lab" class="mt-1 text-sm text-gray-900 dark:text-white"></p>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Computer Number</label>
+        <p id="modal-computer" class="mt-1 text-sm text-gray-900 dark:text-white"></p>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Purpose</label>
+        <p id="modal-purpose" class="mt-1 text-sm text-gray-900 dark:text-white"></p>
+      </div>
+    </div>
+
+    <div class="flex justify-end space-x-3 mt-6">
+      <button id="modal-decline-btn" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+        Decline
+      </button>
+      <button id="modal-approve-btn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+        Approve
+      </button>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  // Notification handling
+  let notifications = [];
+  let unreadCount = 0;
+
+  // Function to show notification badge
+  function updateNotificationBadge() {
+    const badge = document.getElementById('notification-badge');
+    if (unreadCount > 0) {
+      badge.classList.remove('hidden');
+      badge.textContent = unreadCount > 9 ? '9+' : unreadCount.toString();
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
+  // Function to format date
+  function formatDate(dateString) {
+    if (!dateString) return '';
+    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
+
+  // Function to render notifications
+  function renderNotifications() {
+    const itemsContainer = document.getElementById('notification-items');
+    const emptyState = document.getElementById('empty-notifications');
+
+    itemsContainer.innerHTML = '';
+
+    if (notifications.length === 0) {
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+
+    notifications.forEach((reservation, index) => {
+      const notificationItem = document.createElement('div');
+      notificationItem.className = `px-4 py-3 border-b border-gray-100 dark:border-gray-600 ${reservation.unread ? 'bg-blue-50 dark:bg-gray-800' : ''}`;
+      notificationItem.innerHTML = `
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">${reservation.fullname}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">${reservation.lab_name} • PC-${reservation.computer}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${formatDate(reservation.reserve_date)}</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="handleApproval(${reservation.reservation_id}, ${index}); event.stopPropagation();" 
+                            class="text-xs px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded hover:bg-green-200 dark:hover:bg-green-800 transition">
+                        Approve
+                    </button>
+                    <button onclick="handleDecline(${reservation.reservation_id}, ${index}); event.stopPropagation();" 
+                            class="text-xs px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-800 transition">
+                        Decline
+                    </button>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                <span class="font-medium">Purpose:</span> ${reservation.purpose}
+            </div>
+        `;
+
+      notificationItem.addEventListener('click', () => {
+        markAsRead(index);
+      });
+
+      itemsContainer.appendChild(notificationItem);
+    });
+  }
+
+  async function handleApproval(reservationId) {
+    const result = await Swal.fire({
+      title: 'Confirm Approval',
+      text: "Are you sure you want to approve this reservation?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, approve it!'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        // Updated to match your route with reservation_id in URL
+        const response = await fetch(`/admin/api/approve_reservation/${reservationId}`, {
+          method: 'GET',  // Changed to GET to match your route
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          await Swal.fire(
+            'Approved!',
+            data.message || 'The reservation has been approved.',
+            'success'
+          );
+          // Refresh just the table content
+          await loadReservations();
+        } else {
+          throw new Error(data.message || 'Approval failed');
+        }
+      } catch (error) {
+        Swal.fire(
+          'Error!',
+          error.message || 'There was an error approving the reservation.',
+          'error'
+        );
+      }
+    }
+  }
+
+  async function handleDecline(reservationId) {
+    const result = await Swal.fire({
+      title: 'Confirm Decline',
+      text: "Are you sure you want to decline this reservation?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, decline it!'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`/admin/api/decline_reservation/${reservationId}`);
+
+        // Handle non-OK responses
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Server responded with status ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          await Swal.fire({
+            title: 'Declined!',
+            text: data.message || 'The reservation has been declined.',
+            icon: 'success'
+          });
+          await loadReservations();
+        } else {
+          throw new Error(data.message || 'Decline operation failed');
+        }
+      } catch (error) {
+        console.error('Decline error:', error);
+        await Swal.fire({
+          title: 'Error!',
+          text: error.message || 'There was an error declining the reservation.',
+          icon: 'error'
+        });
+      }
+    }
+  }
+
+  // Function to mark notification as read
+  function markAsRead(index) {
+    if (notifications[index].unread) {
+      notifications[index].unread = false;
+      unreadCount--;
+      updateNotificationBadge();
+      renderNotifications();
+    }
+  }
+
+  // Load reservations and check for new ones
+  async function loadReservations() {
+    try {
+      const response = await fetch("{{ url_for('admin.get_pending_reservations') }}");
+      const pendingReservations = await response.json();
+
+      // Clear existing notifications and repopulate
+      notifications = pendingReservations.map(res => ({ ...res, unread: true }));
+      unreadCount = notifications.length;
+      updateNotificationBadge();
+      renderNotifications();
+
+    } catch (error) {
+      console.error("Error loading reservations:", error);
+    }
+  }
+
+  // Initial load when page loads
+  document.addEventListener("DOMContentLoaded", () => {
+    loadReservations();
+    // Check for new reservations every 30 seconds
+    setInterval(loadReservations, 30000);
+  });
+</script>
 {% elif user_in_login_page and action=='Logout' and user.role == 'Student'%}
 <nav class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 text-white shadow-sm"
   data-user-id="{{ user.idno }}">
