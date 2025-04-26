@@ -2022,6 +2022,25 @@ def retrieve_logs():
 
     try:
         logs = admin_account.retrieve_logs()
-        return jsonify({'success': True, 'data': logs['data']}), 200
+
+        logs_list = [
+            {
+                'logs_id': log['logs_id'],
+                'reservation_id': log['reservation_id'],
+                'student_idno': log['student_idno'],
+                'fullname': log['fullname'],
+                'action_taken_on': log['action_taken_on'],
+                'status': log['status'],
+                'staff_idno': log['staff_idno'],
+                'request_date': log['request_date'],
+                'reserve_date': log['reserve_date'],
+                'lab_name': log['lab_name'],
+                'computer': log['computer'],
+                'purpose': log['purpose']
+            }
+            for log in logs['data']
+        ]
+
+        return jsonify({'success': True, 'data': logs_list}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
