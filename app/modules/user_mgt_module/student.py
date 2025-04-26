@@ -71,3 +71,28 @@ class Student(User):
         except Exception as e:
             return {'success':False, 'error':str(e)}
     
+    def retrieve_my_feedbacks(self, idno):
+        """Retrieve Student Feedbacks"""
+        try:
+            my_feedbacks = self.db.getall_feedbacks(idno=idno)
+            return {'success': True, 'data':my_feedbacks}
+        except Exception as e:
+            return {'success': False, 'message':str(e)}
+    
+    def get_lab_resources(self):
+        """Retrieve all lab resources"""
+        try:
+            lab_resources = self.db.fetchOne(table='lab_resources', status='Published')
+            return {'success': True, 'data': lab_resources}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    def get_my_rank(self, idno):
+        """Get Rank"""
+        try:
+            rank = self.db.fetchOne(table='leaderboards', idno=idno)
+            if rank:
+                return {'success': True, 'data':rank} 
+            return {'success': False, 'error': 'Rank not found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}  
