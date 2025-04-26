@@ -395,18 +395,22 @@ class Admin(User):
     def update_computer_slots(self, lab_id, update_index, status):
         """Update computer slots"""
         try:
-            lab = self.db.find_record(table='lab', lab_id=lab_id)
+            lab = self.db.fetchOne(table='lab', lab_id=lab_id)
             if not lab:
                 return {'success': False, 'message': 'Lab not found'}
             
-            computers_list:list = list(lab[0]['computers'])
-
-            if len(computers_list) != len(update_index):
-                return {'success': False, 'message': 'Mismatch in computer slots length'}
+            computers_list = list(lab[0]['computers'])
             
-            computers_list[update_index] = status
-
-            updated_computers = ''.join(computers_list)
+            # Convert string indices to integers
+            update_index = [int(idx) for idx in update_index]
+            
+            if len(update_index) > 1 and len(status) > 1:
+                for idx, stat in zip(update_index, status):
+                    computers_list[idx - 1] = '1' if stat else '0'
+                updated_computers = ''.join(computers_list)
+            else:
+                computers_list[update_index[0] - 1] = '1' if status[0] else '0'
+                updated_computers = ''.join(computers_list)
 
             self.db.update_record(table='lab', lab_id=lab_id, computers=updated_computers)
             return {'success': True}
