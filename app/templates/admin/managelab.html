@@ -325,6 +325,42 @@
 <script>
     // Track computer status changes
     let computerStatusChanges = {};
+    let currentLabData = null; // Store current lab data
+
+    // Function to toggle computer status
+    function toggleComputerStatus(computerNumber) {
+        // Get the current status from changes or default to available (1)
+        const currentStatus = computerStatusChanges[computerNumber] !== undefined ?
+            computerStatusChanges[computerNumber] :
+            true; // Default to available if no change recorded
+
+        // Toggle the status
+        computerStatusChanges[computerNumber] = !currentStatus;
+
+        // Update the UI immediately
+        const computer = document.getElementById(`computer-${computerNumber}`);
+        if (computer) {
+            const isNowAvailable = computerStatusChanges[computerNumber];
+
+            // Toggle classes
+            computer.className = `flex flex-col items-center p-3 rounded-lg cursor-pointer transition-all ${isNowAvailable ? 'bg-green-100 hover:bg-green-200' : 'bg-red-100 hover:bg-red-200'
+                }`;
+
+            // Update icon color
+            const svg = computer.querySelector('svg');
+            svg.classList.remove(isNowAvailable ? 'text-red-600' : 'text-green-600');
+            svg.classList.add(isNowAvailable ? 'text-green-600' : 'text-red-600');
+
+            // Update status text
+            const statusText = computer.querySelector('span.text-xs');
+            statusText.textContent = isNowAvailable ? 'Available' : 'Unavailable';
+            statusText.classList.remove(isNowAvailable ? 'text-red-600' : 'text-green-600');
+            statusText.classList.add(isNowAvailable ? 'text-green-600' : 'text-red-600');
+        }
+
+        // Enable save button
+        document.getElementById('saveChangesBtn').disabled = false;
+    }
 
     // Function to toggle computers view
     async function toggleComputersView() {
@@ -335,115 +371,70 @@
             // Show computers grid
             computersGrid.classList.remove('hidden');
             viewBtn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd" />
-                </svg>
-                Hide Computers
-            `;
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd" />
+            </svg>
+            Hide Computers
+        `;
 
-            const lab_id = document.getElementById('modalLabID').value;
-
-            response = await fetch(`/admin/api/labs/find-lab/${lab_id}`);
-
-            if (!response.ok) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: `Failed to fetch computers. ${data.error}`
-                });
-                return;
+            if (!currentLabData) {
+                const lab_id = document.getElementById('modalLabID').value;
+                const response = await fetch(`/admin/api/labs/find-lab/${lab_id}`);
+                if (!response.ok) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to fetch lab data'
+                    });
+                    return;
+                }
+                currentLabData = await response.json();
             }
 
-            data = await response.json();
-
-
-
-            slots = data.data.slots;
-            computers = data.data.computers;
-
-            console.log({
-                slots,
-                computers
-            })
-
-            // Generate sample computers (in a real app, you'd fetch these from your API)
+            // Generate computers
             generateComputers({
-                'slots': slots,
-                'computers': computers
+                'slots': currentLabData.data.slots,
+                'computers': currentLabData.data.computers
             });
 
-            // Scroll the computers grid into view
             computersGrid.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
             // Hide computers grid
             computersGrid.classList.add('hidden');
             viewBtn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd" />
-                </svg>
-                View Computers
-            `;
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd" />
+            </svg>
+            View Computers
+        `;
         }
     }
 
-    function generateComputers({ slots, computers }) {
-        const container = document.getElementById('computersContainer');
-        container.innerHTML = '';
+    // Function to open modal with lab details
+    function openLabModal({ lab_id, lab_name, lab_description, vacant_time, slots }) {
+        // Reset previous state
+        computerStatusChanges = {};
+        currentLabData = null;
+        document.getElementById('saveChangesBtn').disabled = true;
 
-        // Convert string to array (if not already)
-        const computersArray = Array.from(computers);
+        // Hide computers grid if open
+        document.getElementById('computersGrid').classList.add('hidden');
+        document.getElementById('viewComputersBtn').innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd" />
+        </svg>
+        View Computers
+    `;
 
-        for (let i = 0; i < slots; i++) {
-            const computerNumber = i + 1;
-            const status = computersArray[i];  // 0-based index
+        // Set new lab data
+        document.getElementById('modalLabID').value = lab_id;
+        document.getElementById('modalLabTitle').textContent = `Lab ${lab_name} Details`;
+        document.getElementById('modalLabDescription').textContent = lab_description;
+        document.getElementById('modalLabSchedule').textContent = vacant_time;
+        document.getElementById('modalLabSeats').textContent = slots;
 
-            const computer = document.createElement('div');
-            computer.className = `flex flex-col ... ${status === '1' ? 'bg-green-100' : 'bg-red-100'}`;
-            computer.onclick = () => toggleComputerStatus(computerNumber);
-
-            computer.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 ${computers[i] == '1' ? 'text-green-600' : 'text-red-600'}" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd" />
-                </svg>
-                <span class="font-medium">PC-${i.toString().padStart(2, '0')}</span>
-                <span class="text-xs mt-1 ${computers[i] == '1' ? 'text-green-600' : 'text-red-600'}">${computers[i] == '1' ? 'Available' : 'Unavailable'}</span>
-            `;
-
-            container.appendChild(computer);
-        }
-    }
-
-    // Function to toggle computer status
-    function toggleComputerStatus(computerId) {
-        const computer = document.getElementById(`computer-${computerId}`);
-        const isCurrentlyAvailable = computer.classList.contains('bg-green-100');
-
-        // Toggle the visual state
-        if (isCurrentlyAvailable) {
-            // Change to unavailable
-            computer.classList.remove('bg-green-100', 'hover:bg-green-200');
-            computer.classList.add('bg-red-100', 'hover:bg-red-200');
-            computer.querySelector('svg').classList.remove('text-green-600');
-            computer.querySelector('svg').classList.add('text-red-600');
-            computer.querySelector('span.text-xs').textContent = 'Unavailable';
-            computer.querySelector('span.text-xs').classList.remove('text-green-600');
-            computer.querySelector('span.text-xs').classList.add('text-red-600');
-        } else {
-            // Change to available
-            computer.classList.remove('bg-red-100', 'hover:bg-red-200');
-            computer.classList.add('bg-green-100', 'hover:bg-green-200');
-            computer.querySelector('svg').classList.remove('text-red-600');
-            computer.querySelector('svg').classList.add('text-green-600');
-            computer.querySelector('span.text-xs').textContent = 'Available';
-            computer.querySelector('span.text-xs').classList.remove('text-red-600');
-            computer.querySelector('span.text-xs').classList.add('text-green-600');
-        }
-
-        // Track the change
-        computerStatusChanges[computerId] = !isCurrentlyAvailable;
-
-        // Enable save button if there are changes
-        document.getElementById('saveChangesBtn').disabled = false;
+        // Show the modal
+        document.getElementById('labModal').classList.remove('hidden');
     }
 
     // Function to save computer changes
@@ -463,6 +454,22 @@
 
         const data = await response.json();
 
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Computer status updated successfully!',
+            });
+        }
+        else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `Failed to update computer status. ${data.message}`
+            });
+        }
+
+        closeModa()
 
         // Reset changes tracker
         computerStatusChanges = {};
@@ -470,20 +477,61 @@
         // Disable save button
         document.getElementById('saveChangesBtn').disabled = true;
     }
-
     // Function to close modal
     function closeModal() {
-        document.getElementById('labModal').classList.add('hidden');
-        // Hide computers grid if open
+        // Reset all modal state
+        computerStatusChanges = {};
+        currentLabData = null;
+        document.getElementById('computersContainer').innerHTML = '';
         document.getElementById('computersGrid').classList.add('hidden');
-        // Reset view button text
+        document.getElementById('saveChangesBtn').disabled = true;
+
+        // Reset view button
         document.getElementById('viewComputersBtn').innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd" />
+        </svg>
+        View Computers
+    `;
+
+        // Hide modal
+        document.getElementById('labModal').classList.add('hidden');
+
+        // You should also call your function to refresh the labs table here
+        // Example: refreshLabsTable();
+    }
+
+    // Function to generate computers grid
+    function generateComputers({ slots, computers }) {
+        const container = document.getElementById('computersContainer');
+        container.innerHTML = '';
+
+        // Convert computers string to array if it isn't already
+        const computersArray = typeof computers === 'string' ? computers.split('') : computers;
+
+        // Create computers (matching the lab's seat count)
+        for (let i = 0; i < slots; i++) {
+            const computerNumber = i + 1;  // Display numbers starting from 1
+            const status = computersArray[i]; // Get status (0 or 1)
+
+            const computer = document.createElement('div');
+            computer.className = `flex flex-col items-center p-3 rounded-lg cursor-pointer transition-all ${status === '1' ? 'bg-green-100 hover:bg-green-200' : 'bg-red-100 hover:bg-red-200'}`;
+            computer.id = `computer-${computerNumber}`;
+            computer.onclick = () => toggleComputerStatus(computerNumber);
+
+            computer.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 ${status === '1' ? 'text-green-600' : 'text-red-600'}" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd" />
             </svg>
-            View Computers
+            <span class="font-medium">PC-${computerNumber.toString().padStart(2, '0')}</span>
+            <span class="text-xs mt-1 ${status === '1' ? 'text-green-600' : 'text-red-600'}">${status === '1' ? 'Available' : 'Unavailable'}</span>
         `;
+
+            container.appendChild(computer);
+        }
     }
+
+
     // Function to open modal with lab details
     function openLabModal({ lab_id, lab_name, lab_description, vacant_time, slots }) {
         // In a real app, you would fetch the lab details from your API
@@ -497,10 +545,6 @@
         document.getElementById('labModal').classList.remove('hidden');
     }
 
-    // Function to close modal
-    function closeModal() {
-        document.getElementById('labModal').classList.add('hidden');
-    }
 
     // Sample function to add a lab (you would connect this to your actual API)
     function addLab() {

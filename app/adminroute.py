@@ -1578,7 +1578,7 @@ def delete_laboratory(lab_id):
             'message': str(e)
         }), 500
 
-@admin.route('/api/labs/update-computer/<lab_id>')
+@admin.route('/api/labs/update-computer/<lab_id>', methods=['POST'])
 def update_computer(lab_id):
     """Update Laboratory Computers Slot"""
     global admin_account
@@ -1588,22 +1588,30 @@ def update_computer(lab_id):
 
     if admin_account is None:
         admin_account = Admin(**session.get('admin'))
+    if not request.is_json:
+        return jsonify({'success': False, 'message': 'Missing JSON'}), 400
+        
+    computerStatusChanges = request.get_json()
     
     try:
         # Get the new number of slots from the request
-        update_index = request.args.get('slots', type=int)
+        update_index = list(computerStatusChanges.keys())
+        status = list(computerStatusChanges.values())
+        print(update_index)
+        print(status)
 
         if update_index is None:
             return jsonify({'success': False, 'message': 'Slots parameter is required'}), 400
 
         # Call the update method from your Admin class
-        response = admin_account.update_computer_slots(lab_id=lab_id, slots=update_index)
+        response = admin_account.update_computer_slots(lab_id=lab_id, update_index=update_index, status=status)
 
         if response['success']:
             return jsonify({'success': True, 'message': 'Laboratory computers updated successfully!'}), 200
         else:
             return jsonify({'success': False, 'message': response['error']}), 500
     except Exception as e:
+        print(f'Error in catch {str(e)}')
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @admin.route('/api/labs/find-lab/<lab_id>')
