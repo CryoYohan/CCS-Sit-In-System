@@ -616,7 +616,8 @@ def fetch_labs():
             'lab_description': lab['lab_description'],
             'vacant_time': lab['vacant_time'],
             'slots': lab['slots'],
-            'image':lab['image']
+            'image':lab['image'],
+            'computers': lab['computers']
         }
         for lab in labs['data']
     ]
@@ -652,6 +653,7 @@ def fetch_lab(lab_id):
             'vacant_time': vacant_times,  # List of available schedules
             'slots': lab['slots'],
             'image': lab['image'],
+            'computers': lab['computers'],
             'success': True
         })
     else:
@@ -720,9 +722,10 @@ def reserve_lab():
     reserve_date = data.get('reserve_date')  # Expected format: "YYYY-MM-DD"
     time = data.get('time')  # Expected format: "HH:MM"
     fullDateTime = data.get('fullDateTime')  # Expected format: "YYYY-MM-DD HH:MM"
+    computer = data.get('computer')
 
     # Validate required fields
-    if not all([lab, purpose, reserve_date, time, fullDateTime]):
+    if not all([lab, purpose, reserve_date, time, fullDateTime, computer]):
         return jsonify({
             'success': False,
             'message': 'Missing required fields. Please fill out all fields.'
@@ -754,6 +757,7 @@ def reserve_lab():
         'request_date': current_datetime,  # Use the current datetime
         'reserve_date': fullDateTime,
         'status': 'Pending',
+        'computer': computer,
         'message': f'Hey {student.firstname.title()}! Your reservation request is sent. Please wait for confirmation.'
     }
 
