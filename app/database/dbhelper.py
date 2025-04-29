@@ -133,7 +133,11 @@ class Databasehelper:
         """Fetches all records from the specified table."""
         sql = f"SELECT * FROM {table}"
         return self.getprocess(sql)
-    
+
+    def fetchReservedStudents(self):
+        """Fetches all students with reserved status"""
+        sql = f"SELECT * FROM reservation_details WHERE user_status = 'Reserved'"
+        return self.getprocess(sql)
 
     def find_reservation_record(self,idno:str):
         """Finds a specific reservation record by idno."""

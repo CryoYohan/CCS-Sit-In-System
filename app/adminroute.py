@@ -2044,3 +2044,18 @@ def retrieve_logs():
         return jsonify({'success': True, 'data': logs_list}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
+
+@admin.route('/api/auto-sitin')
+def auto_sitin():
+    global admin_account
+    
+    if not session.get('admin'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+        
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+    
+    result = admin_account.auto_sitin_reserved_students()
+    status_code = 200 if result['success'] else 400
+    return jsonify(result), status_code
