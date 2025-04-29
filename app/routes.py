@@ -1151,3 +1151,31 @@ def expire_reservation(reservation_id):
     except Exception as e:
         print(f"ERROR CAUGHT! 3 {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@main.route('/api/total-sessions')
+def total_sessions():
+    """Return total remaining sessions for the logged-in student"""
+    global student
+    if not session.get('student'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    if student is None:
+        student = Student(**session.get('student'))
+
+    try:
+        result = student.get_remaining_sessions(idno=student.idno)
+        
+        if not result['success']:
+            return jsonify(result), 400
+            
+        return jsonify({
+            'success': True,
+            'remaining_sessions': result['data']
+        }), 200
+
+    except Exception as e:
+        print(f"Error in total_sessions: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to fetch session data'
+        }), 500

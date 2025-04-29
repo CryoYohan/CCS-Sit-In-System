@@ -188,3 +188,13 @@ class Databasehelper:
 
         sql = f"DELETE FROM {table} WHERE {keys[0]} = ?"
         return self.postprocess(sql, (values[0],))
+
+
+    def purpose_statistics(self):
+        """Lab purpose stats"""
+        sql = """SELECT reason, total 
+                FROM sitinPurposeStatistics 
+                WHERE total != 0
+                ORDER BY total DESC """
+        
+        return self.getprocess(sql)
