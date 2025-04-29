@@ -724,6 +724,8 @@ def reserve_lab():
     fullDateTime = data.get('fullDateTime')  # Expected format: "YYYY-MM-DD HH:MM"
     computer = data.get('computer')
 
+    fix_computer_index = int(computer) + 1
+
     # Validate required fields
     if not all([lab, purpose, reserve_date, time, fullDateTime, computer]):
         return jsonify({
@@ -757,9 +759,10 @@ def reserve_lab():
         'request_date': current_datetime,  # Use the current datetime
         'reserve_date': fullDateTime,
         'status': 'Pending',
-        'computer': computer,
+        'computer': fix_computer_index,
         'message': f'Hey {student.firstname.title()}! Your reservation request is sent. Please wait for confirmation.'
     }
+    print(reservation_data)
 
     # Call the reservation function
     response = reservation.request_reservation(**reservation_data)
