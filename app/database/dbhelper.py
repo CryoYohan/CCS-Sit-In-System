@@ -140,6 +140,11 @@ class Databasehelper:
         sql = f"SELECT * FROM reservation WHERE idno = ? AND status = 'Pending'"
         return self.getprocess(sql, (idno,))
     
+    def find_upcoming_reservation(self,idno):
+        """Finds a specific reservation record by idno."""
+        sql = f"SELECT * FROM reservation WHERE lab_status = 'Upcoming' AND idno = ?"
+        return self.getprocess(sql, (idno,))
+    
     def find_reservation_info(self, reservation_id: str):
         """Finds a specific record by reservation_id."""
         sql = f"SELECT * FROM student_reservations_info WHERE reservation_id = ?"

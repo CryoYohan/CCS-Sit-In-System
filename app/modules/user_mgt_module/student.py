@@ -96,3 +96,13 @@ class Student(User):
             return {'success': False, 'error': 'Rank not found'}
         except Exception as e:
             return {'success': False, 'error': str(e)}  
+        
+    def get_reservation_notifications(self, idno):
+        """Get reservation notifications"""
+        try:
+            upcoming_reservation = self.db.find_upcoming_reservation(idno=idno)
+            if upcoming_reservation:
+                return {'success': True, 'data': upcoming_reservation}
+            return {'success': False, 'error': 'No upcoming reservations found'}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
