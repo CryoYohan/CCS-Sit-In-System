@@ -483,48 +483,9 @@
         }
     });
 
-    /* async function fetchTotalSitins() {
-        try {
-            const student_idno = '{{ student.idno }}'; // Ensure this is correctly populated
-            const response = await fetch(`/api/session-records/${student_idno}`, {
-                credentials: 'include', // Include cookies in the request
-            });
+    async function totalSessions() {
 
-            // Handle unauthorized access
-            if (response.status === 401) {
-                window.location.href = '/login'; // Redirect to login page
-                return;
-            }
-
-            // Handle other HTTP errors
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            // Parse the response as JSON
-            const data = await response.json();
-
-            // Check if the response is an array (or has a `data` property)
-            if (Array.isArray(data)) {
-                const totalSitinsCount = data.length; // Get the count of sit-ins
-                document.getElementById('total-sitins').textContent = totalSitinsCount;
-            } else if (data.success && Array.isArray(data.data)) {
-                // If the response has a `data` property
-                const totalSitinsCount = data.data.length;
-                document.getElementById('total-sitins').textContent = totalSitinsCount;
-            } else {
-                // Handle invalid response format
-                throw new Error('Invalid response format from the server');
-            }
-        } catch (error) {
-            console.error('Fetch error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Failed to fetch total sit-ins. Please try again later.',
-            });
-        }
-    } */
+    }
 
     async function fetchAnnouncements1() {
         try {

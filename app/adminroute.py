@@ -2059,3 +2059,24 @@ def auto_sitin():
     result = admin_account.auto_sitin_reserved_students()
     status_code = 200 if result['success'] else 400
     return jsonify(result), status_code
+
+
+@admin.route('/api/sitin-purpose-stats')
+def sitin_purpose_stats():
+    """Get sit-in purpose statistics"""
+    global admin_account
+
+    if not session.get('admin'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    if admin_account is None:
+        admin_account = Admin(**session.get('admin'))
+
+    try:
+        result = admin_account.get_purpose_stats()
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+    

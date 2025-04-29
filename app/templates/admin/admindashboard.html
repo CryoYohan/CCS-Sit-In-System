@@ -135,7 +135,7 @@
                     <div class="grid gap-2 grid-cols-1 lg:grid-cols-2">
                         <!-- Sit-in Purposes Chart -->
                         <div class="bg-white shadow-lg p-4" id="purposeChart"></div>
-                        
+
                         <!-- Sit-in Trends Chart -->
                         <div class="bg-white shadow-lg p-4" id="trendChart"></div>
                     </div>
@@ -196,71 +196,77 @@
         // Initialize charts after data is loaded
         initCharts();
     });
+    // Sit-in Purposes Chart (Pie Chart)
+    function initPurposeChart() {
+        const labels = [
+            "Python", "C#", "Java", "WEB DEV", "Database",
+            "Digital Logic & Design", "Embedded System & IoT",
+            "System Integration & Architecture", "Computer Application",
+            "Project Management", "IT Trends", "Technopreneurship", "Capstone"
+        ];
 
-    function initCharts() {
-        // Sit-in Purposes Chart (Bar Chart)
-        var purposeOptions = {
-            series: [{
-                name: 'Students',
-                data: [45, 32, 28, 15, 8]
-            }],
+        const values = [30, 13, 5, 3, 0, 0, 1, 0, 0, 17, 3, 0, 8];
+
+        const purposeOptions = {
+            series: values,
             chart: {
-                type: 'bar',
+                type: 'pie',
                 height: 350,
-                toolbar: {
-                    show: false
+                toolbar: { show: false }
+            },
+            labels: labels,
+            colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+                '#EC4899', '#F97316', '#22C55E', '#6366F1', '#14B8A6',
+                '#EAB308', '#FB923C', '#7C3AED'],
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: { width: 200 },
+                    legend: { position: 'bottom' }
                 }
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 4,
-                    horizontal: false,
-                    distributed: true,
-                    colors: {
-                        ranges: [{
-                            from: 0,
-                            to: 100,
-                            color: '#3B82F6' // Blue
-                        }]
-                    }
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
-            xaxis: {
-                categories: ['Academic Study', 'Group Project', 'Research', 'Exam Prep', 'Other'],
-                title: {
-                    text: 'Purpose of Visit'
-                }
-            },
-            yaxis: {
-                title: {
-                    text: 'Number of Students'
-                }
-            },
+            }],
             title: {
                 text: 'Sit-in Purposes Distribution',
                 align: 'center',
-                style: {
-                    fontSize: '16px',
-                    fontWeight: 'bold'
-                }
+                style: { fontSize: '16px', fontWeight: 'bold' }
+            },
+            legend: {
+                position: 'right',
+                offsetY: 0,
+                height: 230,
             },
             tooltip: {
                 y: {
-                    formatter: function (val) {
-                        return val + " students";
-                    }
+                    formatter: (val) => val + " students"
                 }
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: (val, opts) => {
+                    const total = values.reduce((a, b) => a + b, 0);
+                    const count = values[opts.seriesIndex];
+                    const percentage = total ? ((count / total) * 100).toFixed(1) : 0;
+                    return `${labels[opts.seriesIndex]}: ${count} (${percentage}%)`;
+                },
+                dropShadow: { enabled: false }
             }
         };
 
-        var purposeChart = new ApexCharts(document.querySelector("#purposeChart"), purposeOptions);
-        purposeChart.render();
+        const chartEl = document.querySelector("#purposeChart");
+        if (chartEl) {
+            const chart = new ApexCharts(chartEl, purposeOptions);
+            chart.render();
+        } else {
+            console.error("Chart container #purposeChart not found.");
+        }
+    }
 
-        // Sit-in Trends Chart (Line Chart)
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initPurposeChart);
+
+    function initCharts() {
+
+        // Sit-in Trends Chart (Line Chart) - Keep this unchanged
         var trendOptions = {
             series: [{
                 name: 'Sit-ins',
@@ -320,36 +326,6 @@
 
         var trendChart = new ApexCharts(document.querySelector("#trendChart"), trendOptions);
         trendChart.render();
-    }
-
-    function data() {
-        return {
-            isSideMenuOpen: false,
-            toggleSideMenu() {
-                this.isSideMenuOpen = !this.isSideMenuOpen
-            },
-            closeSideMenu() {
-                this.isSideMenuOpen = false
-            },
-            isNotificationsMenuOpen: false,
-            toggleNotificationsMenu() {
-                this.isNotificationsMenuOpen = !this.isNotificationsMenuOpen
-            },
-            closeNotificationsMenu() {
-                this.isNotificationsMenuOpen = false
-            },
-            isProfileMenuOpen: false,
-            toggleProfileMenu() {
-                this.isProfileMenuOpen = !this.isProfileMenuOpen
-            },
-            closeProfileMenu() {
-                this.isProfileMenuOpen = false
-            },
-            isPagesMenuOpen: false,
-            togglePagesMenu() {
-                this.isPagesMenuOpen = !this.isPagesMenuOpen
-            },
-        }
     }
 </script>
 {% endblock %}

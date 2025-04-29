@@ -165,3 +165,5 @@ class Student(User):
         except Exception as e:
             # Consider logging the full error here for debugging
             return {'success': False, 'error': str(e)}
+        
+        

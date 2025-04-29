@@ -493,6 +493,24 @@ class Admin(User):
                 'success': False,
                 'error': f'Failed to auto sit-in students: {str(e)}'
             }
+    
+    def get_purpose_stats(self):
+        """Get sit-in purpose statistics where total != 0"""
+        try:
+            results = self.db.purpose_statistics()
+            
+            return {
+                'success': True,
+                'data': {
+                    'labels': [row['reason'] for row in results],
+                    'values': [row['total'] for row in results]
+                }
+            }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e)
+            }
 
     def __str__(self):
         return f"{self.firstname.title()} {self.middlename[0].capitalize()}. {self.lastname.title()}"
