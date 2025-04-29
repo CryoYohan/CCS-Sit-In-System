@@ -106,3 +106,19 @@ class Student(User):
             return {'success': False, 'error': 'No upcoming reservations found'}
         except Exception as e:
             return {'success': False, 'error': str(e)}
+
+    def confirm_reservation(self, reservation_id, message):
+        """Confirm reservation"""
+        try:
+            self.db.update_record(table='reservation',reservation_id=reservation_id, lab_status='Confirmed', message=message)
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    def expire_reservation(self, reservation_id,message):
+        """Mark reservation as expired"""
+        try:
+            self.db.update_record(table='reservation', reservation_id=reservation_id, lab_status='Expired', message=message)
+            return {'success': True}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
