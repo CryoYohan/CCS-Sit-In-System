@@ -115,10 +115,53 @@ class Student(User):
         except Exception as e:
             return {'success': False, 'error': str(e)}
 
-    def expire_reservation(self, reservation_id,message):
+    def expire_reservation(self, reservation_id):
         """Mark reservation as expired"""
         try:
-            self.db.update_record(table='reservation', reservation_id=reservation_id, lab_status='Expired', message=message)
+            reservation = self.db.find_reservation_info(reservation_id=reservation_id)
+            if not reservation:
+                return {'success': False, 'error': 'Reservation not found'}
+
+            reservation = reservation[0]  # Get first (and presumably only) reservation
+            
+            # Update user status
+            user_status = 'Idle'
+            user_info_set_status = self.db.fetchOne(table='user', idno=reservation['idno'])
+            if user_info_set_status:
+                self.db.update_record(table='user', idno=reservation['idno'], status=user_status)
+
+            # Update reservation status
+            message = f'Hey {reservation["firstname"]}! Your reservation has expired.'
+            self.db.update_record(
+                table='reservation',
+                reservation_id=reservation_id,
+                message=message,
+                lab_status='Expired'
+            )
+            
+            # Update lab computer status
+            lab = self.db.fetchOne(table='lab', lab_id=reservation['lab_id'])
+            if not lab:
+                return {'success': False, 'message': 'Lab not found'}
+
+            computer_index = reservation['computer'] - 1
+            computers_list = list(lab[0]['computers'])
+            
+            # Validate computer index
+            if computer_index < 0 or computer_index >= len(computers_list):
+                return {'success': False, 'error': 'Invalid computer number in reservation'}
+            
+            # Mark computer as available
+            computers_list[computer_index] = '1'
+            updated_computers = ''.join(computers_list)
+            
+            self.db.update_record(
+                table='lab',
+                lab_id=reservation['lab_id'],
+                computers=updated_computers
+            )
+
             return {'success': True}
         except Exception as e:
+            # Consider logging the full error here for debugging
             return {'success': False, 'error': str(e)}
