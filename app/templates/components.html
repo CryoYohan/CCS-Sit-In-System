@@ -39,7 +39,7 @@ action,user, image) %} {% if not user_in_login_page %}
   <div class="relative flex items-center space-x-8 pr-12">
     <!-- Notification Button (existing) -->
     <div class="relative">
-      <button id="notification-button"
+      <button id="notification-button-admin"
         class="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white relative"
         aria-label="Notifications">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,7 +51,7 @@ action,user, image) %} {% if not user_in_login_page %}
       </button>
 
       <!-- Notification Dropdown -->
-      <div id="notification-dropdown"
+      <div id="notification-dropdown-admin"
         class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-50 divide-y divide-gray-100 dark:divide-gray-600">
         <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
           <p class="font-medium">Notifications</p>
@@ -145,6 +145,20 @@ action,user, image) %} {% if not user_in_login_page %}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  document
+    .getElementById("profile-menu-admin")
+    ?.addEventListener("click", function () {
+      document.getElementById("dropdown-admin").classList.toggle("hidden");
+    });
+
+  const notificationButton = document.getElementById('notification-button-admin');
+  const notificationDropdown = document.getElementById('notification-dropdown-admin');
+
+
+  // Toggle dropdown
+  notificationButton.addEventListener('click', () => {
+    notificationDropdown.classList.toggle('hidden');
+  });
   // Notification handling
   let notifications = [];
   let unreadCount = 0;
@@ -367,11 +381,11 @@ action,user, image) %} {% if not user_in_login_page %}
         </div>
         <div class="py-1 max-h-96 overflow-y-auto">
           <!-- Empty State -->
-          <div id="empty-notifications" class="px-4 py-3 text-center text-sm text-gray-500 dark:text-gray-400">
+          <div id="empty-notifications-student" class="px-4 py-3 text-center text-sm text-gray-500 dark:text-gray-400">
             No new notifications
           </div>
           <!-- Notification Items (dynamically populated) -->
-          <div id="notification-items"></div>
+          <div id="notification-items-student"></div>
         </div>
         <div class="py-1">
           <a href="#"
@@ -430,6 +444,72 @@ action,user, image) %} {% if not user_in_login_page %}
   </div>
 </nav>
 <script>
+  document
+    .getElementById("profile-menu-user")
+    ?.addEventListener("click", function () {
+      document.getElementById("dropdown-user").classList.toggle("hidden");
+    });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const notificationButton = document.getElementById('notification-button');
+    const notificationDropdown = document.getElementById('notification-dropdown');
+    const notificationItems = document.getElementById('notification-items-student');
+    const emptyState = document.getElementById('empty-notifications-student');
+
+    // Toggle dropdown
+    notificationButton.addEventListener('click', () => {
+      notificationDropdown.classList.toggle('hidden');
+    });
+
+    // Fetch reservation on page load
+    fetch('/api/notify-reservation', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(res => res.json())
+      .then(result => {
+        if (!result.success) {
+          console.error("Error:", result.error);
+          return;
+        }
+
+        const data = result.data;
+        const reserveDate = new Date(data.reserve_date);
+        const today = new Date();
+
+        if (reserveDate.toDateString() === today.toDateString()) {
+          emptyState.classList.add('hidden'); // hide 'No notifications'
+          const notifElement = document.createElement('div');
+          notifElement.className = "px-4 py-2 text-sm text-gray-800 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600";
+          notifElement.textContent = `🔔 You have a reservation today in Lab ${data.lab_id}`;
+
+          notifElement.addEventListener('click', () => {
+            Swal.fire({
+              title: 'Your Reservation Today',
+              html: `
+            <b>Lab:</b> ${data.lab_id}<br>
+            <b>Computer:</b> ${data.computer}<br>
+            <b>Purpose:</b> ${data.purpose}<br>
+            <b>Status:</b> ${data.lab_status}<br>
+            <b>Time:</b> ${new Date(data.reserve_date).toLocaleString()}
+          `,
+              icon: 'info',
+              confirmButtonColor: '#3085d6',
+              confirmButtonText: 'Okay!'
+            });
+          });
+
+          notificationItems.appendChild(notifElement);
+          document.getElementById('notification-badge').classList.remove('hidden');
+        }
+      })
+      .catch(error => {
+        console.error("Fetch error:", error);
+      });
+  });
+
   // Function to create fire animation
   function createFireAnimation(rank) {
     const colors = {
@@ -481,6 +561,7 @@ action,user, image) %} {% if not user_in_login_page %}
       const rankElement = document.getElementById('rankingP');
       const response = await fetch(`/api/myRank/${"{{ user.idno }}"}`);
 
+
       if (response.status === 401) {
         window.location.href = '/login';
         return;
@@ -523,7 +604,10 @@ action,user, image) %} {% if not user_in_login_page %}
       console.error('Fetch error:', error);
       document.getElementById('rankingP').textContent = 'N/A';
     }
+
   });
+
+
 </script>
 <style>
   @keyframes fire-flicker {
@@ -604,80 +688,6 @@ action,user, image) %} {% if not user_in_login_page %}
 </nav>
 {% endif %}
 
-<script>
-  document
-    .getElementById("profile-menu-admin")
-    ?.addEventListener("click", function () {
-      document.getElementById("dropdown-admin").classList.toggle("hidden");
-    });
-  document
-    .getElementById("profile-menu-user")
-    ?.addEventListener("click", function () {
-      document.getElementById("dropdown-user").classList.toggle("hidden");
-    });
-  // Toggle notification dropdown
-  document.getElementById('notification-button').addEventListener('click', function (e) {
-    e.stopPropagation();
-    document.getElementById('notification-dropdown').classList.toggle('hidden');
-    // Mark notifications as read when dropdown is opened
-    document.getElementById('notification-badge').classList.add('hidden');
-  });
-
-  // Close dropdown when clicking outside
-  document.addEventListener('click', function () {
-    document.getElementById('notification-dropdown').classList.add('hidden');
-  });
-
-  // Sample function to add notifications (replace with real data)
-  function loadNotifications() {
-    // This would be replaced with actual API call
-    const notifications = [
-      // Sample data - replace with real notifications
-      // { id: 1, message: "Your reservation has been approved", time: "2 hours ago", read: false },
-      // { id: 2, message: "New message from Lab Admin", time: "1 day ago", read: true }
-    ];
-
-    const notificationItems = document.getElementById('notification-items');
-    const emptyState = document.getElementById('empty-notifications');
-    const badge = document.getElementById('notification-badge');
-
-    notificationItems.innerHTML = '';
-
-    if (notifications.length > 0) {
-      emptyState.classList.add('hidden');
-
-      const unreadCount = notifications.filter(n => !n.read).length;
-      if (unreadCount > 0) {
-        badge.classList.remove('hidden');
-      }
-
-      notifications.forEach(notification => {
-        const item = document.createElement('a');
-        item.href = "#"; // Replace with actual link
-        item.className = `flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600 ${!notification.read ? 'bg-blue-50 dark:bg-gray-800' : ''}`;
-        item.innerHTML = `
-          <div class="flex-shrink-0">
-            <svg class="w-5 h-5 text-blue-500 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd"></path>
-            </svg>
-          </div>
-          <div class="w-full pl-3">
-            <div class="text-sm text-gray-600 dark:text-gray-200 ${!notification.read ? 'font-semibold' : ''}">
-              ${notification.message}
-              <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${notification.time}</div>
-            </div>
-          </div>
-        `;
-        notificationItems.appendChild(item);
-      });
-    } else {
-      emptyState.classList.remove('hidden');
-    }
-  }
-
-  // Load notifications when page loads
-  document.addEventListener('DOMContentLoaded', loadNotifications);
-</script>
 
 {% endmacro %}
 {% macro user_card(student) -%}

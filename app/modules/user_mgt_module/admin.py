@@ -205,8 +205,14 @@ class Admin(User):
         try:
             reservation = self.db.find_reservation_info(reservation_id=reservation_id)
             today = datetime.now()
+            user_status = 'Reserved'
+            user_info_set_status = self.db.fetchOne(table='user', idno=reservation[0]['idno'])
+
+            if user_info_set_status:
+                self.db.update_record(table='user', idno=reservation[0]['idno'], status=user_status)
+
             message = f'Hey {reservation[0]["firstname"]}! Your reservation has been approved. Please proceed to the lab at {reservation[0]["lab_id"]} on {reservation[0]["reserve_date"]}.'
-            self.db.update_record(table='reservation',reservation_id=reservation_id,status='Approved',message=message, staff_idno=admin.idno, approved_on=today)
+            self.db.update_record(table='reservation',reservation_id=reservation_id,status='Approved',message=message, staff_idno=admin.idno, approved_on=today, lab_status='Upcoming')
             return {'success': True}
         except Exception as e:
             return {'success': False, 'message': f'Approving Reservation ERRROR: {str(e)}'}

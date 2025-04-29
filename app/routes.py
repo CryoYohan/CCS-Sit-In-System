@@ -1056,3 +1056,50 @@ def my_rank(idno):
 
 
 
+@main.route('/api/notify-reservation', methods=['POST'])
+def notify_reservation():
+    """Fetch reservation notifications"""
+    global student
+    if not session.get('student'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    if student is None:
+        student = Student(**session.get('student'))
+
+    try:
+        notification = student.get_reservation_notifications(idno=student.idno)
+        notification_data = notification['data'][0]
+
+        date_str = notification_data['reserve_date']
+
+        try:
+            reserve_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            reserve_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M")
+
+        now = datetime.now()
+
+        if reserve_date.date() == now.date():
+            print("Today's your reservation!")
+        else:
+            print("Today's not your reservation")
+
+        return jsonify({
+            'success': True,
+            'data': {
+                'reservation_id': notification_data['reservation_id'],
+                'idno': notification_data['idno'],
+                'request_date': notification_data['request_date'],
+                'reserve_date': notification_data['reserve_date'],
+                'lab_status': notification_data['status'],
+                'message': notification_data['message'],
+                'staff_idno': notification_data['staff_idno'],
+                'purpose': notification_data['purpose'],
+                'lab_id': notification_data['lab_id'],
+                'computer': notification_data['computer'],
+            }
+        }), 200
+
+    except Exception as e:
+        print(f"ERROR CAUGHT! {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
