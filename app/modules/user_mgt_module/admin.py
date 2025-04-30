@@ -220,8 +220,7 @@ class Admin(User):
             
             computers_list = list(lab[0]['computers'])
             computers_list[reservation[0]['computer'] - 1] = '0'  # Mark the computer as unavailable
-            print(reservation[0]['computer'])
-            print(reservation[0]['computer'] - 1)
+
             updated_computers = ''.join(computers_list)
             print(f'Updated computers list: {updated_computers}')
 
@@ -458,6 +457,42 @@ class Admin(User):
             return {'success': True, 'data': logs}
         except Exception as e:
             return {'success': False, 'error': str(e)}
+
+
+    def auto_sitin_reserved_students(self):
+        """Automatically set status to 'In-lab' for students whose reservation time has passed"""
+        try:
+            reserved_students = self.db.fetchReservedStudents()
+            current_datetime = datetime.now()
+            updated_count = 0
+
+            for student in reserved_students:
+                try:
+                    # Parse WITHOUT seconds (matches your SQLite format)
+                    reserve_date = datetime.strptime(student['reserve_date'], '%Y-%m-%d %H:%M')
+                    
+                    if reserve_date <= current_datetime:  # Time has passed
+                        self.db.update_record(
+                            table='user',
+                            idno=student['idno'],
+                            status='In-lab'
+                        )
+                        updated_count += 1
+                        
+                except ValueError:
+                    continue  # Skip invalid formats
+
+            return {
+                'success': True,
+                'message': f'Updated {updated_count} students to In-lab status',
+                'updated_count': updated_count
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Failed to auto sit-in students: {str(e)}'
+            }
 
     def __str__(self):
         return f"{self.firstname.title()} {self.middlename[0].capitalize()}. {self.lastname.title()}"
