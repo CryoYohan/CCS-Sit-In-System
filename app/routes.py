@@ -1074,7 +1074,7 @@ def notify_reservation():
         notification_data = notification['data'][0]
     
     except Exception as e:
-        print(f"ERROR CAUGHT! 1 {str(e)}")
+        print(f"ERROR CAUGHT! Empty Notif {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
     date_str = notification_data['reserve_date']
@@ -1144,9 +1144,7 @@ def expire_reservation(reservation_id):
 
     try:
 
-        message = f'Hey {student.firstname}! Your reservation request has expired due to not showing up in time. Please be on time next time.'
-
-        response = student.expire_reservation(reservation_id=reservation_id,message=message)
+        response = student.expire_reservation(reservation_id=reservation_id)
 
         return jsonify(response), 200
 
