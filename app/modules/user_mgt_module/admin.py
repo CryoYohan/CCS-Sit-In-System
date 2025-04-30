@@ -276,6 +276,7 @@ class Admin(User):
                     'reason': reservation[0]['reason'],
                     'completed_at': datetime.now()
             }
+            print(data)
             
             # Insert into sitin_record with the correct log-off time and logged_off_by
             self.db.add_record(
