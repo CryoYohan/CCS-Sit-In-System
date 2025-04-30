@@ -275,6 +275,8 @@ class Admin(User):
                     'status': 'Completed',
                     'reason': reservation[0]['reason'],
                     'completed_at': datetime.now()
+
+                    
             }
             print(data)
             
