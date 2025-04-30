@@ -1068,10 +1068,12 @@ def notify_reservation():
 
     if student is None:
         student = Student(**session.get('student'))
-
+    print('TEST 1')
     try:
         notification = student.get_reservation_notifications(idno=student.idno)
         notification_data = notification['data'][0]
+    
+        print('TEST 2')
     
     except Exception as e:
         print(f"ERROR CAUGHT! Empty Notif {str(e)}")
