@@ -213,6 +213,19 @@ class Admin(User):
 
             message = f'Hey {reservation[0]["firstname"]}! Your reservation has been approved. Please proceed to the lab at {reservation[0]["lab_id"]} on {reservation[0]["reserve_date"]}.'
             self.db.update_record(table='reservation',reservation_id=reservation_id,status='Approved',message=message, staff_idno=admin.idno, approved_on=today, lab_status='Upcoming')
+            
+            lab = self.db.fetchOne(table='lab', lab_id=reservation[0]['lab_id'])
+            if not lab:
+                return {'success': False, 'message': 'Lab not found'}
+            
+            computers_list = list(lab[0]['computers'])
+            computers_list[reservation[0]['computer'] - 1] = '0'  # Mark the computer as unavailable
+            print(reservation[0]['computer'])
+            print(reservation[0]['computer'] - 1)
+            updated_computers = ''.join(computers_list)
+            print(f'Updated computers list: {updated_computers}')
+
+            self.db.update_record(table='lab',lab_id=reservation[0]['lab_id'], computers=updated_computers)
             return {'success': True}
         except Exception as e:
             return {'success': False, 'message': f'Approving Reservation ERRROR: {str(e)}'}
