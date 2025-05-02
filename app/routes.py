@@ -1069,37 +1069,84 @@ def notify_reservation():
     try:
         notification = student.get_reservation_notifications(idno=student.idno)
         notification_data = notification['data'][0]
+    
+    except Exception as e:
+        print(f"ERROR CAUGHT! 1 {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-        date_str = notification_data['reserve_date']
+    date_str = notification_data['reserve_date']
 
-        try:
-            reserve_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            reserve_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M")
+    try:
+        reserve_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        reserve_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M")
 
-        now = datetime.now()
+    now = datetime.now()
 
-        if reserve_date.date() == now.date():
-            print("Today's your reservation!")
-        else:
-            print("Today's not your reservation")
+    if reserve_date.date() == now.date():
+        print("Today's your reservation!")
+    else:
+        print("Today's not your reservation")
 
-        return jsonify({
-            'success': True,
-            'data': {
-                'reservation_id': notification_data['reservation_id'],
-                'idno': notification_data['idno'],
-                'request_date': notification_data['request_date'],
-                'reserve_date': notification_data['reserve_date'],
-                'lab_status': notification_data['status'],
-                'message': notification_data['message'],
-                'staff_idno': notification_data['staff_idno'],
-                'purpose': notification_data['purpose'],
-                'lab_id': notification_data['lab_id'],
-                'computer': notification_data['computer'],
-            }
-        }), 200
+    return jsonify({
+        'success': True,
+        'data': {
+            'reservation_id': notification_data['reservation_id'],
+            'idno': notification_data['idno'],
+            'request_date': notification_data['request_date'],
+            'reserve_date': notification_data['reserve_date'],
+            'lab_status': notification_data['status'],
+            'message': notification_data['message'],
+            'purpose': notification_data['purpose'],
+            'lab_name': notification_data['lab_name'],
+            'computer': notification_data['computer'],
+        }
+    }), 200
+
+
+@main.route('/api/confirm-reservation/<reservation_id>')
+def confirm_reservation(reservation_id):
+    """Confirm reservation"""
+    global student
+    if not session.get('student'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    if student is None:
+        student = Student(**session.get('student'))
+
+    try:
+
+        if not reservation_id:
+            return jsonify({'success': False, 'error': 'Missing reservation ID or ID number'}), 400
+
+        message = f'Hey {student.firstname}! Your reservation request is confirmed. Please be on time.'
+
+        response = student.confirm_reservation(reservation_id=reservation_id,message=message)
+
+        return jsonify(response), 200
 
     except Exception as e:
-        print(f"ERROR CAUGHT! {str(e)}")
+        print(f"ERROR CAUGHT! 2 {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@main.route('/api/expire-reservation/<reservation_id>')
+def expire_reservation(reservation_id):
+    """Expire reservation"""
+    global student
+    if not session.get('student'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    if student is None:
+        student = Student(**session.get('student'))
+
+    try:
+
+        message = f'Hey {student.firstname}! Your reservation request has expired due to not showing up in time. Please be on time next time.'
+
+        response = student.expire_reservation(reservation_id=reservation_id,message=message)
+
+        return jsonify(response), 200
+
+    except Exception as e:
+        print(f"ERROR CAUGHT! 3 {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
